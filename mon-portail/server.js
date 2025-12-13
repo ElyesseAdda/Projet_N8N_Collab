@@ -28,6 +28,14 @@ try {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Middleware de logging pour diagnostiquer les requêtes (uniquement en production pour debug)
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        console.log(`📥 Requête reçue: ${req.method} ${req.path} depuis ${req.ip}`);
+        next();
+    });
+}
+
 // Configuration des headers de sécurité
 // Note: Certains headers (comme Cross-Origin-Opener-Policy) nécessitent HTTPS pour fonctionner
 // Ils seront automatiquement ignorés en HTTP mais fonctionneront dès que HTTPS sera configuré
@@ -169,12 +177,16 @@ app.get('/api/me', (req, res) => {
 // En production, servir les fichiers React buildés
 // IMPORTANT: Ne pas intercepter /n8n - laissé au reverse proxy Traefik
 if (process.env.NODE_ENV === 'production') {
+    console.log('📁 Configuration production: chargement des fichiers statiques depuis dist/');
     // Servir les fichiers statiques (CSS, JS, images, etc.) en premier
     // express.static servira automatiquement les fichiers qui existent dans dist/
-    app.use(express.static(path.join(__dirname, 'dist')));
+    const distPath = path.join(__dirname, 'dist');
+    console.log(`📁 Chemin dist: ${distPath}`);
+    app.use(express.static(distPath));
     
     // Protéger les routes API qui nécessitent une authentification
     // Les routes /api/* (sauf /api/login et /api/logout) nécessitent une authentification
+    console.log('🔒 Configuration des routes API protégées');
     app.use('/api', (req, res, next) => {
         // Laisser passer /api/login et /api/logout sans authentification
         if (req.path === '/login' || req.path === '/logout') {
@@ -188,6 +200,7 @@ if (process.env.NODE_ENV === 'production') {
     // Cela permet à React Router de gérer le routing côté client
     // React vérifiera l'authentification via /api/me et affichera le login si nécessaire
     // IMPORTANT: Ce middleware doit être le dernier pour ne pas intercepter les routes API
+    console.log('🌐 Configuration du routing SPA (catch-all pour index.html)');
     app.use((req, res, next) => {
         // Ne jamais servir index.html pour /n8n (doit être routé vers n8n par Traefik)
         if (req.path.startsWith('/n8n')) {
@@ -839,10 +852,15 @@ server.listen(PORT, '0.0.0.0', () => {
         console.log(`✅ Serveur Node en production`);
         console.log(`   Accessible via: http://zoniahub.fr ou http://www.zoniahub.fr`);
         console.log(`   Écoute sur le port ${PORT} (routé par Traefik)`);
+        console.log(`   📡 Écoute sur 0.0.0.0:${PORT} (toutes les interfaces réseau)`);
     } else {
         console.log(`Serveur Node prêt sur http://localhost:${PORT}`);
     }
     console.log('✅ Serveur démarré avec succès. En attente de requêtes...');
+    
+    // Log pour confirmer l'adresse d'écoute
+    const addr = server.address();
+    console.log(`🔍 Adresse d'écoute réelle: ${JSON.stringify(addr)}`);
 });
 
 // Gestion des erreurs de démarrage du serveur
@@ -872,4 +890,7 @@ server.on('listening', () => {
     const addr = server.address();
     const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     console.log(`✅ Serveur HTTP en écoute sur ${bind}`);
+    if (typeof addr === 'object') {
+        console.log(`   📡 Interface: ${addr.address}, Port: ${addr.port}, Famille: ${addr.family}`);
+    }
 });
