@@ -89,7 +89,13 @@ function requireAuth(req, res, next) {
     if (req.session && req.session.user) {
         return next();
     }
-    res.redirect('/login.html');
+    // Pour les routes API, retourner un 401 JSON
+    if (req.path.startsWith('/api')) {
+        return res.status(401).json({ error: 'Non authentifié' });
+    }
+    // Pour les autres routes (pages), laisser passer pour que React gère l'authentification
+    // React vérifiera l'authentification via /api/me et affichera le login si nécessaire
+    return next();
 }
 
 // Routes d'authentification
@@ -144,26 +150,32 @@ app.get('/api/me', (req, res) => {
 // En production, servir les fichiers React buildés
 // IMPORTANT: Ne pas intercepter /n8n - laissé au reverse proxy Traefik
 if (process.env.NODE_ENV === 'production') {
+    // Servir les fichiers statiques (CSS, JS, images, etc.) en premier
+    // express.static servira automatiquement les fichiers qui existent dans dist/
     app.use(express.static(path.join(__dirname, 'dist')));
     
-    // Protéger toutes les routes sauf /api, /socket.io et /n8n
-    app.use((req, res, next) => {
-        // Laisser passer /n8n (géré par Traefik -> service n8n)
-        if (req.path.startsWith('/n8n')) {
-            return next(); // Ne pas traiter, Traefik doit router vers n8n
-        }
-        if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    // Protéger les routes API qui nécessitent une authentification
+    // Les routes /api/* (sauf /api/login et /api/logout) nécessitent une authentification
+    app.use('/api', (req, res, next) => {
+        // Laisser passer /api/login et /api/logout sans authentification
+        if (req.path === '/login' || req.path === '/logout') {
             return next();
         }
+        // Pour les autres routes API, vérifier l'authentification
         requireAuth(req, res, next);
     });
     
-    // Servir index.html pour toutes les autres routes (sauf /n8n)
-    app.use((req, res) => {
+    // Servir index.html pour toutes les routes restantes (SPA routing)
+    // Cela permet à React Router de gérer le routing côté client
+    // React vérifiera l'authentification via /api/me et affichera le login si nécessaire
+    app.get('*', (req, res) => {
         // Ne jamais servir index.html pour /n8n (doit être routé vers n8n par Traefik)
         if (req.path.startsWith('/n8n')) {
             return res.status(404).send('Not found');
         }
+        // Ne pas servir index.html pour les fichiers statiques (déjà servis par express.static)
+        // Si on arrive ici, c'est que express.static n'a pas trouvé le fichier
+        // Donc on sert index.html pour permettre le routing React
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
 } else {
