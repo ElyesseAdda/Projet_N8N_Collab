@@ -696,6 +696,35 @@ app.post('/api/workflows/:workflowId/refresh-name', requireAuth, async (req, res
     }
 });
 
+// Gestion des signaux pour un arrêt propre
+function gracefulShutdown(signal) {
+    console.log(`\n${signal} reçu. Arrêt du serveur en cours...`);
+    server.close(() => {
+        console.log('✅ Serveur fermé proprement');
+        process.exit(0);
+    });
+    
+    // Forcer l'arrêt après 10 secondes si le serveur ne se ferme pas
+    setTimeout(() => {
+        console.error('⚠️ Forçage de l\'arrêt du serveur');
+        process.exit(1);
+    }, 10000);
+}
+
+// Écouter les signaux de terminaison
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Gestion des erreurs non capturées
+process.on('uncaughtException', (error) => {
+    console.error('❌ Erreur non capturée:', error);
+    gracefulShutdown('uncaughtException');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Promesse rejetée non gérée:', reason);
+});
+
 // Lancement du serveur sur le port 3000
 const PORT = 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
