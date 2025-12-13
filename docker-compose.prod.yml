@@ -104,6 +104,12 @@ services:
       - N8N_BASIC_AUTH_ACTIVE=false
       - N8N_USER_MANAGEMENT_DISABLED=true
       - N8N_TRUST_PROXY=true
+      # Permettre l'accès public sans authentification
+      - N8N_SKIP_WEBHOOK_DEREGISTRATION_SHUTDOWN=true
+      # Désactiver la vérification de sécurité pour l'accès public
+      - N8N_SECURE_COOKIE=false
+      # Permettre les requêtes cross-origin depuis le portail
+      - N8N_CORS_ORIGIN=*
       
       # CLÉ DE CHIFFREMENT
       # ⚠️ IMPORTANT : Utilisez une clé sécurisée unique
