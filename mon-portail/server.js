@@ -54,8 +54,12 @@ app.use((req, res, next) => {
     // Headers qui nécessitent HTTPS pour être appliqués
     // En HTTP, ces headers seront envoyés mais ignorés par le navigateur
     // En HTTPS, ils seront actifs et le warning disparaîtra
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    // 
+    // IMPORTANT: Cross-Origin-Embedder-Policy est activé pour la sécurité
+    // n8n doit aussi avoir ce header (configuré via Traefik middleware) pour être compatible
+    // Cross-Origin-Opener-Policy pour renforcer l'isolation des origines
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     
     // HSTS uniquement en HTTPS (sinon ignoré)
     if (isSecure) {
@@ -63,7 +67,10 @@ app.use((req, res, next) => {
     }
     
     // Permettre les iframes depuis la même origine (nécessaire pour intégrer n8n)
-    res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+    // frame-src 'self' permet de charger /n8n/ dans une iframe
+    // frame-ancestors 'self' permet que notre app soit chargée dans une iframe (si nécessaire)
+    // Ne pas restreindre davantage pour éviter de bloquer n8n
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'self'; frame-src 'self' https:");
     
     next();
 });
@@ -132,6 +139,7 @@ app.post('/api/login', async (req, res) => {
     const user = users.find(u => u.username === username);
 
     if (!user) {
+        console.log(`❌ Tentative de connexion échouée: utilisateur "${username}" non trouvé`);
         return res.status(401).json({ error: 'Identifiants invalides' });
     }
 
@@ -142,8 +150,10 @@ app.post('/api/login', async (req, res) => {
                 username: user.username,
                 displayName: user.displayName
             };
+            console.log(`✅ Connexion réussie pour: ${user.username} (Session ID: ${req.sessionID})`);
             res.json({ success: true, user: req.session.user });
         } else {
+            console.log(`❌ Tentative de connexion échouée: mot de passe incorrect pour "${username}"`);
             res.status(401).json({ error: 'Identifiants invalides' });
         }
     } catch (error) {
@@ -167,6 +177,10 @@ app.get('/api/test', (req, res) => {
 });
 
 app.get('/api/me', (req, res) => {
+    // Log pour diagnostiquer les problèmes de session
+    if (process.env.NODE_ENV === 'production') {
+        console.log(`🔍 /api/me appelé - Session ID: ${req.sessionID}, User: ${req.session?.user?.username || 'none'}`);
+    }
     if (req.session && req.session.user) {
         res.json({ user: req.session.user });
     } else {

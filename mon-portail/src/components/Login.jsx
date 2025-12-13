@@ -18,6 +18,7 @@ function Login({ onLogin }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Inclure les cookies pour maintenir la session
         body: JSON.stringify({ username, password }),
       });
 

@@ -13,7 +13,9 @@ function App() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/me');
+      const response = await fetch('/api/me', {
+        credentials: 'include', // Inclure les cookies pour maintenir la session
+      });
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
@@ -36,7 +38,10 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/logout', { method: 'POST' });
+      const response = await fetch('/api/logout', { 
+        method: 'POST',
+        credentials: 'include', // Inclure les cookies pour maintenir la session
+      });
       if (response.ok) {
         setUser(null);
         setIsAuthenticated(false);

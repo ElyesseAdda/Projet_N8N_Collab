@@ -119,19 +119,34 @@ services:
       - N8N_ENCRYPTION_KEY=vzzLSkyJmYtc4wOlzRsJp36aSwMQb2ytun2dfVp0m5k=
     labels:
       - "traefik.enable=true"
-      # Configuration pour le domaine zoniahub.fr
-      # IMPORTANT: Priorité plus haute pour capturer /n8n en premier
+      
+      # --- DÉFINITION DU MIDDLEWARE DE SÉCURITÉ ---
+      # On crée un middleware qui ajoute les headers nécessaires pour la compatibilité COEP
+      # Cross-Origin-Embedder-Policy=require-corp : n8n accepte d'être chargée par un parent strict
+      - "traefik.http.middlewares.n8n-security.headers.customresponseheaders.Cross-Origin-Embedder-Policy=require-corp"
+      - "traefik.http.middlewares.n8n-security.headers.customresponseheaders.Cross-Origin-Opener-Policy=same-origin"
+      - "traefik.http.middlewares.n8n-security.headers.customresponseheaders.Cross-Origin-Resource-Policy=same-site"
+      - "traefik.http.middlewares.n8n-security.headers.customresponseheaders.X-Frame-Options=SAMEORIGIN"
+      
+      # Middleware pour retirer le préfixe /n8n
+      - "traefik.http.middlewares.n8n-strip.stripprefix.prefixes=/n8n"
+      
       # Router HTTP (redirige vers HTTPS)
       - "traefik.http.routers.n8n.rule=(Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)) && PathPrefix(`/n8n`)"
       - "traefik.http.routers.n8n.entrypoints=web"
       - "traefik.http.routers.n8n.priority=200"
+      - "traefik.http.routers.n8n.middlewares=n8n-strip"
+      
       # Router HTTPS (principal)
       - "traefik.http.routers.n8n-secure.rule=(Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)) && PathPrefix(`/n8n`)"
       - "traefik.http.routers.n8n-secure.entrypoints=websecure"
       - "traefik.http.routers.n8n-secure.tls.certresolver=letsencrypt"
       - "traefik.http.routers.n8n-secure.priority=200"
-      - "traefik.http.middlewares.n8n-strip.stripprefix.prefixes=/n8n"
-      - "traefik.http.routers.n8n-secure.middlewares=n8n-strip"
+      
+      # --- ACTIVATION DES MIDDLEWARES ---
+      # On applique les middlewares au router HTTPS (strip puis security)
+      - "traefik.http.routers.n8n-secure.middlewares=n8n-strip,n8n-security"
+      
       - "traefik.http.services.n8n.loadbalancer.server.port=5678"
     depends_on:
       postgres:

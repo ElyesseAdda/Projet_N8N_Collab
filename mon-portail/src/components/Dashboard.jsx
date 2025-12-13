@@ -52,6 +52,7 @@ function Dashboard({ user, onLogout }) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Inclure les cookies pour maintenir la session
       });
       
       if (response.ok) {
@@ -316,6 +317,7 @@ function Dashboard({ user, onLogout }) {
           headers: {
             'Content-Type': 'application/json',
           },
+          credentials: 'include', // Inclure les cookies pour maintenir la session
         });
 
         if (response.ok) {
