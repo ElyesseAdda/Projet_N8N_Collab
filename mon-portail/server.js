@@ -59,8 +59,11 @@ app.set('trust proxy', 1);
 const useSecureCookies = process.env.SECURE_COOKIES === 'true' || 
                          (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS === 'true');
 
+// Pour la production, on pourrait utiliser un store Redis ou un store de fichiers
+// Pour l'instant, on utilise MemoryStore avec un warning accepté
+// En production multi-instances, il faudra utiliser Redis ou un store partagé
 app.use(session({
-    secret: 'votre-secret-session-tres-securise-changez-moi',
+    secret: process.env.SESSION_SECRET || 'votre-secret-session-tres-securise-changez-moi',
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -71,6 +74,8 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000, // 24 heures
         sameSite: 'lax' // Protection CSRF
     }
+    // Note: MemoryStore est utilisé par défaut
+    // Pour la production multi-instances, utilisez un store Redis ou de fichiers
 }));
 
 // Charger les utilisateurs depuis le fichier JSON
@@ -168,7 +173,8 @@ if (process.env.NODE_ENV === 'production') {
     // Servir index.html pour toutes les routes restantes (SPA routing)
     // Cela permet à React Router de gérer le routing côté client
     // React vérifiera l'authentification via /api/me et affichera le login si nécessaire
-    app.get('*', (req, res) => {
+    // Utiliser app.use au lieu de app.get('*') car Express 5 ne supporte plus le wildcard '*'
+    app.use((req, res, next) => {
         // Ne jamais servir index.html pour /n8n (doit être routé vers n8n par Traefik)
         if (req.path.startsWith('/n8n')) {
             return res.status(404).send('Not found');
