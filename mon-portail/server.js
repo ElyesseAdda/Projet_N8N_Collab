@@ -142,19 +142,28 @@ app.get('/api/me', (req, res) => {
 });
 
 // En production, servir les fichiers React buildés
+// IMPORTANT: Ne pas intercepter /n8n - laissé au reverse proxy Traefik
 if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, 'dist')));
     
-    // Protéger toutes les routes sauf /api et /socket.io
+    // Protéger toutes les routes sauf /api, /socket.io et /n8n
     app.use((req, res, next) => {
+        // Laisser passer /n8n (géré par Traefik -> service n8n)
+        if (req.path.startsWith('/n8n')) {
+            return next(); // Ne pas traiter, Traefik doit router vers n8n
+        }
         if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
             return next();
         }
         requireAuth(req, res, next);
     });
     
-    // Servir index.html pour toutes les autres routes
+    // Servir index.html pour toutes les autres routes (sauf /n8n)
     app.use((req, res) => {
+        // Ne jamais servir index.html pour /n8n (doit être routé vers n8n par Traefik)
+        if (req.path.startsWith('/n8n')) {
+            return res.status(404).send('Not found');
+        }
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
 } else {

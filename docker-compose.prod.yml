@@ -7,20 +7,21 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
-      # Pour HTTPS (décommentez après configuration SSL)
-      # - "--entrypoints.websecure.address=:443"
-      # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      # - "--certificatesresolvers.letsencrypt.acme.email=votre-email@example.com"
-      # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Configuration HTTPS avec Let's Encrypt
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=zonia.ai.pro@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Redirection automatique HTTP vers HTTPS
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
     ports:
       - "80:80"
-      # Pour HTTPS
-      # - "443:443"
+      - "443:443"
       - "8080:8080"  # Dashboard Traefik (à sécuriser en production)
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      # Pour HTTPS (décommentez après configuration SSL)
-      # - "./letsencrypt:/letsencrypt"
+      - "./letsencrypt:/letsencrypt"
     labels:
       - "traefik.enable=true"
 
@@ -38,17 +39,23 @@ services:
       # Clé API n8n pour authentifier les requêtes
       # 🔑 IMPORTANT : Vérifiez que cette clé est bien celle de votre compte entreprise
       - N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYWJlYmU1NS04Y2RkLTRkODUtOTc5ZC0yMWFhNGU5Mjk1MjIiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY1NjQyMTAwLCJleHAiOjE3NjgxOTQwMDB9.k-zrpH0z7UlfdnqSM1OEGtS0MuwzTT1VyGhCl-EUon4
+      # Forcer HTTPS pour activer les headers de sécurité (Cross-Origin-Opener-Policy, etc.)
+      - FORCE_HTTPS=true
+      - SECURE_COOKIES=true
     # Les ports 3000 et 5173 ne sont plus nécessaires car on passe par Traefik
     labels:
       - "traefik.enable=true"
       # Configuration pour le domaine zoniahub.fr
-      - "traefik.http.routers.portail.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)"
+      # IMPORTANT: Priorité plus basse que n8n pour laisser /n8n passer en premier
+      # Router HTTP (redirige vers HTTPS) - Exclut /n8n pour que Traefik route vers n8n
+      - "traefik.http.routers.portail.rule=(Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)) && !PathPrefix(`/n8n`)"
       - "traefik.http.routers.portail.entrypoints=web"
-      - "traefik.http.routers.portail.priority=100"
-      # Pour HTTPS (décommentez après configuration SSL)
-      # - "traefik.http.routers.portail-secure.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)"
-      # - "traefik.http.routers.portail-secure.entrypoints=websecure"
-      # - "traefik.http.routers.portail-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portail.priority=10"
+      # Router HTTPS (principal) - Exclut /n8n
+      - "traefik.http.routers.portail-secure.rule=(Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)) && !PathPrefix(`/n8n`)"
+      - "traefik.http.routers.portail-secure.entrypoints=websecure"
+      - "traefik.http.routers.portail-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portail-secure.priority=10"
       - "traefik.http.services.portail.loadbalancer.server.port=3000"
     depends_on:
       n8n:
@@ -97,21 +104,16 @@ services:
       # Domaine configuré : zoniahub.fr
       - N8N_HOST=zoniahub.fr
       - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      # Pour HTTPS, changez en https (après configuration SSL)
-      # - N8N_PROTOCOL=https
+      - N8N_PROTOCOL=https
       - N8N_PATH=/n8n/
-      - N8N_EDITOR_BASE_URL=http://zoniahub.fr/n8n/
-      - WEBHOOK_URL=http://zoniahub.fr/n8n/
-      # Pour HTTPS (décommentez après configuration SSL)
-      # - N8N_EDITOR_BASE_URL=https://zoniahub.fr/n8n/
-      # - WEBHOOK_URL=https://zoniahub.fr/n8n/
+      - N8N_EDITOR_BASE_URL=https://zoniahub.fr/n8n/
+      - WEBHOOK_URL=https://zoniahub.fr/n8n/
       
       - N8N_BASIC_AUTH_ACTIVE=false
       - N8N_USER_MANAGEMENT_DISABLED=true
       - N8N_TRUST_PROXY=true
-      # Désactiver la vérification de sécurité pour l'accès public (cookies non sécurisés en HTTP)
-      - N8N_SECURE_COOKIE=false
+      # Cookies sécurisés activés en HTTPS
+      - N8N_SECURE_COOKIE=true
       # Permettre les requêtes cross-origin depuis le portail
       - N8N_CORS_ORIGIN=*
       # Configuration recommandée pour éviter les warnings
@@ -124,15 +126,18 @@ services:
     labels:
       - "traefik.enable=true"
       # Configuration pour le domaine zoniahub.fr
+      # IMPORTANT: Priorité plus haute pour capturer /n8n en premier
+      # Router HTTP (redirige vers HTTPS)
       - "traefik.http.routers.n8n.rule=(Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)) && PathPrefix(`/n8n`)"
       - "traefik.http.routers.n8n.entrypoints=web"
-      - "traefik.http.routers.n8n.priority=50"
-      # Pour HTTPS (décommentez après configuration SSL)
-      # - "traefik.http.routers.n8n-secure.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`) && PathPrefix(`/n8n`)"
-      # - "traefik.http.routers.n8n-secure.entrypoints=websecure"
-      # - "traefik.http.routers.n8n-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.n8n.priority=200"
+      # Router HTTPS (principal)
+      - "traefik.http.routers.n8n-secure.rule=(Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)) && PathPrefix(`/n8n`)"
+      - "traefik.http.routers.n8n-secure.entrypoints=websecure"
+      - "traefik.http.routers.n8n-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.n8n-secure.priority=200"
       - "traefik.http.middlewares.n8n-strip.stripprefix.prefixes=/n8n"
-      - "traefik.http.routers.n8n.middlewares=n8n-strip"
+      - "traefik.http.routers.n8n-secure.middlewares=n8n-strip"
       - "traefik.http.services.n8n.loadbalancer.server.port=5678"
     depends_on:
       postgres:
