@@ -60,12 +60,6 @@ services:
     depends_on:
       n8n:
         condition: service_started
-    healthcheck:
-      test: ["CMD-SHELL", "node -e \"require('http').get('http://localhost:3000/api/me', (r) => process.exit(r.statusCode === 401 || r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\" || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
     restart: unless-stopped
 
   # 3. La base de données Postgres
@@ -143,6 +137,11 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+
+networks:
+  default:
+    name: n8n-network
+    driver: bridge
 
 volumes:
   db_data:
