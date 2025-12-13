@@ -13,7 +13,16 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+
+// Initialiser Socket.io avec gestion d'erreur
+let io;
+try {
+    io = new Server(server);
+    console.log('✅ Socket.io initialisé');
+} catch (error) {
+    console.error('❌ Erreur lors de l\'initialisation de Socket.io:', error);
+    process.exit(1);
+}
 
 // Middleware pour parser JSON
 app.use(express.json());
@@ -356,7 +365,13 @@ async function getWorkflowFromN8n(workflowId) {
 }
 
 // Gestion des connexions en temps réel
+if (!io) {
+    console.error('❌ Socket.io n\'est pas initialisé');
+    process.exit(1);
+}
+
 io.on('connection', (socket) => {
+    console.log(`✅ Nouvelle connexion Socket.io: ${socket.id}`);
     let user = { username: 'anonymous', displayName: 'Anonyme' };
 
     // Récupérer les informations utilisateur depuis la session
@@ -794,10 +809,6 @@ function gracefulShutdown(signal) {
     }, 10000);
 }
 
-// Écouter les signaux de terminaison
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
 // Gestion des erreurs non capturées
 process.on('uncaughtException', (error) => {
     console.error('❌ Erreur non capturée:', error);
@@ -812,6 +823,17 @@ process.on('unhandledRejection', (reason, promise) => {
 const PORT = 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+// Écouter les signaux de terminaison (UNIQUEMENT une fois, après la définition de gracefulShutdown)
+process.on('SIGTERM', () => {
+    console.log('\n⚠️ SIGTERM reçu. Arrêt du serveur en cours...');
+    gracefulShutdown('SIGTERM');
+});
+
+process.on('SIGINT', () => {
+    console.log('\n⚠️ SIGINT reçu. Arrêt du serveur en cours...');
+    gracefulShutdown('SIGINT');
+});
+
 server.listen(PORT, '0.0.0.0', () => {
     if (NODE_ENV === 'production') {
         console.log(`✅ Serveur Node en production`);
@@ -820,6 +842,7 @@ server.listen(PORT, '0.0.0.0', () => {
     } else {
         console.log(`Serveur Node prêt sur http://localhost:${PORT}`);
     }
+    console.log('✅ Serveur démarré avec succès. En attente de requêtes...');
 });
 
 // Gestion des erreurs de démarrage du serveur

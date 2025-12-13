@@ -32,7 +32,7 @@ services:
     volumes:
       - ./mon-portail:/app
       - portail_node_modules:/app/node_modules
-    command: sh -c "npm install && npm run build && NODE_ENV=production node server.js"
+    command: sh -c "npm install && npm run build && NODE_ENV=production exec node server.js"
     environment:
       # URL de l'API n8n (accessible via le nom du service Docker)
       - N8N_API_URL=http://n8n:5678
