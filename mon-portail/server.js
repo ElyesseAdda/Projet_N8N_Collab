@@ -144,6 +144,11 @@ app.post('/api/logout', (req, res) => {
     });
 });
 
+// Route de test pour vérifier que le serveur répond
+app.get('/api/test', (req, res) => {
+    res.json({ status: 'ok', message: 'Le serveur répond correctement' });
+});
+
 app.get('/api/me', (req, res) => {
     if (req.session && req.session.user) {
         res.json({ user: req.session.user });
@@ -173,16 +178,25 @@ if (process.env.NODE_ENV === 'production') {
     // Servir index.html pour toutes les routes restantes (SPA routing)
     // Cela permet à React Router de gérer le routing côté client
     // React vérifiera l'authentification via /api/me et affichera le login si nécessaire
-    // Utiliser app.use au lieu de app.get('*') car Express 5 ne supporte plus le wildcard '*'
+    // IMPORTANT: Ce middleware doit être le dernier pour ne pas intercepter les routes API
     app.use((req, res, next) => {
         // Ne jamais servir index.html pour /n8n (doit être routé vers n8n par Traefik)
         if (req.path.startsWith('/n8n')) {
             return res.status(404).send('Not found');
         }
+        // Ne pas servir index.html pour les routes API (déjà traitées)
+        if (req.path.startsWith('/api')) {
+            return next(); // Laisser passer, devrait déjà être traité
+        }
         // Ne pas servir index.html pour les fichiers statiques (déjà servis par express.static)
         // Si on arrive ici, c'est que express.static n'a pas trouvé le fichier
         // Donc on sert index.html pour permettre le routing React
-        res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+        res.sendFile(path.join(__dirname, 'dist', 'index.html'), (err) => {
+            if (err) {
+                console.error('Erreur lors de l\'envoi de index.html:', err);
+                res.status(500).send('Erreur serveur');
+            }
+        });
     });
 } else {
     // En développement, Vite s'occupe du frontend sur le port 5173
@@ -797,6 +811,7 @@ process.on('unhandledRejection', (reason, promise) => {
 // Lancement du serveur sur le port 3000
 const PORT = 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
 server.listen(PORT, '0.0.0.0', () => {
     if (NODE_ENV === 'production') {
         console.log(`✅ Serveur Node en production`);
@@ -805,4 +820,33 @@ server.listen(PORT, '0.0.0.0', () => {
     } else {
         console.log(`Serveur Node prêt sur http://localhost:${PORT}`);
     }
+});
+
+// Gestion des erreurs de démarrage du serveur
+server.on('error', (error) => {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+    
+    const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
+    
+    switch (error.code) {
+        case 'EACCES':
+            console.error(`❌ ${bind} nécessite des privilèges élevés`);
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(`❌ ${bind} est déjà utilisé`);
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+});
+
+// Vérifier que le serveur écoute bien
+server.on('listening', () => {
+    const addr = server.address();
+    const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+    console.log(`✅ Serveur HTTP en écoute sur ${bind}`);
 });
