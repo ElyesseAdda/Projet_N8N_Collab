@@ -29,7 +29,7 @@ services:
       # Clé API n8n pour authentifier les requêtes
       # 🔑 À CHANGER : Remplacez par la clé API de votre compte entreprise N8N
       # Obtenez-la dans N8N : Settings → API → Créer une nouvelle clé API
-      - N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNDljZTVjNy1jMWMxLTQ4NWYtYWRmMC1iNGNkNzIwYWUzYWUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY1NjI4NDYxLCJleHAiOjE3NjgxOTQwMDB9.yp3YcEn3cQdnhbcFLnU-GA2wDTUU6PCawg6cz5Nd3LA
+      - N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYWJlYmU1NS04Y2RkLTRkODUtOTc5ZC0yMWFhNGU5Mjk1MjIiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY1NjQyMTAwLCJleHAiOjE3NjgxOTQwMDB9.k-zrpH0z7UlfdnqSM1OEGtS0MuwzTT1VyGhCl-EUon4
     ports:
       - "3000:3000" # Juste au cas où, mais on passera par le port 80
       - "5173:5173" # Port Vite pour le dev (si besoin)

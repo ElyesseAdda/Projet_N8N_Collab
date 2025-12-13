@@ -19,15 +19,57 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Configuration des headers de sécurité
+// Note: Certains headers (comme Cross-Origin-Opener-Policy) nécessitent HTTPS pour fonctionner
+// Ils seront automatiquement ignorés en HTTP mais fonctionneront dès que HTTPS sera configuré
+app.use((req, res, next) => {
+    // Détecter si la requête arrive via HTTPS (via Traefik ou directement)
+    const isSecure = req.secure || 
+                     req.headers['x-forwarded-proto'] === 'https' ||
+                     process.env.FORCE_HTTPS === 'true';
+    
+    // Headers de sécurité généraux (fonctionnent en HTTP et HTTPS)
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Headers qui nécessitent HTTPS pour être appliqués
+    // En HTTP, ces headers seront envoyés mais ignorés par le navigateur
+    // En HTTPS, ils seront actifs et le warning disparaîtra
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    
+    // HSTS uniquement en HTTPS (sinon ignoré)
+    if (isSecure) {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    
+    // Permettre les iframes depuis la même origine (nécessaire pour intégrer n8n)
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'self'");
+    
+    next();
+});
+
 // Configuration des sessions
+// Faire confiance au proxy Traefik pour détecter HTTPS via X-Forwarded-Proto
+app.set('trust proxy', 1);
+
+// Détecter si on est en HTTPS (via env var ou via Traefik en production)
+const useSecureCookies = process.env.SECURE_COOKIES === 'true' || 
+                         (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS === 'true');
+
 app.use(session({
     secret: 'votre-secret-session-tres-securise-changez-moi',
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: false, // Mettre à true en production avec HTTPS
+        // En HTTP: secure = false (sinon les cookies ne fonctionnent pas)
+        // En HTTPS: mettre SECURE_COOKIES=true dans docker-compose.prod.yml après activation HTTPS
+        secure: useSecureCookies,
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 heures
+        maxAge: 24 * 60 * 60 * 1000, // 24 heures
+        sameSite: 'lax' // Protection CSRF
     }
 }));
 

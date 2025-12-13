@@ -12,7 +12,7 @@ Vous avez déjà configuré votre compte entreprise N8N en local avec :
 
 ```yaml
 # docker-compose.prod.yml
-N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNDljZTVjNy1jMWMxLTQ4NWYtYWRmMC1iNGNkNzIwYWUzYWUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY1NjI8NDYxLCJleHAiOjE3NjgxOTQwMDB9.yp3YcEn3cQdnhbcFLnU-GA2wDTUU6PCawg6cz5Nd3LA
+N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwYWJlYmU1NS04Y2RkLTRkODUtOTc5ZC0yMWFhNGU5Mjk1MjIiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY1NjQyMTAwLCJleHAiOjE3NjgxOTQwMDB9.k-zrpH0z7UlfdnqSM1OEGtS0MuwzTT1VyGhCl-EUon4
 ```
 
 **Pourquoi ?** C'est la clé de votre compte entreprise, elle fonctionne partout.
