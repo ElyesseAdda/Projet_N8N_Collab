@@ -44,6 +44,7 @@ services:
       # Configuration pour le domaine zoniahub.fr
       - "traefik.http.routers.portail.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)"
       - "traefik.http.routers.portail.entrypoints=web"
+      - "traefik.http.routers.portail.priority=100"
       # Pour HTTPS (décommentez après configuration SSL)
       # - "traefik.http.routers.portail-secure.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)"
       # - "traefik.http.routers.portail-secure.entrypoints=websecure"
@@ -111,8 +112,9 @@ services:
     labels:
       - "traefik.enable=true"
       # Configuration pour le domaine zoniahub.fr
-      - "traefik.http.routers.n8n.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`) && PathPrefix(`/n8n`)"
+      - "traefik.http.routers.n8n.rule=(Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)) && PathPrefix(`/n8n`)"
       - "traefik.http.routers.n8n.entrypoints=web"
+      - "traefik.http.routers.n8n.priority=50"
       # Pour HTTPS (décommentez après configuration SSL)
       # - "traefik.http.routers.n8n-secure.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`) && PathPrefix(`/n8n`)"
       # - "traefik.http.routers.n8n-secure.entrypoints=websecure"
