@@ -479,7 +479,6 @@ function Dashboard({ user, onLogout }) {
         src="/n8n/" 
         title="n8n Workflow"
         allow="fullscreen"
-        sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
       ></iframe>
       
       {/* Badge d'avertissement pour plusieurs utilisateurs */}
