@@ -1,0 +1,134 @@
+version: "3"
+
+services:
+  # 1. Le Proxy (Traefik) - Le chef d'orchestre
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      # Pour HTTPS (décommentez après configuration SSL)
+      # - "--entrypoints.websecure.address=:443"
+      # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      # - "--certificatesresolvers.letsencrypt.acme.email=votre-email@example.com"
+      # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      # Pour HTTPS
+      # - "443:443"
+      - "8080:8080"  # Dashboard Traefik (à sécuriser en production)
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      # Pour HTTPS (décommentez après configuration SSL)
+      # - "./letsencrypt:/letsencrypt"
+    labels:
+      - "traefik.enable=true"
+
+  # 2. Ton Portail Node.js
+  mon-portail:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./mon-portail:/app
+      - portail_node_modules:/app/node_modules
+    command: sh -c "npm install && npm run build && NODE_ENV=production npm run server"
+    environment:
+      # URL de l'API n8n (accessible via le nom du service Docker)
+      - N8N_API_URL=http://n8n:5678
+      # Clé API n8n pour authentifier les requêtes
+      # 🔑 IMPORTANT : Vérifiez que cette clé est bien celle de votre compte entreprise
+      # Remplacez cette valeur par votre clé API ou utilisez un fichier .env
+      - N8N_API_KEY=remplacez_par_votre_cle_api
+    # Les ports 3000 et 5173 ne sont plus nécessaires car on passe par Traefik
+    labels:
+      - "traefik.enable=true"
+      # ⚠️ À MODIFIER : Remplacez 'votre-domaine.com' par votre vrai domaine
+      - "traefik.http.routers.portail.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`)"
+      - "traefik.http.routers.portail.entrypoints=web"
+      # Pour HTTPS (décommentez après configuration SSL)
+      # - "traefik.http.routers.portail-secure.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`)"
+      # - "traefik.http.routers.portail-secure.entrypoints=websecure"
+      # - "traefik.http.routers.portail-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portail.loadbalancer.server.port=3000"
+    depends_on:
+      n8n:
+        condition: service_started
+    restart: unless-stopped
+
+  # 3. La base de données Postgres
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=n8n
+      # ⚠️ IMPORTANT : Changez ce mot de passe en production !
+      # Utilisez un mot de passe fort et sécurisé (min 16 caractères recommandé)
+      - POSTGRES_PASSWORD=changez-moi-par-un-mot-de-passe-securise
+      - POSTGRES_DB=n8n
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U n8n"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    # Ne pas exposer le port PostgreSQL publiquement en production
+    # ports:
+    #   - "5432:5432"
+
+  # 4. n8n
+  n8n:
+    image: n8nio/n8n:latest
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=changez-moi-par-un-mot-de-passe-securise
+      
+      # CONFIGURATION POUR LA PRODUCTION
+      # ⚠️ À MODIFIER : Remplacez 'votre-domaine.com' par votre vrai domaine
+      - N8N_HOST=votre-domaine.com
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      # Pour HTTPS, changez en https (après configuration SSL)
+      # - N8N_PROTOCOL=https
+      - N8N_PATH=/n8n/
+      - N8N_EDITOR_BASE_URL=http://votre-domaine.com/n8n/
+      - WEBHOOK_URL=http://votre-domaine.com/n8n/
+      # Pour HTTPS (décommentez après configuration SSL)
+      # - N8N_EDITOR_BASE_URL=https://votre-domaine.com/n8n/
+      # - WEBHOOK_URL=https://votre-domaine.com/n8n/
+      
+      - N8N_BASIC_AUTH_ACTIVE=false
+      - N8N_USER_MANAGEMENT_DISABLED=true
+      - N8N_TRUST_PROXY=true
+      
+      # CLÉ DE CHIFFREMENT
+      # ⚠️ IMPORTANT : Utilisez une clé sécurisée unique
+      # Générer avec : openssl rand -base64 32 (sur Linux) ou generate-encryption-key.ps1 (sur Windows)
+      - N8N_ENCRYPTION_KEY=remplacez_par_votre_cle_de_chiffrement
+    labels:
+      - "traefik.enable=true"
+      # ⚠️ À MODIFIER : Remplacez 'votre-domaine.com' par votre vrai domaine
+      - "traefik.http.routers.n8n.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`) && PathPrefix(`/n8n`)"
+      - "traefik.http.routers.n8n.entrypoints=web"
+      # Pour HTTPS (décommentez après configuration SSL)
+      # - "traefik.http.routers.n8n-secure.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`) && PathPrefix(`/n8n`)"
+      # - "traefik.http.routers.n8n-secure.entrypoints=websecure"
+      # - "traefik.http.routers.n8n-secure.tls.certresolver=letsencrypt"
+      - "traefik.http.middlewares.n8n-strip.stripprefix.prefixes=/n8n"
+      - "traefik.http.routers.n8n.middlewares=n8n-strip"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  portail_node_modules:
+

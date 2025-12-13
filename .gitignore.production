@@ -1,0 +1,28 @@
+# Fichiers à ne JAMAIS commiter en production
+
+# Variables d'environnement
+.env.prod
+.env.production
+
+# Certificats SSL
+letsencrypt/
+*.pem
+*.key
+*.crt
+
+# Clés SSH
+id_rsa
+id_ed25519
+*.pem
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+
+# Logs
+*.log
+logs/
+
+# Node modules (déjà dans .gitignore normalement)
+node_modules/
+

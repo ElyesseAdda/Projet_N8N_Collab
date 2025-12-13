@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.prod
+.env.production
+
+# Users data (sensitive)
+mon-portail/users.json
+
+# Production files (sensitive)
+letsencrypt/
+*.pem
+*.key
+*.crt
+id_rsa
+id_ed25519
+*.pem
+*.bak
+*.backup
+
+# Docker volumes data (optionnel - à inclure si vous ne voulez pas commiter les données)
+# db_data/
+
+# Build files
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+

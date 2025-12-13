@@ -1,0 +1,113 @@
+version: "3"
+
+services:
+  # 1. Le Proxy (Traefik) - Le chef d'orchestre
+  traefik:
+    image: traefik:v2.10
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  # 2. Ton Portail Node.js (Maintenant dans Docker !)
+  mon-portail:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./mon-portail:/app  # On connecte ton dossier local au conteneur
+      - portail_node_modules:/app/node_modules  # Volume nommé pour éviter les conflits avec node_modules local
+    command: sh -c "npm install && npm run build && NODE_ENV=production npm run server" # Build React puis lance le serveur
+    environment:
+      # URL de l'API n8n (accessible via le nom du service Docker)
+      - N8N_API_URL=http://n8n:5678
+      # Clé API n8n pour authentifier les requêtes
+      # 🔑 À CHANGER : Remplacez par la clé API de votre compte entreprise N8N
+      # Obtenez-la dans N8N : Settings → API → Créer une nouvelle clé API
+      - N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNDljZTVjNy1jMWMxLTQ4NWYtYWRmMC1iNGNkNzIwYWUzYWUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY1NjI4NDYxLCJleHAiOjE3NjgxOTQwMDB9.yp3YcEn3cQdnhbcFLnU-GA2wDTUU6PCawg6cz5Nd3LA
+    ports:
+      - "3000:3000" # Juste au cas où, mais on passera par le port 80
+      - "5173:5173" # Port Vite pour le dev (si besoin)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portail.rule=Host(`localhost`)"
+      - "traefik.http.services.portail.loadbalancer.server.port=3000"
+    depends_on:
+      n8n:
+        condition: service_started
+
+  # 3. La base de données Postgres
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=n8npassword
+      - POSTGRES_DB=n8n
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U n8n"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 4. n8n (Dernière version)
+  # Pour forcer la mise à jour vers la dernière version, exécutez :
+  # docker pull n8nio/n8n:latest
+  n8n:
+    image: n8nio/n8n:latest
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=n8npassword
+      
+      # CONFIGURATION CRITIQUE POUR LE SOUS-DOSSIER
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_PATH=/n8n/
+      - N8N_EDITOR_BASE_URL=http://localhost/n8n/
+      - WEBHOOK_URL=http://localhost/n8n/
+      - N8N_BASIC_AUTH_ACTIVE=false
+      
+      # Désactiver la gestion des utilisateurs n8n
+      # L'authentification est gérée par le portail, donc n8n fonctionne en mode "single-user"
+      - N8N_USER_MANAGEMENT_DISABLED=true
+      
+      # Authentification API activée (utilise la clé API configurée dans mon-portail)
+      # - N8N_API_AUTH_ENABLED=true  # Activé par défaut dans n8n
+      
+      # Configuration pour le reverse proxy (Traefik)
+      # Permet à n8n de faire confiance aux en-têtes X-Forwarded-For envoyés par Traefik
+      - N8N_TRUST_PROXY=true
+      
+      # CLÉ DE CHIFFREMENT CRITIQUE
+      # Cette clé est utilisée pour chiffrer/déchiffrer les credentials dans la base de données
+      # ⚠️ IMPORTANT : Ne changez JAMAIS cette clé une fois que des credentials sont stockés
+      # Si vous changez cette clé, tous les credentials existants deviendront illisibles
+      # 🔑 MIGRATION COMPTE : Si vous changez de compte N8N et démarrez une nouvelle instance,
+      #    générez une nouvelle clé avec : powershell -ExecutionPolicy Bypass -File generate-encryption-key.ps1
+      #    ⚠️ ATTENTION : Cela rendra tous les credentials existants illisibles !
+      - N8N_ENCRYPTION_KEY=vzzLSkyJmYtc4wOlzRsJp36aSwMQb2ytun2dfVp0m5k=
+    labels:
+      - "traefik.enable=true"
+      # Règle : Si l'URL commence par /n8n, on envoie ici
+      - "traefik.http.routers.n8n.rule=Host(`localhost`) && PathPrefix(`/n8n`)"
+      - "traefik.http.middlewares.n8n-strip.stripprefix.prefixes=/n8n"
+      - "traefik.http.routers.n8n.middlewares=n8n-strip"
+      - "traefik.http.services.n8n.loadbalancer.server.port=5678"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  db_data:
+  portail_node_modules:

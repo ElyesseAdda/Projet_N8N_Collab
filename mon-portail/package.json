@@ -1,0 +1,33 @@
+{
+  "name": "mon-portail",
+  "version": "1.0.0",
+  "description": "Portail collaboratif n8n",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server.js",
+    "dev:full": "concurrently \"npm run dev\" \"npm run server\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "socket.io-client": "^4.8.1",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.1",
+    "express-session": "^1.17.3",
+    "bcrypt": "^5.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8",
+    "nodemon": "^3.1.11",
+    "concurrently": "^8.2.2"
+  }
+}
