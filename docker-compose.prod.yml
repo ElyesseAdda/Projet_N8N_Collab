@@ -39,16 +39,15 @@ services:
       - N8N_API_URL=http://n8n:5678
       # Clé API n8n pour authentifier les requêtes
       # 🔑 IMPORTANT : Vérifiez que cette clé est bien celle de votre compte entreprise
-      # Remplacez cette valeur par votre clé API ou utilisez un fichier .env
-      - N8N_API_KEY=remplacez_par_votre_cle_api
+      - N8N_API_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhNDljZTVjNy1jMWMxLTQ4NWYtYWRmMC1iNGNkNzIwYWUzYWUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY1NjI4NDYxLCJleHAiOjE3NjgxOTQwMDB9.yp3YcEn3cQdnhbcFLnU-GA2wDTUU6PCawg6cz5Nd3LA
     # Les ports 3000 et 5173 ne sont plus nécessaires car on passe par Traefik
     labels:
       - "traefik.enable=true"
-      # ⚠️ À MODIFIER : Remplacez 'votre-domaine.com' par votre vrai domaine
-      - "traefik.http.routers.portail.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`)"
+      # Configuration pour le domaine zoniahub.fr
+      - "traefik.http.routers.portail.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)"
       - "traefik.http.routers.portail.entrypoints=web"
       # Pour HTTPS (décommentez après configuration SSL)
-      # - "traefik.http.routers.portail-secure.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`)"
+      # - "traefik.http.routers.portail-secure.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`)"
       # - "traefik.http.routers.portail-secure.entrypoints=websecure"
       # - "traefik.http.routers.portail-secure.tls.certresolver=letsencrypt"
       - "traefik.http.services.portail.loadbalancer.server.port=3000"
@@ -64,7 +63,7 @@ services:
       - POSTGRES_USER=n8n
       # ⚠️ IMPORTANT : Changez ce mot de passe en production !
       # Utilisez un mot de passe fort et sécurisé (min 16 caractères recommandé)
-      - POSTGRES_PASSWORD=changez-moi-par-un-mot-de-passe-securise
+      - POSTGRES_PASSWORD=Ayla220223@@
       - POSTGRES_DB=n8n
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -87,21 +86,21 @@ services:
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_DATABASE=n8n
       - DB_POSTGRESDB_USER=n8n
-      - DB_POSTGRESDB_PASSWORD=changez-moi-par-un-mot-de-passe-securise
+      - DB_POSTGRESDB_PASSWORD=Ayla220223@@
       
       # CONFIGURATION POUR LA PRODUCTION
-      # ⚠️ À MODIFIER : Remplacez 'votre-domaine.com' par votre vrai domaine
-      - N8N_HOST=votre-domaine.com
+      # Domaine configuré : zoniahub.fr
+      - N8N_HOST=zoniahub.fr
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
       # Pour HTTPS, changez en https (après configuration SSL)
       # - N8N_PROTOCOL=https
       - N8N_PATH=/n8n/
-      - N8N_EDITOR_BASE_URL=http://votre-domaine.com/n8n/
-      - WEBHOOK_URL=http://votre-domaine.com/n8n/
+      - N8N_EDITOR_BASE_URL=http://zoniahub.fr/n8n/
+      - WEBHOOK_URL=http://zoniahub.fr/n8n/
       # Pour HTTPS (décommentez après configuration SSL)
-      # - N8N_EDITOR_BASE_URL=https://votre-domaine.com/n8n/
-      # - WEBHOOK_URL=https://votre-domaine.com/n8n/
+      # - N8N_EDITOR_BASE_URL=https://zoniahub.fr/n8n/
+      # - WEBHOOK_URL=https://zoniahub.fr/n8n/
       
       - N8N_BASIC_AUTH_ACTIVE=false
       - N8N_USER_MANAGEMENT_DISABLED=true
@@ -110,14 +109,14 @@ services:
       # CLÉ DE CHIFFREMENT
       # ⚠️ IMPORTANT : Utilisez une clé sécurisée unique
       # Générer avec : openssl rand -base64 32 (sur Linux) ou generate-encryption-key.ps1 (sur Windows)
-      - N8N_ENCRYPTION_KEY=remplacez_par_votre_cle_de_chiffrement
+      - N8N_ENCRYPTION_KEY=vzzLSkyJmYtc4wOlzRsJp36aSwMQb2ytun2dfVp0m5k=
     labels:
       - "traefik.enable=true"
-      # ⚠️ À MODIFIER : Remplacez 'votre-domaine.com' par votre vrai domaine
-      - "traefik.http.routers.n8n.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`) && PathPrefix(`/n8n`)"
+      # Configuration pour le domaine zoniahub.fr
+      - "traefik.http.routers.n8n.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`) && PathPrefix(`/n8n`)"
       - "traefik.http.routers.n8n.entrypoints=web"
       # Pour HTTPS (décommentez après configuration SSL)
-      # - "traefik.http.routers.n8n-secure.rule=Host(`votre-domaine.com`) || Host(`www.votre-domaine.com`) && PathPrefix(`/n8n`)"
+      # - "traefik.http.routers.n8n-secure.rule=Host(`zoniahub.fr`) || Host(`www.zoniahub.fr`) && PathPrefix(`/n8n`)"
       # - "traefik.http.routers.n8n-secure.entrypoints=websecure"
       # - "traefik.http.routers.n8n-secure.tls.certresolver=letsencrypt"
       - "traefik.http.middlewares.n8n-strip.stripprefix.prefixes=/n8n"
