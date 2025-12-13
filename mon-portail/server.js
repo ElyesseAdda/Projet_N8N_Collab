@@ -698,6 +698,13 @@ app.post('/api/workflows/:workflowId/refresh-name', requireAuth, async (req, res
 
 // Lancement du serveur sur le port 3000
 const PORT = 3000;
-server.listen(PORT, () => {
-    console.log(`Serveur Node prêt sur http://localhost:${PORT}`);
+const NODE_ENV = process.env.NODE_ENV || 'development';
+server.listen(PORT, '0.0.0.0', () => {
+    if (NODE_ENV === 'production') {
+        console.log(`✅ Serveur Node en production`);
+        console.log(`   Accessible via: http://zoniahub.fr ou http://www.zoniahub.fr`);
+        console.log(`   Écoute sur le port ${PORT} (routé par Traefik)`);
+    } else {
+        console.log(`Serveur Node prêt sur http://localhost:${PORT}`);
+    }
 });
