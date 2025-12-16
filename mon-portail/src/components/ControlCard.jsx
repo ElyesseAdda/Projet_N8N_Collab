@@ -1,23 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './ControlCard.css';
 
-function ControlCard({ user, currentWorkflow, workflowUsers = [], allWorkflows = [], onClose, onLogout, onTestInjection, onSetWorkflow }) {
+function ControlCard({ user, currentWorkflow, workflowUsers = [], allWorkflows = [], onClose, onLogout }) {
   const displayName = user?.displayName || user?.username || 'Utilisateur';
   const initial = displayName.charAt(0).toUpperCase();
-  const [manualWorkflowId, setManualWorkflowId] = useState('');
 
   const handleLogout = () => {
     if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
       onLogout();
-    }
-  };
-
-  const handleSetWorkflow = () => {
-    if (manualWorkflowId.trim()) {
-      if (onSetWorkflow) {
-        onSetWorkflow(manualWorkflowId.trim());
-        setManualWorkflowId('');
-      }
     }
   };
 
@@ -55,19 +45,6 @@ function ControlCard({ user, currentWorkflow, workflowUsers = [], allWorkflows =
             ) : (
               <div className="workflow-info no-workflow">
                 <div className="workflow-name">Aucun workflow détecté</div>
-                <div className="manual-workflow-input">
-                  <input
-                    type="text"
-                    placeholder="Entrer l'ID du workflow"
-                    value={manualWorkflowId}
-                    onChange={(e) => setManualWorkflowId(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSetWorkflow()}
-                    className="workflow-input"
-                  />
-                  <button onClick={handleSetWorkflow} className="workflow-set-btn">
-                    Définir
-                  </button>
-                </div>
               </div>
             )}
           </div>
@@ -127,9 +104,6 @@ function ControlCard({ user, currentWorkflow, workflowUsers = [], allWorkflows =
           <div className="divider"></div>
 
           <div className="actions-section">
-            <button className="action-btn primary" onClick={onTestInjection}>
-              🧪 Tester l'Injection
-            </button>
             <button className="action-btn danger" onClick={handleLogout}>
               🚪 Déconnexion
             </button>
