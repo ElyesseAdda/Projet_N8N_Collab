@@ -235,13 +235,20 @@ app.post('/api/contact', async (req, res) => {
                 pass: gmailPassword
             },
             // Options supplémentaires pour améliorer la connexion
-            connectionTimeout: 10000, // 10 secondes
-            greetingTimeout: 10000,
-            socketTimeout: 10000,
+            connectionTimeout: 30000, // 30 secondes (augmenté)
+            greetingTimeout: 30000,
+            socketTimeout: 30000,
+            // Désactiver la vérification SSL stricte si nécessaire (déconseillé en production)
+            // tls: {
+            //     rejectUnauthorized: false
+            // },
             // Retry en cas d'échec
             pool: false,
             maxConnections: 1,
-            maxMessages: 3
+            maxMessages: 3,
+            // Logger pour debug
+            debug: process.env.NODE_ENV === 'development',
+            logger: true
         });
 
         // Vérifier la connexion avant d'envoyer
