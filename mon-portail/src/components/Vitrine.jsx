@@ -5,7 +5,7 @@ import {
   Menu, ArrowRight, Mail, CalendarClock, Bot, FileCheck, 
   Database, Sparkles, Clock, Infinity, TrendingUp, FileText, 
   FileBarChart, FileSpreadsheet, Zap, User, Search, Check, 
-  AlertCircle, Send 
+  AlertCircle, Send, X, HelpCircle, Shield, FileText as FileTextIcon
 } from 'lucide-react';
 
 // --- STYLES CSS INTÉGRÉS ---
@@ -332,11 +332,41 @@ const Navbar = () => (
   </nav>
 );
 
+const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose}></div>
+      <div 
+        className="relative bg-slate-900 rounded-2xl border border-slate-700 max-w-3xl w-full max-h-[90vh] overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="sticky top-0 bg-slate-800/90 backdrop-blur-sm border-b border-slate-700 px-6 py-4 flex items-center justify-between z-10">
+          <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+            {title}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-white transition-colors p-2 hover:bg-slate-700 rounded-lg"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="overflow-y-auto max-h-[calc(90vh-80px)] p-6 text-slate-300">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Vitrine = () => {
   console.log('Vitrine: Composant rendu');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [openModal, setOpenModal] = useState(null); // 'legal', 'privacy', 'support', null
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -491,11 +521,377 @@ const Vitrine = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8">
             <div className="flex items-center gap-2 mb-4 md:mb-0"><ZoniaLogo size={30} circleSize={5} /><span className="text-xl font-bold tracking-widest text-white">ZONIA</span></div>
-            <div className="flex space-x-6 text-slate-400 text-sm"><a href="#" className="hover:text-[#FFD700] transition-colors">Mentions Légales</a><a href="#" className="hover:text-[#FFD700] transition-colors">Politique de Confidentialité</a><a href="#" className="hover:text-[#FFD700] transition-colors">Support</a></div>
+            <div className="flex space-x-6 text-slate-400 text-sm">
+              <button onClick={() => setOpenModal('legal')} className="hover:text-[#FFD700] transition-colors">Mentions Légales</button>
+              <button onClick={() => setOpenModal('privacy')} className="hover:text-[#FFD700] transition-colors">Politique de Confidentialité</button>
+              <button onClick={() => setOpenModal('support')} className="hover:text-[#FFD700] transition-colors">Support</button>
+            </div>
           </div>
-          <div className="text-center text-slate-600 text-xs">&copy; 2024 Zonia Systems. Tous droits réservés.</div>
+          <div className="text-center text-slate-600 text-xs">&copy; 2024 Zonia Systems. Tous droits réservés.          </div>
         </div>
       </footer>
+
+      {/* Modale Mentions Légales */}
+      <Modal 
+        isOpen={openModal === 'legal'} 
+        onClose={() => setOpenModal(null)}
+        title={
+          <>
+            <FileTextIcon className="w-6 h-6 text-[#FFD700]" />
+            Mentions Légales
+          </>
+        }
+      >
+        <div className="space-y-6">
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">1. Informations sur l'entreprise</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong className="text-white">Raison sociale :</strong> Zonia </p>
+              <p><strong className="text-white">Forme juridique :</strong> SAS</p>
+              <p><strong className="text-white">Siège social :</strong> 24 Boulevard Gay Lussac,13014 Marseille</p>
+              <p><strong className="text-white">SIRET :</strong> 994 508 190 00018</p>
+              <p><strong className="text-white">RCS :</strong> 994 508 190 R.C.S. Marseille</p>
+              
+              <p><strong className="text-white">Capital social :</strong> 1 000,00 Euros</p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">2. Directeur de publication</h3>
+            <p className="text-sm">[ADDA ATTOU Elyesse]</p>
+            <p className="text-sm">Contact : <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline">zonia.ai.pro@gmail.com</a></p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">3. Hébergement</h3>
+            <div className="space-y-2 text-sm">
+              <p><strong className="text-white">Hébergeur :</strong> Hostinger International Ltd.</p>
+              <p className="text-slate-400 text-xs ml-4">61 Lordou Vironos Street, 6023 Larnaca, Chypre</p>
+              <p className="text-slate-400 text-xs ml-4">Site web : <a href="https://www.hostinger.fr" target="_blank" rel="noopener noreferrer" className="text-[#19E4FA] hover:underline">www.hostinger.fr</a></p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">4. Propriété intellectuelle</h3>
+            <p className="text-sm mb-2">
+              L'ensemble de ce site relève de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. 
+              Tous les droits de reproduction sont réservés, y compris pour les documents téléchargeables et les représentations iconographiques et photographiques.
+            </p>
+            <p className="text-sm">
+              La reproduction de tout ou partie de ce site sur un support électronique ou autre est formellement interdite sauf autorisation expresse du directeur de publication.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">5. Responsabilité</h3>
+            <p className="text-sm mb-2">
+              Les informations contenues sur ce site sont aussi précises que possible et le site est périodiquement remis à jour, 
+              mais peut toutefois contenir des inexactitudes, des omissions ou des lacunes.
+            </p>
+            <p className="text-sm">
+              Zonia Systems ne pourra être tenu responsable des dommages directs et indirects causés au matériel de l'utilisateur, 
+              lors de l'accès au site, et résultant soit de l'utilisation d'un matériel ne répondant pas aux spécifications, 
+              soit de l'apparition d'un bug ou d'une incompatibilité.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">6. Liens hypertextes</h3>
+            <p className="text-sm">
+              Le site peut contenir des liens hypertextes vers d'autres sites présents sur le réseau Internet. 
+              Les liens vers ces autres ressources vous font quitter le site. Il est possible de créer un lien vers la page de présentation 
+              de ce site sans autorisation expresse de l'éditeur.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">7. Droit applicable</h3>
+            <p className="text-sm">
+              Tout litige en relation avec l'utilisation du site est soumis au droit français. 
+              Il est fait attribution exclusive de juridiction aux tribunaux compétents de [Ville du siège social].
+            </p>
+          </section>
+        </div>
+      </Modal>
+
+      {/* Modale Politique de Confidentialité */}
+      <Modal 
+        isOpen={openModal === 'privacy'} 
+        onClose={() => setOpenModal(null)}
+        title={
+          <>
+            <Shield className="w-6 h-6 text-[#19E4FA]" />
+            Politique de Confidentialité
+          </>
+        }
+      >
+        <div className="space-y-6">
+          <section>
+            <p className="text-sm mb-4">
+              La présente politique de confidentialité décrit la manière dont Zonia Systems collecte, utilise et protège 
+              vos informations personnelles lorsque vous utilisez notre site web et nos services.
+            </p>
+            <p className="text-sm text-slate-400">
+              <strong className="text-white">Dernière mise à jour :</strong> {new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">1. Données collectées</h3>
+            <p className="text-sm mb-2">Nous collectons les informations suivantes :</p>
+            <ul className="list-disc list-inside space-y-1 text-sm ml-4">
+              <li><strong className="text-white">Données d'identification :</strong> nom, prénom, adresse email professionnelle</li>
+              <li><strong className="text-white">Données de navigation :</strong> adresse IP, type de navigateur, pages visitées, durée de visite</li>
+              <li><strong className="text-white">Données de communication :</strong> messages envoyés via les formulaires de contact</li>
+              <li><strong className="text-white">Cookies :</strong> données de préférences et de session (voir section Cookies)</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">2. Utilisation des données</h3>
+            <p className="text-sm mb-2">Vos données personnelles sont utilisées pour :</p>
+            <ul className="list-disc list-inside space-y-1 text-sm ml-4">
+              <li>Répondre à vos demandes de contact et de support</li>
+              <li>Vous envoyer des informations sur nos services (avec votre consentement)</li>
+              <li>Améliorer notre site web et nos services</li>
+              <li>Assurer la sécurité et prévenir les fraudes</li>
+              <li>Respecter nos obligations légales et réglementaires</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">3. Base légale du traitement</h3>
+            <p className="text-sm">
+              Le traitement de vos données personnelles est basé sur :
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm ml-4 mt-2">
+              <li>Votre consentement (pour les communications marketing)</li>
+              <li>L'exécution d'un contrat ou de mesures précontractuelles</li>
+              <li>Notre intérêt légitime (amélioration des services, sécurité)</li>
+              <li>Le respect d'obligations légales</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">4. Conservation des données</h3>
+            <p className="text-sm">
+              Vos données sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées, 
+              conformément aux obligations légales. Les données de contact sont conservées pendant 3 ans à compter du dernier contact. 
+              Les données de navigation sont conservées pendant 13 mois maximum.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">5. Partage des données</h3>
+            <p className="text-sm mb-2">
+              Vos données personnelles ne sont pas vendues, louées ou cédées à des tiers. Elles peuvent être partagées avec :
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm ml-4">
+              <li>Nos prestataires techniques (hébergement, outils d'analyse) sous contrat strict</li>
+              <li>Les autorités compétentes si la loi l'exige</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">6. Vos droits (RGPD)</h3>
+            <p className="text-sm mb-2">Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :</p>
+            <ul className="list-disc list-inside space-y-1 text-sm ml-4">
+              <li><strong className="text-white">Droit d'accès :</strong> obtenir une copie de vos données personnelles</li>
+              <li><strong className="text-white">Droit de rectification :</strong> corriger vos données inexactes</li>
+              <li><strong className="text-white">Droit à l'effacement :</strong> supprimer vos données ("droit à l'oubli")</li>
+              <li><strong className="text-white">Droit à la limitation :</strong> limiter le traitement de vos données</li>
+              <li><strong className="text-white">Droit à la portabilité :</strong> récupérer vos données dans un format structuré</li>
+              <li><strong className="text-white">Droit d'opposition :</strong> vous opposer au traitement de vos données</li>
+              <li><strong className="text-white">Droit de retirer votre consentement :</strong> à tout moment</li>
+            </ul>
+            <p className="text-sm mt-3">
+              Pour exercer ces droits, contactez-nous à : <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline">zonia.ai.pro@gmail.com</a>
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">7. Cookies</h3>
+            <p className="text-sm mb-2">
+              Notre site utilise des cookies pour améliorer votre expérience de navigation. Les cookies sont de petits fichiers texte 
+              stockés sur votre appareil. Nous utilisons :
+            </p>
+            <ul className="list-disc list-inside space-y-1 text-sm ml-4">
+              <li><strong className="text-white">Cookies essentiels :</strong> nécessaires au fonctionnement du site</li>
+              <li><strong className="text-white">Cookies analytiques :</strong> pour comprendre l'utilisation du site (avec votre consentement)</li>
+            </ul>
+            <p className="text-sm mt-3">
+              Vous pouvez gérer vos préférences de cookies via les paramètres de votre navigateur.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">8. Sécurité</h3>
+            <p className="text-sm">
+              Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données personnelles 
+              contre tout accès non autorisé, perte, destruction ou altération. Cependant, aucune méthode de transmission sur Internet 
+              n'est totalement sécurisée.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">9. Contact</h3>
+            <p className="text-sm">
+              Pour toute question concernant cette politique de confidentialité ou le traitement de vos données personnelles, 
+              vous pouvez nous contacter :
+            </p>
+            <div className="mt-3 p-4 bg-slate-800/50 rounded-lg text-sm">
+              <p><strong className="text-white">Email :</strong> <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline">zonia.ai.pro@gmail.com</a></p>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">10. Réclamation</h3>
+            <p className="text-sm">
+              Si vous estimez que vos droits ne sont pas respectés, vous avez le droit d'introduire une réclamation auprès 
+              de la Commission Nationale de l'Informatique et des Libertés (CNIL) : 
+              <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" className="text-[#19E4FA] hover:underline ml-1">www.cnil.fr</a>
+            </p>
+          </section>
+        </div>
+      </Modal>
+
+      {/* Modale Support */}
+      <Modal 
+        isOpen={openModal === 'support'} 
+        onClose={() => setOpenModal(null)}
+        title={
+          <>
+            <HelpCircle className="w-6 h-6 text-[#FFD700]" />
+            Support & Aide
+          </>
+        }
+      >
+        <div className="space-y-6">
+          <section>
+            <p className="text-sm mb-4">
+              Notre équipe de support est là pour vous aider. Consultez les informations ci-dessous ou contactez-nous directement.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
+              <Mail className="w-5 h-5 text-[#19E4FA]" />
+              Contact Support
+            </h3>
+            <div className="bg-slate-800/50 rounded-lg p-4 space-y-3 text-sm">
+              <div>
+                <strong className="text-white">Email général :</strong>
+                <p className="mt-1"><a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline">zonia.ai.pro@gmail.com</a></p>
+              </div>
+              <div>
+                <strong className="text-white">Email technique :</strong>
+                <p className="mt-1"><a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline">zonia.ai.pro@gmail.com</a></p>
+              </div>
+              <div>
+                <strong className="text-white">Téléphone :</strong>
+                <p className="mt-1">[À compléter - Numéro de téléphone]</p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">Horaires de support</h3>
+            <div className="bg-slate-800/50 rounded-lg p-4 text-sm">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Lundi - Vendredi</span>
+                  <span className="text-white font-medium">9h00 - 18h00 (CET)</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Samedi - Dimanche</span>
+                  <span className="text-white font-medium">Fermé</span>
+                </div>
+                <p className="text-xs text-slate-500 mt-3">
+                  Pour les urgences critiques, contactez-nous par email. Nous répondrons dans les plus brefs délais.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">Questions fréquentes (FAQ)</h3>
+            <div className="space-y-4">
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2">Comment puis-je demander une démonstration ?</h4>
+                <p className="text-sm text-slate-300">
+                  Utilisez le formulaire de contact sur la page d'accueil ou envoyez-nous un email à 
+                  <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline ml-1">zonia.ai.pro@gmail.com</a>. 
+                  Nous vous répondrons sous 24h ouvrées.
+                </p>
+              </div>
+
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2">Quels types de solutions proposez-vous ?</h4>
+                <p className="text-sm text-slate-300">
+                  Nous proposons des solutions d'automatisation sur mesure : traitement d'emails IA, chatbots, 
+                  systèmes RAG documentaires, prise de rendez-vous automatisée, et bien plus. 
+                  Consultez notre section "Solutions" pour plus de détails.
+                </p>
+              </div>
+
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2">Combien de temps prend l'implémentation ?</h4>
+                <p className="text-sm text-slate-300">
+                  Le délai dépend de la complexité de votre projet. Pour une solution standard, comptez 2 à 4 semaines. 
+                  Pour des projets sur mesure, nous établissons un planning personnalisé lors de l'audit initial.
+                </p>
+              </div>
+
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2">Proposez-vous un support après l'installation ?</h4>
+                <p className="text-sm text-slate-300">
+                  Oui, nous proposons différents niveaux de support : maintenance, formation, et assistance technique. 
+                  Contactez-nous pour connaître nos offres de support.
+                </p>
+              </div>
+
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2">Vos solutions sont-elles conformes au RGPD ?</h4>
+                <p className="text-sm text-slate-300">
+                  Absolument. La conformité RGPD est une priorité. Toutes nos solutions respectent les réglementations 
+                  en vigueur sur la protection des données personnelles.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-bold text-white mb-3">Ressources supplémentaires</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2 text-sm">Documentation</h4>
+                <p className="text-xs text-slate-400">Guides d'utilisation et tutoriels</p>
+                <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline text-sm mt-2 inline-block">Demander l'accès →</a>
+              </div>
+              <div className="bg-slate-800/50 rounded-lg p-4">
+                <h4 className="font-bold text-white mb-2 text-sm">Formation</h4>
+                <p className="text-xs text-slate-400">Sessions de formation pour vos équipes</p>
+                <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline text-sm mt-2 inline-block">En savoir plus →</a>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-gradient-to-r from-[#19E4FA]/10 to-[#FFD700]/10 rounded-lg p-4 border border-[#19E4FA]/20">
+            <h3 className="font-bold text-white mb-2">Besoin d'aide immédiate ?</h3>
+            <p className="text-sm text-slate-300 mb-3">
+              Pour les problèmes urgents, contactez-nous directement par email avec le sujet "URGENT" 
+              et nous prioriserons votre demande.
+            </p>
+            <a 
+              href="mailto:zonia.ai.pro@gmail.com?subject=URGENT%20-%20Demande%20de%20support" 
+              className="inline-flex items-center gap-2 bg-[#19E4FA] hover:bg-[#FFD700] text-slate-900 font-bold px-4 py-2 rounded-lg transition-colors text-sm"
+            >
+              <Send className="w-4 h-4" />
+              Contacter le support
+            </a>
+          </section>
+        </div>
+      </Modal>
     </div>
   );
 };

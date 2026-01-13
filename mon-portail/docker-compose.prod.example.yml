@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  mon-portail:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      # Configuration Gmail pour l'envoi d'emails
+      - GMAIL_USER=zonia.ai.pro@gmail.com
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      
+      # Configuration du serveur
+      - NODE_ENV=production
+      - PORT=3000
+      - SESSION_SECRET=${SESSION_SECRET}
+      
+      # Configuration HTTPS (si vous utilisez Traefik ou un reverse proxy)
+      - FORCE_HTTPS=true
+      - SECURE_COOKIES=true
+      
+    volumes:
+      # Montage du build React
+      - ./dist:/app/dist
+      
+      # Montage du fichier users.json (si nécessaire)
+      - ./users.json:/app/users.json
+      
+    restart: unless-stopped
+    
+    # Labels pour Traefik (si vous utilisez Traefik comme reverse proxy)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mon-portail.rule=Host(`votre-domaine.com`)"
+      - "traefik.http.routers.mon-portail.entrypoints=websecure"
+      - "traefik.http.routers.mon-portail.tls.certresolver=letsencrypt"
+      - "traefik.http.services.mon-portail.loadbalancer.server.port=3000"
