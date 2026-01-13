@@ -13,6 +13,13 @@ import nodemailer from 'nodemailer';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Vérification du chargement des variables d'environnement au démarrage
+console.log('🔐 Vérification des variables d\'environnement:');
+console.log('  - GMAIL_USER:', process.env.GMAIL_USER ? '✅ ' + process.env.GMAIL_USER : '❌ Non défini');
+console.log('  - GMAIL_APP_PASSWORD:', process.env.GMAIL_APP_PASSWORD ? '✅ Configuré (' + process.env.GMAIL_APP_PASSWORD.length + ' caractères)' : '❌ Non défini');
+console.log('  - GMAIL_PASSWORD:', process.env.GMAIL_PASSWORD ? '✅ Configuré' : '❌ Non défini');
+console.log('  - NODE_ENV:', process.env.NODE_ENV || 'development');
+
 const app = express();
 const server = http.createServer(app);
 
@@ -200,15 +207,43 @@ app.post('/api/contact', async (req, res) => {
             return res.status(400).json({ error: 'Email invalide' });
         }
 
+        // Vérification des variables d'environnement
+        const gmailUser = process.env.GMAIL_USER || 'zonia.ai.pro@gmail.com';
+        const gmailPassword = process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASSWORD;
+        
+        if (!gmailPassword) {
+            console.error('❌ GMAIL_APP_PASSWORD ou GMAIL_PASSWORD non défini dans les variables d\'environnement');
+            return res.status(500).json({ 
+                error: 'Configuration email manquante. Veuillez contacter l\'administrateur.' 
+            });
+        }
+
+        console.log('📧 Configuration email:', {
+            user: gmailUser,
+            passwordConfigured: gmailPassword ? '✅ Oui' : '❌ Non',
+            passwordLength: gmailPassword ? gmailPassword.length : 0
+        });
+
         // Configuration du transporteur email avec Gmail
         // Les credentials peuvent être passés via variables d'environnement
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: process.env.GMAIL_USER || 'zonia.ai.pro@gmail.com',
-                pass: process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASSWORD
+                user: gmailUser,
+                pass: gmailPassword
             }
         });
+
+        // Vérifier la connexion avant d'envoyer
+        try {
+            await transporter.verify();
+            console.log('✅ Connexion SMTP Gmail vérifiée');
+        } catch (verifyError) {
+            console.error('❌ Erreur de vérification SMTP:', verifyError);
+            return res.status(500).json({ 
+                error: 'Erreur de connexion au serveur email. Veuillez réessayer plus tard.' 
+            });
+        }
 
         // Contenu de l'email
         const mailOptions = {
@@ -233,13 +268,32 @@ app.post('/api/contact', async (req, res) => {
         };
 
         // Envoi de l'email
-        await transporter.sendMail(mailOptions);
+        const info = await transporter.sendMail(mailOptions);
         
         console.log(`✅ Email de demande d'audit envoyé pour: ${email}`);
+        console.log('📧 Détails de l\'envoi:', {
+            messageId: info.messageId,
+            accepted: info.accepted,
+            rejected: info.rejected
+        });
+        
         res.json({ success: true, message: 'Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h ouvrées.' });
     } catch (error) {
         console.error('❌ Erreur lors de l\'envoi de l\'email:', error);
-        res.status(500).json({ error: 'Erreur lors de l\'envoi de la demande. Veuillez réessayer plus tard.' });
+        console.error('❌ Détails de l\'erreur:', {
+            message: error.message,
+            code: error.code,
+            command: error.command,
+            response: error.response,
+            responseCode: error.responseCode
+        });
+        
+        // Message d'erreur plus détaillé pour le développement
+        const errorMessage = process.env.NODE_ENV === 'development' 
+            ? `Erreur: ${error.message}` 
+            : 'Erreur lors de l\'envoi de la demande. Veuillez réessayer plus tard.';
+            
+        res.status(500).json({ error: errorMessage });
     }
 });
 
