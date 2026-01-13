@@ -225,23 +225,26 @@ app.post('/api/contact', async (req, res) => {
         });
 
         // Configuration du transporteur email avec Gmail
-        // Utilisation explicite du port 465 avec SSL pour éviter les problèmes de timeout
+        // Utilisation du port 587 avec STARTTLS (plus compatible avec Docker)
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
-            port: 465,
-            secure: true, // true pour le port 465 (SSL), false pour 587 (TLS)
+            port: 587,
+            secure: false, // false pour 587 (STARTTLS), true pour 465 (SSL direct)
+            requireTLS: true, // Force l'utilisation de TLS
             auth: {
                 user: gmailUser,
                 pass: gmailPassword
             },
             // Options supplémentaires pour améliorer la connexion
-            connectionTimeout: 30000, // 30 secondes (augmenté)
+            connectionTimeout: 30000, // 30 secondes
             greetingTimeout: 30000,
             socketTimeout: 30000,
-            // Désactiver la vérification SSL stricte si nécessaire (déconseillé en production)
-            // tls: {
-            //     rejectUnauthorized: false
-            // },
+            // Configuration TLS
+            tls: {
+                // Ne pas rejeter les certificats non autorisés (peut être nécessaire dans certains environnements Docker)
+                rejectUnauthorized: false,
+                minVersion: 'TLSv1.2'
+            },
             // Retry en cas d'échec
             pool: false,
             maxConnections: 1,
