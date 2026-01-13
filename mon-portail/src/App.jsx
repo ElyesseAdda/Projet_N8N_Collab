@@ -5,13 +5,11 @@ import Dashboard from './components/Dashboard';
 import Vitrine from './components/Vitrine';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Composant pour rediriger vers n8n/dashboard selon l'environnement
+// Composant pour rediriger vers dashboard
 function RedirectToN8n() {
   useEffect(() => {
-    // En développement, rediriger vers /dashboard (affiche n8n dans iframe)
-    // En production, rediriger vers /n8n (route gérée par Traefik)
-    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    window.location.href = isDevelopment ? '/dashboard' : '/n8n';
+    // Rediriger vers /dashboard (affiche n8n dans iframe avec ControlCard)
+    window.location.href = '/dashboard';
   }, []);
   return null;
 }

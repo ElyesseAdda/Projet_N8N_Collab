@@ -56,10 +56,10 @@ app.use((req, res, next) => {
     // En HTTP, ces headers seront envoyés mais ignorés par le navigateur
     // En HTTPS, ils seront actifs et le warning disparaîtra
     // 
-    // IMPORTANT: Cross-Origin-Embedder-Policy est activé pour la sécurité
-    // n8n doit aussi avoir ce header (configuré via Traefik middleware) pour être compatible
+    // NOTE: Cross-Origin-Embedder-Policy est désactivé car n8n charge des ressources externes
+    // (CDN n8n, PostHog) qui ne supportent pas CORP. COEP require-corp bloquerait ces ressources.
     // Cross-Origin-Opener-Policy pour renforcer l'isolation des origines
-    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    // res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp'); // Désactivé pour n8n
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     
     // HSTS uniquement en HTTPS (sinon ignoré)

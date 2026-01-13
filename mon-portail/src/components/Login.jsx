@@ -36,14 +36,8 @@ function Login({ onLogin }) {
 
       if (response.ok && data.success) {
         onLogin(data.user);
-        // En développement, rediriger vers /dashboard (affiche n8n dans iframe)
-        // En production, rediriger vers /n8n (route gérée par Traefik)
-        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        if (isDevelopment) {
-          navigate('/dashboard');
-        } else {
-          window.location.href = '/n8n';
-        }
+        // Rediriger vers /dashboard (affiche n8n dans iframe avec ControlCard)
+        navigate('/dashboard');
       } else {
         setError(data.error || 'Erreur de connexion');
       }
