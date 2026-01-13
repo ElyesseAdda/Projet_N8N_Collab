@@ -473,15 +473,38 @@ function Dashboard({ user, onLogout }) {
   // Vérifier si plusieurs utilisateurs sont sur le workflow actuel
   const hasMultipleUsers = workflowUsers.length > 1;
 
+  console.log('Dashboard: Rendu avec user:', user);
+
+  // En développement, n8n n'est pas disponible
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
   return (
     <div className="dashboard">
-      <iframe 
-        id="n8n-frame" 
-        ref={iframeRef}
-        src="/n8n/" 
-        title="n8n Workflow"
-        allow="fullscreen"
-      ></iframe>
+      {isDevelopment ? (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          background: '#fff',
+          color: '#333',
+          padding: '40px',
+          textAlign: 'center'
+        }}>
+          <h2 style={{ fontSize: '24px', marginBottom: '16px' }}>🚧 Mode Développement</h2>
+          <p style={{ fontSize: '16px', marginBottom: '8px' }}>N8N n'est pas disponible en développement.</p>
+          <p style={{ fontSize: '14px', color: '#666' }}>Le Dashboard fonctionnera en production avec N8N intégré.</p>
+        </div>
+      ) : (
+        <iframe 
+          id="n8n-frame" 
+          ref={iframeRef}
+          src="/n8n/" 
+          title="n8n Workflow"
+          allow="fullscreen"
+        ></iframe>
+      )}
       
       {/* Badge d'avertissement pour plusieurs utilisateurs */}
       {hasMultipleUsers && currentWorkflow && (

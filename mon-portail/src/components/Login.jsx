@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 
 function Login({ onLogin }) {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,10 +24,26 @@ function Login({ onLogin }) {
         body: JSON.stringify({ username, password }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : {};
+      } catch (parseError) {
+        console.error('Erreur de parsing JSON:', parseError);
+        setError('Erreur de connexion au serveur (réponse invalide)');
+        return;
+      }
 
       if (response.ok && data.success) {
         onLogin(data.user);
+        // En développement, rediriger vers /dashboard (affiche n8n dans iframe)
+        // En production, rediriger vers /n8n (route gérée par Traefik)
+        const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (isDevelopment) {
+          navigate('/dashboard');
+        } else {
+          window.location.href = '/n8n';
+        }
       } else {
         setError(data.error || 'Erreur de connexion');
       }

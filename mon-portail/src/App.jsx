@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import Vitrine from './components/Vitrine';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
+// Composant pour rediriger vers n8n/dashboard selon l'environnement
+function RedirectToN8n() {
+  useEffect(() => {
+    // En développement, rediriger vers /dashboard (affiche n8n dans iframe)
+    // En production, rediriger vers /n8n (route gérée par Traefik)
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    window.location.href = isDevelopment ? '/dashboard' : '/n8n';
+  }, []);
+  return null;
+}
+
+function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
@@ -17,9 +32,15 @@ function App() {
         credentials: 'include', // Inclure les cookies pour maintenir la session
       });
       if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-        setIsAuthenticated(true);
+        try {
+          const text = await response.text();
+          const data = text ? JSON.parse(text) : {};
+          setUser(data.user);
+          setIsAuthenticated(true);
+        } catch (parseError) {
+          console.error('Erreur de parsing JSON:', parseError);
+          setIsAuthenticated(false);
+        }
       } else {
         setIsAuthenticated(false);
       }
@@ -45,6 +66,7 @@ function App() {
       if (response.ok) {
         setUser(null);
         setIsAuthenticated(false);
+        navigate('/connect');
       }
     } catch (error) {
       console.error('Erreur de déconnexion:', error);
@@ -65,13 +87,43 @@ function App() {
   }
 
   return (
-    <>
-      {isAuthenticated ? (
-        <Dashboard user={user} onLogout={handleLogout} />
-      ) : (
-        <Login onLogin={handleLogin} />
-      )}
-    </>
+    <Routes>
+      {/* Route racine : Vitrine publique */}
+      <Route path="/" element={<Vitrine />} />
+      
+      {/* Route de connexion : Login si non connecté, sinon rediriger vers n8n */}
+      <Route 
+        path="/connect" 
+        element={
+          isAuthenticated ? (
+            <RedirectToN8n />
+          ) : (
+            <Login onLogin={handleLogin} />
+          )
+        } 
+      />
+      
+      {/* Route dashboard (optionnelle, gardée pour compatibilité) */}
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <Dashboard user={user} onLogout={handleLogout} />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Route catch-all pour les routes non trouvées */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
   );
 }
 

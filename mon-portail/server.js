@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import nodemailer from 'nodemailer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -188,7 +189,60 @@ app.get('/api/me', (req, res) => {
     }
 });
 
-// En production, servir les fichiers React buildés
+// Route pour envoyer les demandes d'audit par email
+app.post('/api/contact', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Validation de l'email
+        if (!email || !email.includes('@')) {
+            return res.status(400).json({ error: 'Email invalide' });
+        }
+
+        // Configuration du transporteur email avec Gmail
+        // Les credentials peuvent être passés via variables d'environnement
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.GMAIL_USER || 'zonia.ai.pro@gmail.com',
+                pass: process.env.GMAIL_APP_PASSWORD || process.env.GMAIL_PASSWORD
+            }
+        });
+
+        // Contenu de l'email
+        const mailOptions = {
+            from: process.env.GMAIL_USER || 'zonia.ai.pro@gmail.com',
+            to: 'zonia.ai.pro@gmail.com',
+            subject: 'Nouvelle demande d\'audit gratuit - Zonia',
+            html: `
+                <h2>Nouvelle demande d'audit gratuit</h2>
+                <p><strong>Email du client:</strong> ${email}</p>
+                <p><strong>Date:</strong> ${new Date().toLocaleString('fr-FR')}</p>
+                <hr>
+                <p>Cette demande provient du formulaire de contact sur le site Zonia.</p>
+            `,
+            text: `
+                Nouvelle demande d'audit gratuit
+                
+                Email du client: ${email}
+                Date: ${new Date().toLocaleString('fr-FR')}
+                
+                Cette demande provient du formulaire de contact sur le site Zonia.
+            `
+        };
+
+        // Envoi de l'email
+        await transporter.sendMail(mailOptions);
+        
+        console.log(`✅ Email de demande d'audit envoyé pour: ${email}`);
+        res.json({ success: true, message: 'Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h ouvrées.' });
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'envoi de l\'email:', error);
+        res.status(500).json({ error: 'Erreur lors de l\'envoi de la demande. Veuillez réessayer plus tard.' });
+    }
+});
+
+// En production, servir d'abord les fichiers React buildés depuis dist/
 // IMPORTANT: Ne pas intercepter /n8n - laissé au reverse proxy Traefik
 if (process.env.NODE_ENV === 'production') {
     console.log('📁 Configuration production: chargement des fichiers statiques depuis dist/');
@@ -197,36 +251,41 @@ if (process.env.NODE_ENV === 'production') {
     const distPath = path.join(__dirname, 'dist');
     console.log(`📁 Chemin dist: ${distPath}`);
     app.use(express.static(distPath));
-    
-    // Protéger les routes API qui nécessitent une authentification
-    // Les routes /api/* (sauf /api/login et /api/logout) nécessitent une authentification
-    console.log('🔒 Configuration des routes API protégées');
-    app.use('/api', (req, res, next) => {
-        // Laisser passer /api/login et /api/logout sans authentification
-        if (req.path === '/login' || req.path === '/logout') {
-            return next();
-        }
-        // Pour les autres routes API, vérifier l'authentification
-        requireAuth(req, res, next);
-    });
-    
-    // Servir index.html pour toutes les routes restantes (SPA routing)
-    // Cela permet à React Router de gérer le routing côté client
-    // React vérifiera l'authentification via /api/me et affichera le login si nécessaire
-    // IMPORTANT: Ce middleware doit être le dernier pour ne pas intercepter les routes API
+} else {
+    // En développement, servir les fichiers statiques du dossier public
+    const publicPath = path.join(__dirname, 'public');
+    console.log('📁 Configuration dev: chargement des fichiers statiques depuis public/');
+    app.use(express.static(publicPath));
+}
+
+// Protéger les routes API qui nécessitent une authentification
+// Les routes /api/* (sauf /api/login, /api/logout et /api/contact) nécessitent une authentification
+console.log('🔒 Configuration des routes API protégées');
+app.use('/api', (req, res, next) => {
+    // Laisser passer /api/login, /api/logout et /api/contact sans authentification
+    if (req.path === '/login' || req.path === '/logout' || req.path === '/contact') {
+        return next();
+    }
+    // Pour les autres routes API, vérifier l'authentification
+    requireAuth(req, res, next);
+});
+
+// Routes React - servir index.html pour le routing React (SPA)
+// Toutes les routes frontend sont gérées par React Router
+if (process.env.NODE_ENV === 'production') {
     console.log('🌐 Configuration du routing SPA (catch-all pour index.html)');
-    app.use((req, res, next) => {
+    app.get('*', (req, res, next) => {
         // Ne jamais servir index.html pour /n8n (doit être routé vers n8n par Traefik)
         if (req.path.startsWith('/n8n')) {
             return res.status(404).send('Not found');
         }
         // Ne pas servir index.html pour les routes API (déjà traitées)
         if (req.path.startsWith('/api')) {
-            return next(); // Laisser passer, devrait déjà être traité
+            return next();
         }
         // Ne pas servir index.html pour les fichiers statiques (déjà servis par express.static)
         // Si on arrive ici, c'est que express.static n'a pas trouvé le fichier
-        // Donc on sert index.html pour permettre le routing React
+        // Donc on sert index.html pour permettre le routing React (/, /connect, /dashboard, etc.)
         res.sendFile(path.join(__dirname, 'dist', 'index.html'), (err) => {
             if (err) {
                 console.error('Erreur lors de l\'envoi de index.html:', err);
@@ -236,7 +295,7 @@ if (process.env.NODE_ENV === 'production') {
     });
 } else {
     // En développement, Vite s'occupe du frontend sur le port 5173
-    // Le serveur Express ne sert que les API
+    // Le serveur Express ne sert que les API et les fichiers statiques
 }
 
 // Stockage des utilisateurs connectés et leurs workflows
