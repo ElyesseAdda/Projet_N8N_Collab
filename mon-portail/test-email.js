@@ -22,11 +22,16 @@ if (!gmailPassword) {
 // Configuration du transporteur
 console.log('📧 Configuration du transporteur email...');
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true pour le port 465 (SSL)
     auth: {
         user: gmailUser,
         pass: gmailPassword
-    }
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
 });
 
 // Test de connexion

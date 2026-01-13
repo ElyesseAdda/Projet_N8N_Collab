@@ -225,13 +225,23 @@ app.post('/api/contact', async (req, res) => {
         });
 
         // Configuration du transporteur email avec Gmail
-        // Les credentials peuvent être passés via variables d'environnement
+        // Utilisation explicite du port 465 avec SSL pour éviter les problèmes de timeout
         const transporter = nodemailer.createTransport({
-            service: 'gmail',
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true, // true pour le port 465 (SSL), false pour 587 (TLS)
             auth: {
                 user: gmailUser,
                 pass: gmailPassword
-            }
+            },
+            // Options supplémentaires pour améliorer la connexion
+            connectionTimeout: 10000, // 10 secondes
+            greetingTimeout: 10000,
+            socketTimeout: 10000,
+            // Retry en cas d'échec
+            pool: false,
+            maxConnections: 1,
+            maxMessages: 3
         });
 
         // Vérifier la connexion avant d'envoyer
