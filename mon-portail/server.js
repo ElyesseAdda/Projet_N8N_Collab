@@ -274,7 +274,12 @@ app.use('/api', (req, res, next) => {
 // Toutes les routes frontend sont gérées par React Router
 if (process.env.NODE_ENV === 'production') {
     console.log('🌐 Configuration du routing SPA (catch-all pour index.html)');
-    app.get('*', (req, res, next) => {
+    // Utiliser app.use() au lieu de app.get('*') car Express 5.x ne supporte plus le pattern '*'
+    app.use((req, res, next) => {
+        // Ne traiter que les requêtes GET (les autres sont déjà gérées)
+        if (req.method !== 'GET') {
+            return next();
+        }
         // Ne jamais servir index.html pour /n8n (doit être routé vers n8n par Traefik)
         if (req.path.startsWith('/n8n')) {
             return res.status(404).send('Not found');
