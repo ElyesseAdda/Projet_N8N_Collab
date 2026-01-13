@@ -81,10 +81,10 @@ function Login({ onLogin }) {
                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
                   </filter>
                 </defs>
-                {/* Glow Layer */}
+                {/* Glow Layer - Gold */}
                 <path 
                   d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" 
-                  stroke="#a855f7" 
+                  stroke="#FFD700" 
                   strokeWidth="4" 
                   strokeLinecap="round" 
                   strokeLinejoin="round" 
@@ -103,9 +103,9 @@ function Login({ onLogin }) {
                   fill="none"
                   className="draw-path"
                 />
-                {/* Tech Dot */}
-                <circle cx="50" cy="50" r="3" fill="#a855f7" className="ping-dot"/>
-                <circle cx="50" cy="50" r="3" fill="#a855f7"/>
+                {/* Tech Dot - Gold */}
+                <circle cx="50" cy="50" r="5" fill="#FFD700" className="ping-dot"/>
+                <circle cx="50" cy="50" r="5" fill="#FFD700"/>
               </svg>
             </div>
             <h1 className="logo-title">ZONIA</h1>

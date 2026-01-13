@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zonia | Solutions d'Automatisation IA</title>
+    <meta name="description" content="Automatisation et amélioration de production sur mesure pour les entreprises grâce à l'Intelligence Artificielle.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Configuration Tailwind pour la Palette Exacte -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: '#FFD700',
+                        cyan: '#19E4FA',
+                        slate: {
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            500: '#64748b',
+                            400: '#94a3b8'
+                        }
+                    },
+                    boxShadow: {
+                        'glow-cyan': '0 0 20px -5px rgba(25, 228, 250, 0.5)',
+                        'glow-gold': '0 0 20px -5px rgba(255, 215, 0, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+        
+        /* Grille de fond Tech */
+        .bg-grid {
+            background-size: 60px 60px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+
+        /* Effet de lueur d'ambiance - CYAN */
+        .glow-blob {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(25, 228, 250, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: #FFD700; /* BORDURE ACTIVE OR */
+            box-shadow: 0 10px 30px -10px rgba(255, 215, 0, 0.15);
+        }
+
+        /* Animation du texte gradient - OR -> CYAN -> OR */
+        .text-gradient {
+            background: linear-gradient(to right, #FFD700, #19E4FA, #FFD700);
+            background-size: 200% auto;
+            color: #000;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* --- ANIMATIONS POUR LA DEMO RAG --- */
+        
+        .msg-enter {
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animation de scan sur le fichier - CYAN */
+        .file-scan {
+            position: relative;
+            overflow: hidden;
+        }
+        .file-scan::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(25, 228, 250, 0.4), transparent);
+            animation: scanFile 2s ease-in-out infinite;
+            display: none;
+        }
+        .scanning .file-scan::after {
+            display: block;
+        }
+
+        .demo-file-item {
+            transition: all 0.3s;
+        }
+        /* Style actif pour le fichier sélectionné - BORDURE OR */
+        .demo-file-item.active-file {
+            background: rgba(255, 215, 0, 0.05); 
+            border-color: #FFD700;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 overflow-x-hidden selection:bg-gold selection:text-slate-900">
+
+    <!-- Background Layer -->
+    <div class="fixed inset-0 bg-grid pointer-events-none z-0"></div>
+    <div class="glow-blob top-[-200px] left-[-200px]"></div>
+    <div class="glow-blob bottom-[-200px] right-[-200px]" style="background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(15, 23, 42, 0) 70%);"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo Zonia - UPDATE OR -->
+                <div class="flex items-center gap-3">
+                    <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
+                         <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                         <circle cx="50" cy="50" r="5" fill="#FFD700" /> <!-- Point Or -->
+                    </svg>
+                    <span class="text-xl font-bold tracking-[0.2em] text-white">ZONIA</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#services" class="hover:text-gold transition-colors px-3 py-2 rounded-md text-sm font-medium">Solutions</a>
+                        <a href="#benefits" class="hover:text-gold transition-colors px-3 py-2 rounded-md text-sm font-medium">Avantages IA</a>
+                        <!-- Bouton Cyan avec texte foncé pour lisibilité -->
+                        <a href="#contact" class="bg-cyan hover:bg-cyan/80 text-slate-900 px-5 py-2.5 rounded-lg text-sm font-bold transition-transform hover:scale-105 shadow-glow-cyan">
+                            Démarrer un projet
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button class="text-gray-300 hover:text-white focus:outline-none p-2">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 z-10">
+        <div class="max-w-7xl mx-auto text-center">
+            <!-- Badge - Border Gold, Text Gold -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-gold/30 text-gold text-sm font-medium mb-8">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-gold"></span>
+                </span>
+                Automatisation sur mesure pour entreprises
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+                Libérez votre potentiel,<br>
+                <span class="text-gradient">automatisez le reste.</span>
+            </h1>
+            
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-400">
+                Zonia conçoit des outils d'IA personnalisés pour traiter vos emails, gérer vos documents et piloter votre service client. Gagnez du temps pour ce qui compte vraiment.
+            </p>
+            
+            <!-- Buttons -->
+            <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                <!-- Primary: Cyan -->
+                <a href="#contact" class="px-8 py-4 bg-cyan hover:bg-cyan/90 text-slate-900 rounded-xl font-bold text-lg shadow-glow-cyan transition-all hover:-translate-y-1 flex items-center justify-center gap-2">
+                    Audit Gratuit <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </a>
+                <!-- Secondary: Glass with Gold Hover -->
+                <a href="#services" class="px-8 py-4 glass-panel hover:bg-white/5 text-white rounded-xl font-bold text-lg border border-white/10 hover:border-gold/50 hover:text-gold transition-all hover:-translate-y-1">
+                    Nos Services
+                </a>
+            </div>
+
+            <!-- Dashboard Animation Container -->
+            <div class="mt-20 relative max-w-5xl mx-auto">
+                <!-- Glow Cyan arrière plan -->
+                <div class="absolute inset-0 bg-cyan blur-[120px] opacity-10 rounded-full"></div>
+                
+                <!-- Main App Window Simulation -->
+                <div class="relative glass-panel rounded-2xl border border-slate-700 overflow-hidden shadow-2xl h-[550px] md:h-[500px] flex text-left font-sans flex-col md:flex-row">
+                    
+                    <!-- Sidebar (Documents) -->
+                    <div class="w-full md:w-64 bg-slate-900/95 border-b md:border-b-0 md:border-r border-slate-700 p-4 flex flex-col gap-4 overflow-y-auto">
+                        <div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 hidden md:block">Base de Connaissances</div>
+                        
+                        <div class="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+                            <!-- Doc Item 1 -->
+                            <div id="file-rh" onclick="playDemo('rh')" class="demo-file-item flex items-center gap-3 p-3 rounded-lg border border-slate-700/50 hover:bg-slate-800 transition-colors cursor-pointer min-w-[200px] md:min-w-0">
+                                <div class="bg-slate-800 p-2 rounded text-slate-400"><i data-lucide="file-text" class="w-4 h-4"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-slate-300">Procédure_RH.pdf</div>
+                                    <div class="text-[10px] text-slate-500">1.2 MB</div>
+                                </div>
+                            </div>
+
+                            <!-- Doc Item 2 (Active by default) - Border Gold -->
+                            <div id="file-finance" onclick="playDemo('finance')" class="demo-file-item active-file flex items-center gap-3 p-3 rounded-lg border border-gold hover:bg-slate-800 transition-colors cursor-pointer min-w-[200px] md:min-w-0">
+                                <div class="bg-cyan/10 p-2 rounded text-cyan"><i data-lucide="file-bar-chart" class="w-4 h-4"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-white">Factures_Oct.pdf</div>
+                                    <div class="text-[10px] text-slate-400">En cours d'analyse...</div>
+                                </div>
+                            </div>
+
+                            <!-- Doc Item 3 -->
+                            <div id="file-stock" onclick="playDemo('stock')" class="demo-file-item flex items-center gap-3 p-3 rounded-lg border border-slate-700/50 hover:bg-slate-800 transition-colors cursor-pointer min-w-[200px] md:min-w-0">
+                                <div class="bg-slate-800 p-2 rounded text-slate-400"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i></div>
+                                <div>
+                                    <div class="text-sm font-medium text-slate-300">Stock_Q4.xlsx</div>
+                                    <div class="text-[10px] text-slate-500">2.4 MB</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- RAG Engine Indicator -->
+                        <div class="mt-auto p-3 bg-slate-800 rounded-lg border border-slate-700 hidden md:block">
+                            <div class="flex items-center gap-2 text-gold text-xs font-bold mb-1">
+                                <i data-lucide="zap" class="w-3 h-3"></i> Zonia RAG Engine
+                            </div>
+                            <div class="text-[10px] text-slate-400">Cliquez sur un fichier pour tester</div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Area -->
+                    <div class="flex-1 bg-slate-800/50 p-6 flex flex-col relative">
+                        <!-- Header -->
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-700 mb-4">
+                            <div class="flex items-center gap-3">
+                                <!-- Avatar Gradient: Gold to Cyan -->
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gold to-cyan flex items-center justify-center shadow-lg">
+                                    <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+                                        <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="50" cy="50" r="8" fill="black" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-white">Assistant Zonia</div>
+                                    <!-- Online Indicator: Cyan -->
+                                    <div class="text-xs text-cyan flex items-center gap-1 font-medium"><span class="w-1.5 h-1.5 bg-cyan rounded-full shadow-[0_0_5px_#19E4FA]"></span> En ligne</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages Container -->
+                        <div id="chat-container" class="flex-1 overflow-y-auto space-y-4 pr-2">
+                            <!-- JS Injection -->
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="mt-4 pt-4 border-t border-slate-700 relative">
+                            <input type="text" disabled placeholder="Sélectionnez un fichier..." class="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-400 text-sm focus:outline-none cursor-not-allowed opacity-70">
+                            <button class="absolute right-3 top-6 text-gold"><i data-lucide="send" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Nos Solutions Intelligentes</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">
+                    Nous déployons des briques technologiques adaptées à vos flux de travail existants. Pas de complexité, juste de l'efficacité.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Service 1: Emails - Cyan -->
+                <div class="glass-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-cyan/10 rounded-xl flex items-center justify-center mb-6 border border-cyan/20 group-hover:bg-cyan group-hover:border-cyan transition-colors">
+                        <i data-lucide="mail" class="w-7 h-7 text-cyan group-hover:text-slate-900"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-cyan transition-colors">Traitement d'Emails IA</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Analyse, tri et réponse automatique aux emails entrants. Détecte les urgences et prépare les brouillons.
+                    </p>
+                </div>
+
+                <!-- Service 2: Rendez-vous - Gold -->
+                <div class="glass-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gold/10 rounded-xl flex items-center justify-center mb-6 border border-gold/20 group-hover:bg-gold group-hover:border-gold transition-colors">
+                        <i data-lucide="calendar-clock" class="w-7 h-7 text-gold group-hover:text-slate-900"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-gold transition-colors">Prise de RDV Automatisée</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Synchronisation intelligente avec vos agendas. Vos clients réservent sans friction, sans allers-retours.
+                    </p>
+                </div>
+
+                <!-- Service 3: Chatbot - Cyan -->
+                <div class="glass-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-cyan/10 rounded-xl flex items-center justify-center mb-6 border border-cyan/20 group-hover:bg-cyan group-hover:border-cyan transition-colors">
+                        <i data-lucide="bot" class="w-7 h-7 text-cyan group-hover:text-slate-900"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-cyan transition-colors">Chatbot de Commande</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Assistant virtuel capable de guider l'achat, vérifier les stocks et valider les commandes 24/7.
+                    </p>
+                </div>
+
+                <!-- Service 4: Facturation - Gold -->
+                <div class="glass-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-gold/10 rounded-xl flex items-center justify-center mb-6 border border-gold/20 group-hover:bg-gold group-hover:border-gold transition-colors">
+                        <i data-lucide="file-check" class="w-7 h-7 text-gold group-hover:text-slate-900"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-gold transition-colors">Envoi Auto de Documents</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Génération et envoi automatique des factures à votre comptable et aux clients.
+                    </p>
+                </div>
+
+                <!-- Service 5: RAG / Drive - Cyan -->
+                <div class="glass-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 bg-cyan/10 rounded-xl flex items-center justify-center mb-6 border border-cyan/20 group-hover:bg-cyan group-hover:border-cyan transition-colors">
+                        <i data-lucide="database" class="w-7 h-7 text-cyan group-hover:text-slate-900"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-cyan transition-colors">Système RAG Documentaire</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        "Parlez" à votre Drive. Notre IA indexe vos PDF et docs techniques pour répondre instantanément.
+                    </p>
+                </div>
+
+                <!-- Service 6: Sur Mesure - Gold -->
+                <div class="glass-card p-8 rounded-2xl group border-dashed border-slate-600 bg-transparent">
+                    <div class="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center mb-6 group-hover:bg-gold group-hover:text-slate-900 transition-colors">
+                        <i data-lucide="sparkles" class="w-7 h-7 text-slate-300 group-hover:text-inherit"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3 group-hover:text-gold transition-colors">Solution Sur Mesure</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        Vous avez un besoin spécifique ? Nous auditons vos processus pour créer l'outil parfait.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits / Why AI Section -->
+    <section id="benefits" class="py-24 relative overflow-hidden z-10 bg-slate-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <div>
+                    <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">
+                        Pourquoi déléguer les tâches secondaires à l'IA ?
+                    </h2>
+                    <p class="text-slate-400 text-lg mb-8">
+                        L'automatisation ne remplace pas l'humain, elle le libère. Concentrez vos talents sur la stratégie et la relation client, laissez Zonia gérer le répétitif.
+                    </p>
+
+                    <div class="space-y-6">
+                        <!-- Benefit Item -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-cyan/10 flex items-center justify-center border border-cyan/30">
+                                <i data-lucide="clock" class="text-cyan w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Gain de Temps Massif</h4>
+                                <p class="text-slate-400 text-sm">Économisez entre <span class="text-cyan font-semibold">1h et 3h par jour</span> sur la saisie de données.</p>
+                            </div>
+                        </div>
+
+                        <!-- Benefit Item -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center border border-gold/30">
+                                <i data-lucide="infinity" class="text-gold w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Service Client 24/7</h4>
+                                <p class="text-slate-400 text-sm">Ne ratez plus aucune opportunité. Vos chatbots répondent aux prospects instantanément.</p>
+                            </div>
+                        </div>
+
+                        <!-- Benefit Item -->
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-full bg-cyan/10 flex items-center justify-center border border-cyan/30">
+                                <i data-lucide="trending-up" class="text-cyan w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-lg">Fiabilité & Scalabilité</h4>
+                                <p class="text-slate-400 text-sm">Zéro erreur de saisie. Capacité à traiter 1000 demandes simultanément sans surcoût.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Stats Block -->
+                <div class="relative">
+                    <!-- Glow Gradient: Gold & Cyan -->
+                    <div class="absolute -inset-4 bg-gradient-to-r from-gold to-cyan rounded-2xl blur-lg opacity-20"></div>
+                    <div class="relative glass-panel rounded-2xl p-8 border border-slate-600">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-800/50 p-6 rounded-xl text-center border border-slate-700">
+                                <div class="text-4xl font-bold text-cyan mb-2">+40%</div>
+                                <div class="text-xs uppercase tracking-wider text-slate-400">De Productivité</div>
+                            </div>
+                            <div class="bg-slate-800/50 p-6 rounded-xl text-center border border-slate-700">
+                                <div class="text-4xl font-bold text-gold mb-2">0</div>
+                                <div class="text-xs uppercase tracking-wider text-slate-400">Email perdu</div>
+                            </div>
+                            <div class="bg-slate-800/50 p-6 rounded-xl text-center col-span-2 border border-slate-700">
+                                <div class="text-4xl font-bold text-white mb-2">ROI < 3 mois</div>
+                                <div class="text-xs uppercase tracking-wider text-slate-400">Retour sur investissement moyen</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="py-20 relative z-10">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <!-- CTA Card with Gold/Cyan Accent -->
+            <div class="glass-panel rounded-3xl p-10 md:p-16 border border-gold/30 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold to-transparent"></div>
+                
+                <h2 class="text-3xl md:text-5xl font-bold text-white mb-6">Prêt à digitaliser votre avenir ?</h2>
+                <p class="text-slate-300 mb-10 text-lg">
+                    Discutons de vos challenges actuels. Nous vous proposerons une démonstration adaptée à votre structure.
+                </p>
+                
+                <form class="max-w-md mx-auto space-y-4 text-left">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Email Professionnel</label>
+                        <input type="email" placeholder="contact@entreprise.com" class="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-cyan outline-none transition-all">
+                    </div>
+                    <button type="button" class="w-full bg-cyan hover:bg-cyan/90 text-slate-900 font-bold py-4 rounded-lg transition-colors text-lg shadow-glow-cyan">
+                        Demander mon audit gratuit
+                    </button>
+                    <p class="text-center text-xs text-slate-500 mt-4">Réponse sous 24h ouvrées.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-900 pt-16 pb-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+                <div class="flex items-center gap-2 mb-4 md:mb-0">
+                     <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
+                         <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                         <circle cx="50" cy="50" r="5" fill="#FFD700" />
+                    </svg>
+                    <span class="text-xl font-bold tracking-widest text-white">ZONIA</span>
+                </div>
+                <div class="flex space-x-6 text-slate-400 text-sm">
+                    <a href="#" class="hover:text-gold transition-colors">Mentions Légales</a>
+                    <a href="#" class="hover:text-gold transition-colors">Politique de Confidentialité</a>
+                    <a href="#" class="hover:text-gold transition-colors">Support</a>
+                </div>
+            </div>
+            <div class="text-center text-slate-600 text-xs">
+                &copy; 2024 Zonia Systems. Tous droits réservés.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script pour les icônes -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <!-- LOGIQUE DE LA DEMO INTERACTIVE RAG -->
+    <script>
+        // Données des scénarios
+        const demoScenarios = {
+            finance: {
+                fileId: 'file-finance',
+                fileName: 'Factures_Oct.pdf',
+                query: "Quel est le total des factures fournisseurs pour Octobre ?",
+                response: "D'après le fichier <span class='text-cyan font-medium bg-cyan/10 px-1 rounded'>Factures_Oct.pdf</span>, le total des factures fournisseurs s'élève à <strong>14 250,00 €</strong>.",
+                widget: `
+                    <div class="bg-slate-800 rounded-lg p-3 border border-slate-600 mt-2 text-xs font-mono animate-fade-in">
+                        <div class="flex justify-between text-slate-500 mb-1 border-b border-slate-700 pb-1"><span>Poste</span><span>Montant</span></div>
+                        <div class="flex justify-between text-slate-300 py-1"><span>Hébergement Web</span><span>1 200 €</span></div>
+                        <div class="flex justify-between text-slate-300 py-1"><span>Licences Logiciels</span><span>4 500 €</span></div>
+                        <div class="flex justify-between text-slate-300 py-1"><span>Prestataires</span><span>8 550 €</span></div>
+                        <div class="flex justify-between text-gold font-bold pt-2 border-t border-slate-700 mt-1"><span>TOTAL</span><span>14 250 €</span></div>
+                    </div>
+                `
+            },
+            rh: {
+                fileId: 'file-rh',
+                fileName: 'Procédure_RH.pdf',
+                query: "Quelle est la procédure pour demander du télétravail ?",
+                response: "Le document <span class='text-gold font-medium bg-gold/10 px-1 rounded'>Procédure_RH.pdf</span> stipule que le télétravail doit être validé 48h à l'avance.",
+                widget: `
+                    <div class="bg-slate-800 rounded-lg p-3 border border-slate-600 mt-2 text-xs animate-fade-in">
+                        <div class="text-slate-500 uppercase font-bold mb-2 text-[10px]">Conditions Requises</div>
+                        <ul class="space-y-1 text-slate-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3 h-3 text-cyan"></i> Validation Manager</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-3 h-3 text-cyan"></i> VPN Configuré</li>
+                            <li class="flex items-center gap-2"><i data-lucide="alert-circle" class="w-3 h-3 text-gold"></i> Jours: Mar / Jeu</li>
+                        </ul>
+                    </div>
+                `
+            },
+            stock: {
+                fileId: 'file-stock',
+                fileName: 'Stock_Q4.xlsx',
+                query: "Quel est le niveau de stock pour les écrans 27 pouces ?",
+                response: "Le fichier <span class='text-cyan font-medium bg-cyan/10 px-1 rounded'>Stock_Q4.xlsx</span> indique qu'il reste <strong>12 unités</strong>.",
+                widget: `
+                    <div class="bg-slate-800 rounded-lg p-3 border border-slate-600 mt-2 text-xs animate-fade-in">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-slate-400">Référence</span>
+                            <span class="text-white font-mono">MON-27-4K</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2 mb-1">
+                            <div class="bg-cyan h-2 rounded-full" style="width: 20%"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px]">
+                            <span class="text-gold font-bold">Niveau Bas (12)</span>
+                            <span class="text-slate-500">Seuil: 15</span>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        let currentTimeoutIds = [];
+
+        function playDemo(scenarioKey) {
+            const data = demoScenarios[scenarioKey];
+            if (!data) return;
+
+            // 1. Reset Active State
+            document.querySelectorAll('.demo-file-item').forEach(el => {
+                el.classList.remove('active-file', 'scanning');
+                el.style.borderColor = "rgba(51, 65, 85, 0.5)"; // Reset border slate-700/50
+            });
+            const activeFileEl = document.getElementById(data.fileId);
+            activeFileEl.classList.add('active-file');
+            // Force Gold border via JS to ensure logic applies
+            activeFileEl.style.borderColor = "#FFD700";
+
+            // 2. Clear Chat & Timeouts
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML = '';
+            
+            currentTimeoutIds.forEach(id => clearTimeout(id));
+            currentTimeoutIds = [];
+
+            // 3. System Message
+            const systemMsgHTML = `
+                <div class="flex gap-3 animate-fade-in">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gold to-cyan flex-shrink-0 flex items-center justify-center shadow-md">
+                        <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+                            <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="50" cy="50" r="8" fill="black" />
+                        </svg>
+                    </div>
+                    <div class="bg-slate-700/50 rounded-2xl rounded-tl-none p-3 text-sm text-slate-300 max-w-[80%] border border-slate-600">
+                        Bonjour ! Je suis connecté. Quelle information recherchez-vous ?
+                    </div>
+                </div>
+            `;
+            chatContainer.innerHTML = systemMsgHTML;
+
+            // 4. User Message
+            currentTimeoutIds.push(setTimeout(() => {
+                const userMsgHTML = `
+                    <div class="flex gap-3 flex-row-reverse msg-enter">
+                        <div class="w-8 h-8 rounded-full bg-slate-600 flex-shrink-0 flex items-center justify-center text-white text-xs"><i data-lucide="user" class="w-4 h-4"></i></div>
+                        <div class="bg-cyan text-slate-900 font-medium rounded-2xl rounded-tr-none p-3 text-sm max-w-[80%] shadow-lg shadow-cyan/20">
+                            ${data.query}
+                        </div>
+                    </div>
+                `;
+                chatContainer.insertAdjacentHTML('beforeend', userMsgHTML);
+                lucide.createIcons();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 800));
+
+            // 5. Processing
+            currentTimeoutIds.push(setTimeout(() => {
+                activeFileEl.classList.add('scanning');
+
+                const processingHTML = `
+                    <div id="processing-indicator" class="flex gap-3 msg-enter">
+                         <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gold to-cyan flex-shrink-0 flex items-center justify-center shadow-md">
+                            <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+                                <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="50" cy="50" r="8" fill="black" />
+                            </svg>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs text-gold mt-2">
+                            <i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i>
+                            <span>Analyse en cours...</span>
+                        </div>
+                    </div>
+                `;
+                chatContainer.insertAdjacentHTML('beforeend', processingHTML);
+                lucide.createIcons();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 2000));
+
+            // 6. Response
+            currentTimeoutIds.push(setTimeout(() => {
+                const indicator = document.getElementById('processing-indicator');
+                if(indicator) indicator.remove();
+                
+                activeFileEl.classList.remove('scanning');
+
+                const aiResponseHTML = `
+                    <div class="flex gap-3 msg-enter">
+                         <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gold to-cyan flex-shrink-0 flex items-center justify-center shadow-md">
+                            <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
+                                <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="50" cy="50" r="8" fill="black" />
+                            </svg>
+                        </div>
+                        <div class="bg-slate-700/50 rounded-2xl rounded-tl-none p-4 text-sm text-slate-300 max-w-[90%] border border-slate-600">
+                            <p class="mb-3">${data.response}</p>
+                            ${data.widget}
+                        </div>
+                    </div>
+                `;
+                chatContainer.insertAdjacentHTML('beforeend', aiResponseHTML);
+                lucide.createIcons();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 3800));
+        }
+
+        window.addEventListener('load', () => {
+            playDemo('finance');
+        });
+    </script>
+</body>
+</html>

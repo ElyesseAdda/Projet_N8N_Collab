@@ -25,12 +25,12 @@
   z-index: 0;
 }
 
-/* Effet Glow derrière la carte */
+/* Effet Glow derrière la carte - Cyan */
 .glow-blob {
   position: absolute;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
+  background: radial-gradient(circle, rgba(25, 228, 250, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -213,7 +213,7 @@
 .form-input:focus {
   outline: none;
   border-color: transparent;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 1); /* purple-500 ring */
+  box-shadow: 0 0 0 2px rgba(25, 228, 250, 1); /* cyan ring */
 }
 
 /* Input autofill fix for dark mode */
@@ -229,19 +229,19 @@
 /* Forgot Link */
 .forgot-link {
   font-size: 12px;
-  color: #c084fc; /* purple-400 */
+  color: #19E4FA; /* cyan */
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .forgot-link:hover {
-  color: #d8b4fe; /* purple-300 */
+  color: #FFD700; /* gold */
 }
 
-/* Submit Button */
+/* Submit Button - Cyan */
 .submit-button {
   width: 100%;
-  background: white;
+  background: #19E4FA; /* cyan */
   color: #0f172a; /* slate-900 */
   font-weight: 700;
   padding: 14px;
@@ -253,14 +253,14 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 20px -5px rgba(25, 228, 250, 0.5);
   font-size: 16px;
 }
 
 .submit-button:hover:not(:disabled) {
-  background: #faf5ff; /* purple-50 */
+  background: #FFD700; /* gold */
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 20px -5px rgba(255, 215, 0, 0.5);
 }
 
 .submit-button:active:not(:disabled) {
@@ -276,7 +276,7 @@
 .button-arrow {
   width: 16px;
   height: 16px;
-  color: #9333ea; /* purple-600 */
+  color: #0f172a; /* slate-900 */
   transition: transform 0.2s;
 }
 
@@ -317,8 +317,9 @@
 
 .footer-link:hover {
   text-decoration: underline;
-  text-decoration-color: #a855f7; /* purple-500 */
+  text-decoration-color: #FFD700; /* gold */
   text-underline-offset: 4px;
+  color: #FFD700;
 }
 
 /* Copyright */
