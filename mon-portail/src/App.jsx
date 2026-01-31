@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Vitrine from './components/Vitrine';
+import Chat from './components/Chat';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Composant pour rediriger vers dashboard
@@ -88,6 +89,9 @@ function AppContent() {
     <Routes>
       {/* Route racine : Vitrine publique */}
       <Route path="/" element={<Vitrine />} />
+      
+      {/* Route chat : Interface de chat pour tester les workflows n8n */}
+      <Route path="/chat" element={<Chat />} />
       
       {/* Route de connexion : Login si non connecté, sinon rediriger vers n8n */}
       <Route 

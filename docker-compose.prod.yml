@@ -113,6 +113,14 @@ services:
       # Configuration recommandée pour éviter les warnings
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
       
+      # Configuration pour les fonctions Node.js
+      # Autoriser l'utilisation du module xlsx dans les fonctions Node.js
+      - NODE_FUNCTION_ALLOW_EXTERNAL=xlsx
+      
+      # Configuration du timezone (exemple: Europe/Paris, UTC, America/New_York, etc.)
+      # Remplacez par le timezone souhaité selon votre localisation
+      - TZ=Europe/Paris
+      
       # CLÉ DE CHIFFREMENT
       # ⚠️ IMPORTANT : Utilisez une clé sécurisée unique
       # Générer avec : openssl rand -base64 32 (sur Linux) ou generate-encryption-key.ps1 (sur Windows)
