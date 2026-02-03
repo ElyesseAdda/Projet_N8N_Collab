@@ -100,6 +100,7 @@ function Chat() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle'); // idle | uploading | success | error
   const [uploadMessage, setUploadMessage] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
@@ -174,30 +175,54 @@ function Chat() {
     e.target.value = '';
   };
 
-  const uploadFilesToDrive = async (files) => {
+  const uploadFilesToDrive = (files) => {
     setUploadStatus('uploading');
     setUploadMessage('');
+    setUploadProgress(0);
     const formData = new FormData();
     files.forEach((file) => formData.append('files', file));
-    try {
-      const res = await fetch('/api/upload-drive', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.message || data.error || `Erreur ${res.status}`);
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        setUploadProgress(Math.round((e.loaded / e.total) * 100));
+      } else {
+        setUploadProgress((prev) => Math.min(prev + 10, 90));
       }
-      setUploadStatus('success');
-      setUploadMessage(data.message || `${files.length} fichier(s) envoyé(s) vers Google Drive`);
-    } catch (err) {
+    });
+    xhr.addEventListener('load', () => {
+      setUploadProgress(100);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        let data = {};
+        try {
+          data = JSON.parse(xhr.responseText);
+        } catch {}
+        setUploadStatus('success');
+        setUploadMessage(data.message || `${files.length} fichier(s) envoyé(s) vers Google Drive`);
+      } else {
+        let data = {};
+        try {
+          data = JSON.parse(xhr.responseText);
+        } catch {}
+        setUploadStatus('error');
+        setUploadMessage(data.message || data.error || `Erreur ${xhr.status}`);
+      }
+      setTimeout(() => {
+        setUploadStatus('idle');
+        setUploadMessage('');
+        setUploadProgress(0);
+      }, 5000);
+    });
+    xhr.addEventListener('error', () => {
+      setUploadProgress(0);
       setUploadStatus('error');
-      setUploadMessage(err?.message || 'Erreur lors de l\'envoi');
-    }
-    setTimeout(() => {
-      setUploadStatus('idle');
-      setUploadMessage('');
-    }, 5000);
+      setUploadMessage('Erreur réseau');
+      setTimeout(() => {
+        setUploadStatus('idle');
+        setUploadMessage('');
+      }, 5000);
+    });
+    xhr.open('POST', '/api/upload-drive');
+    xhr.send(formData);
   };
 
   const scrollToBottom = () => {
@@ -352,6 +377,11 @@ function Chat() {
               {uploadStatus === 'error' && uploadMessage}
               {(uploadStatus === 'idle' || !uploadStatus) && 'Cliquez ou déposez des fichiers → Google Drive'}
             </div>
+            {(uploadStatus === 'uploading' || uploadProgress > 0 || uploadStatus === 'error') && (
+              <div className={`chat-upload-progress-wrap ${uploadStatus === 'error' ? 'chat-upload-progress-wrap-error' : ''}`}>
+                <div className={`chat-upload-progress-bar ${uploadStatus === 'error' ? 'chat-upload-progress-bar-error' : ''}`} style={{ width: uploadStatus === 'error' ? '100%' : `${uploadProgress}%` }} />
+              </div>
+            )}
           </div>
         </div>
 

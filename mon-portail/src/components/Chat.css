@@ -238,6 +238,7 @@
 }
 
 .chat-sidebar-footer {
+  position: relative;
   margin-top: auto;
   padding: 0.75rem;
   background: var(--chat-slate-800);
@@ -290,6 +291,29 @@
 
 .chat-sidebar-footer .chat-sidebar-footer-hint {
   min-height: 1.25rem;
+}
+
+.chat-upload-progress-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--chat-slate-700);
+  border-radius: 0 0 0.5rem 0.5rem;
+  overflow: hidden;
+}
+
+.chat-upload-progress-bar {
+  height: 100%;
+  background: var(--chat-cyan);
+  border-radius: 0 0 0 0.5rem;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.chat-upload-progress-bar-error {
+  background: #f87171;
+  width: 100% !important;
 }
 
 /* Zone chat principale */
