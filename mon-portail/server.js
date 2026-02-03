@@ -6,9 +6,12 @@ import path from 'path';
 import session from 'express-session';
 import bcrypt from 'bcrypt';
 import fs from 'fs';
+import { Readable } from 'stream';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import nodemailer from 'nodemailer';
+import multer from 'multer';
+import { google } from 'googleapis';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -317,6 +320,224 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
+// Upload vers Google Drive (Zonia RAG Engine) — route publique, avant le middleware /api
+// Utilise OAuth2 avec refresh token (fonctionne avec compte Gmail personnel)
+const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }); // 50 MB max
+
+// Fonction pour décoder correctement les noms de fichiers avec caractères spéciaux
+// Multer encode les noms en latin1, on doit les convertir en UTF-8
+function decodeFileName(filename) {
+    try {
+        // Essayer de décoder depuis latin1 vers UTF-8
+        const decoded = Buffer.from(filename, 'latin1').toString('utf8');
+        // Vérifier si le décodage a produit un résultat valide
+        if (decoded && !decoded.includes('�')) {
+            return decoded;
+        }
+        // Si le nom contient des caractères de remplacement, essayer une autre méthode
+        // Décoder les séquences URI encodées
+        try {
+            return decodeURIComponent(filename);
+        } catch {
+            return filename;
+        }
+    } catch {
+        return filename;
+    }
+}
+
+// Créer le client OAuth2 pour Google Drive
+function createOAuth2Client() {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+    
+    console.log('📋 [Drive] Vérification config OAuth2:');
+    console.log(`   - GOOGLE_CLIENT_ID: ${clientId ? '✅ Configuré (' + clientId.substring(0, 20) + '...)' : '❌ Non défini'}`);
+    console.log(`   - GOOGLE_CLIENT_SECRET: ${clientSecret ? '✅ Configuré (' + clientSecret.length + ' chars)' : '❌ Non défini'}`);
+    console.log(`   - GOOGLE_REFRESH_TOKEN: ${refreshToken ? '✅ Configuré (' + refreshToken.length + ' chars)' : '❌ Non défini'}`);
+    
+    if (!clientId || !clientSecret || !refreshToken) {
+        console.log('⚠️ [Drive] OAuth2 incomplet, fallback vers Service Account...');
+        return null;
+    }
+    
+    const oauth2Client = new google.auth.OAuth2(
+        clientId,
+        clientSecret,
+        'urn:ietf:wg:oauth:2.0:oob'
+    );
+    
+    oauth2Client.setCredentials({
+        refresh_token: refreshToken
+    });
+    
+    console.log('✅ [Drive] Client OAuth2 créé avec succès');
+    return oauth2Client;
+}
+
+app.post('/api/upload-drive', uploadMem.array('files', 10), async (req, res) => {
+    console.log('\n========================================');
+    console.log('📤 [Drive] Nouvelle requête d\'upload');
+    console.log('========================================');
+    
+    try {
+        const files = req.files;
+        if (!files?.length) {
+            console.log('❌ [Drive] Aucun fichier reçu dans la requête');
+            return res.status(400).json({ message: 'Aucun fichier reçu', error: 'NO_FILES' });
+        }
+        
+        console.log(`📁 [Drive] ${files.length} fichier(s) à uploader:`);
+        files.forEach((f, i) => {
+            const decodedName = decodeFileName(f.originalname);
+            console.log(`   ${i + 1}. ${decodedName} (${(f.size / 1024).toFixed(2)} KB, ${f.mimetype})`);
+        });
+        
+        const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+        console.log(`📂 [Drive] Dossier cible: ${folderId || '❌ NON DÉFINI'}`);
+        
+        // Essayer OAuth2 d'abord (compte personnel Gmail)
+        let auth = createOAuth2Client();
+        let authType = 'OAuth2';
+        
+        // Si OAuth2 n'est pas configuré, essayer Service Account (pour Workspace)
+        if (!auth) {
+            authType = 'ServiceAccount';
+            console.log('🔄 [Drive] Tentative avec Service Account...');
+            
+            const keyPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH;
+            const keyJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+            let credentials = null;
+            
+            if (keyJson) {
+                try {
+                    credentials = JSON.parse(keyJson);
+                    console.log('✅ [Drive] Credentials Service Account chargées depuis GOOGLE_SERVICE_ACCOUNT_JSON');
+                } catch {
+                    credentials = null;
+                    console.log('❌ [Drive] Erreur parsing GOOGLE_SERVICE_ACCOUNT_JSON');
+                }
+            }
+            
+            if (!folderId) {
+                console.log('❌ [Drive] ERREUR: GOOGLE_DRIVE_FOLDER_ID non défini');
+                return res.status(503).json({
+                    message: 'Google Drive non configuré. Définissez GOOGLE_DRIVE_FOLDER_ID dans .env',
+                    error: 'DRIVE_NOT_CONFIGURED'
+                });
+            }
+            
+            if (!credentials && !keyPath) {
+                console.log('❌ [Drive] ERREUR: Aucune méthode d\'auth configurée');
+                return res.status(503).json({
+                    message: 'Google Drive non configuré. Définissez GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET et GOOGLE_REFRESH_TOKEN dans .env (ou utilisez un Service Account pour Workspace)',
+                    error: 'DRIVE_NOT_CONFIGURED'
+                });
+            }
+            
+            if (!credentials && keyPath) {
+                try {
+                    console.log(`📄 [Drive] Chargement clé depuis: ${keyPath}`);
+                    const raw = fs.readFileSync(path.resolve(__dirname, keyPath), 'utf8');
+                    credentials = JSON.parse(raw);
+                    console.log(`✅ [Drive] Clé Service Account chargée: ${credentials.client_email}`);
+                } catch (err) {
+                    console.log(`❌ [Drive] Erreur lecture clé: ${err.message}`);
+                    return res.status(500).json({ message: 'Clé compte de service illisible: ' + err.message, error: 'KEY_READ' });
+                }
+            }
+            
+            auth = new google.auth.GoogleAuth({
+                credentials,
+                scopes: ['https://www.googleapis.com/auth/drive.file']
+            });
+        }
+        
+        if (!folderId) {
+            console.log('❌ [Drive] ERREUR: GOOGLE_DRIVE_FOLDER_ID non défini');
+            return res.status(503).json({
+                message: 'GOOGLE_DRIVE_FOLDER_ID non défini dans .env',
+                error: 'DRIVE_NOT_CONFIGURED'
+            });
+        }
+        
+        console.log(`🔐 [Drive] Authentification: ${authType}`);
+        console.log('🚀 [Drive] Début de l\'upload...');
+        
+        const drive = google.drive({ version: 'v3', auth });
+        const uploaded = [];
+        
+        for (const file of files) {
+            // Décoder le nom du fichier pour gérer les caractères spéciaux (accents, espaces, etc.)
+            const fileName = decodeFileName(file.originalname);
+            console.log(`   ⏳ Upload en cours: ${fileName}...`);
+            const startTime = Date.now();
+            
+            const resFile = await drive.files.create({
+                requestBody: { 
+                    name: fileName, 
+                    parents: [folderId] 
+                },
+                media: { 
+                    mimeType: file.mimetype, 
+                    body: Readable.from(file.buffer) 
+                },
+                fields: 'id, name, webViewLink'
+            });
+            
+            const duration = Date.now() - startTime;
+            console.log(`   ✅ Uploadé: ${fileName} (ID: ${resFile.data.id}) en ${duration}ms`);
+            
+            uploaded.push({ 
+                id: resFile.data.id, 
+                name: fileName,
+                link: resFile.data.webViewLink 
+            });
+        }
+        
+        console.log('========================================');
+        console.log(`✅ [Drive] SUCCÈS: ${uploaded.length} fichier(s) uploadé(s)`);
+        console.log('========================================\n');
+        
+        res.json({ message: `${uploaded.length} fichier(s) envoyé(s) vers Google Drive`, uploaded });
+    } catch (err) {
+        console.log('========================================');
+        console.error('❌ [Drive] ERREUR lors de l\'upload:');
+        console.error('   Message:', err?.message);
+        console.error('   Code:', err?.code);
+        console.error('   Status:', err?.status);
+        if (err?.response?.data) {
+            console.error('   Response data:', JSON.stringify(err.response.data, null, 2));
+        }
+        if (err?.errors) {
+            console.error('   Errors:', JSON.stringify(err.errors, null, 2));
+        }
+        console.error('   Stack:', err?.stack);
+        console.log('========================================\n');
+        
+        // Message d'erreur plus explicite
+        let errorMessage = err?.message || 'Erreur lors de l\'envoi vers Google Drive';
+        let errorCode = 'UPLOAD_FAILED';
+        
+        if (err?.message?.includes('invalid_grant')) {
+            errorMessage = 'Le refresh token est invalide ou expiré. Veuillez le régénérer avec: node scripts/get-google-token.mjs';
+            errorCode = 'INVALID_TOKEN';
+        } else if (err?.message?.includes('storage quota')) {
+            errorMessage = 'Quota de stockage dépassé sur votre compte Google Drive';
+            errorCode = 'QUOTA_EXCEEDED';
+        } else if (err?.message?.includes('not found') || err?.code === 404) {
+            errorMessage = 'Le dossier Google Drive n\'existe pas ou n\'est pas accessible. Vérifiez GOOGLE_DRIVE_FOLDER_ID';
+            errorCode = 'FOLDER_NOT_FOUND';
+        } else if (err?.message?.includes('permission') || err?.code === 403) {
+            errorMessage = 'Permission refusée. Vérifiez que vous avez accès au dossier Google Drive';
+            errorCode = 'PERMISSION_DENIED';
+        }
+        
+        res.status(500).json({ message: errorMessage, error: errorCode });
+    }
+});
+
 // En production, servir d'abord les fichiers React buildés depuis dist/
 // IMPORTANT: Ne pas intercepter /n8n - laissé au reverse proxy Traefik
 if (process.env.NODE_ENV === 'production') {
@@ -334,14 +555,12 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Protéger les routes API qui nécessitent une authentification
-// Les routes /api/* (sauf /api/login, /api/logout et /api/contact) nécessitent une authentification
+// Les routes /api/* (sauf /api/login, /api/logout, /api/contact, /api/upload-drive) nécessitent une authentification
 console.log('🔒 Configuration des routes API protégées');
 app.use('/api', (req, res, next) => {
-    // Laisser passer /api/login, /api/logout et /api/contact sans authentification
-    if (req.path === '/login' || req.path === '/logout' || req.path === '/contact') {
+    if (req.path === '/login' || req.path === '/logout' || req.path === '/contact' || req.path === '/upload-drive') {
         return next();
     }
-    // Pour les autres routes API, vérifier l'authentification
     requireAuth(req, res, next);
 });
 

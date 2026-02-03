@@ -34,3 +34,6 @@ lerna-debug.log*
 # Users data (sensitive)
 users.json
 
+# Clés API / comptes de service (ne jamais committer)
+Keys/
+

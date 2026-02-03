@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Send, Search, Database, Zap, FileText, FileSpreadsheet, FileBarChart, ChevronDown, ChevronUp } from 'lucide-react';
+import { User, Send, Search, Database, Zap, FileText, FileSpreadsheet, FileBarChart, ChevronDown, ChevronUp, Upload } from 'lucide-react';
 import { supabase, isSupabaseAvailable, logSupabaseConfig } from '../lib/supabase';
 import './Chat.css';
 
@@ -97,9 +97,13 @@ function Chat() {
   const [documents, setDocuments] = useState([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documentsError, setDocumentsError] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('idle'); // idle | uploading | success | error
+  const [uploadMessage, setUploadMessage] = useState('');
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const WEBHOOK_URL = 'https://zoniahub.fr/n8n/webhook-test/415ff9ab-535b-4b03-a19a-1afde95867be';
 
@@ -138,6 +142,62 @@ function Chat() {
     const next = !documentsExpanded;
     setDocumentsExpanded(next);
     if (next && documents.length === 0 && !documentsLoading) loadDocuments();
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+    const files = e.dataTransfer?.files;
+    if (files?.length) uploadFilesToDrive(Array.from(files));
+  };
+
+  const handleUploadZoneClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = (e) => {
+    const files = e.target.files;
+    if (files?.length) uploadFilesToDrive(Array.from(files));
+    e.target.value = '';
+  };
+
+  const uploadFilesToDrive = async (files) => {
+    setUploadStatus('uploading');
+    setUploadMessage('');
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    try {
+      const res = await fetch('/api/upload-drive', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.message || data.error || `Erreur ${res.status}`);
+      }
+      setUploadStatus('success');
+      setUploadMessage(data.message || `${files.length} fichier(s) envoyé(s) vers Google Drive`);
+    } catch (err) {
+      setUploadStatus('error');
+      setUploadMessage(err?.message || 'Erreur lors de l\'envoi');
+    }
+    setTimeout(() => {
+      setUploadStatus('idle');
+      setUploadMessage('');
+    }, 5000);
   };
 
   const scrollToBottom = () => {
@@ -262,12 +322,36 @@ function Chat() {
               </div>
             )}
           </div>
-          <div className="chat-sidebar-footer">
+          <div
+            className={`chat-sidebar-footer chat-upload-zone ${isDragOver ? 'chat-upload-zone-dragover' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={handleUploadZoneClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleUploadZoneClick(); } }}
+            title="Cliquez ou déposez des fichiers pour les envoyer vers Google Drive"
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="chat-upload-input"
+              onChange={handleFileInputChange}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+              aria-hidden="true"
+            />
             <div className="chat-sidebar-footer-title">
               <Zap size={12} />
               Zonia RAG Engine
             </div>
-            <div className="chat-sidebar-footer-hint">Documents connectés au chat</div>
+            <div className="chat-sidebar-footer-hint">
+              {uploadStatus === 'uploading' && 'Envoi en cours…'}
+              {uploadStatus === 'success' && uploadMessage}
+              {uploadStatus === 'error' && uploadMessage}
+              {(uploadStatus === 'idle' || !uploadStatus) && 'Cliquez ou déposez des fichiers → Google Drive'}
+            </div>
           </div>
         </div>
 

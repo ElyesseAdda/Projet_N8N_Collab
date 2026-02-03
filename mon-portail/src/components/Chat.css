@@ -264,6 +264,34 @@
   color: var(--chat-slate-500);
 }
 
+/* Zone upload Zonia RAG Engine */
+.chat-upload-zone {
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.chat-upload-zone:hover {
+  border-color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.05);
+}
+
+.chat-upload-zone-dragover {
+  border-color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.1);
+}
+
+.chat-upload-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chat-sidebar-footer .chat-sidebar-footer-hint {
+  min-height: 1.25rem;
+}
+
 /* Zone chat principale */
 .chat-main {
   flex: 1;
