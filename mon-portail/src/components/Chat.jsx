@@ -5,21 +5,22 @@ import './Chat.css';
 
 const TABLE_DOCUMENT_METADATA = 'document_metadata';
 
-/** Retourne l'icône et la classe CSS selon l'extension du fichier */
+/** Retourne l'icône et la classe CSS selon l'extension du fichier (taille compacte pour la liste documents) */
 function getDocumentIcon(extension) {
   const ext = (extension || '').toLowerCase().replace(/^\./, '');
+  const iconSize = 12;
   switch (ext) {
     case 'pdf':
-      return { icon: <FileText size={16} />, iconClass: 'chat-file-icon-red' };
+      return { icon: <FileText size={iconSize} />, iconClass: 'chat-file-icon-red' };
     case 'xlsx':
     case 'xls':
     case 'csv':
-      return { icon: <FileSpreadsheet size={16} />, iconClass: 'chat-file-icon-green' };
+      return { icon: <FileSpreadsheet size={iconSize} />, iconClass: 'chat-file-icon-green' };
     case 'doc':
     case 'docx':
-      return { icon: <FileText size={16} />, iconClass: 'chat-file-icon-blue' };
+      return { icon: <FileText size={iconSize} />, iconClass: 'chat-file-icon-blue' };
     default:
-      return { icon: <FileText size={16} />, iconClass: 'chat-file-icon-cyan' };
+      return { icon: <FileText size={iconSize} />, iconClass: 'chat-file-icon-cyan' };
   }
 }
 
@@ -97,6 +98,7 @@ function Chat() {
   const [documents, setDocuments] = useState([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
   const [documentsError, setDocumentsError] = useState(null);
+  const [documentSearchQuery, setDocumentSearchQuery] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('idle'); // idle | uploading | success | error
   const [uploadMessage, setUploadMessage] = useState('');
@@ -327,23 +329,44 @@ function Chat() {
             />
             {documentsExpanded && (
               <div className="chat-documents-list">
+                {!documentsError && documents.length > 0 && (
+                  <div className="chat-documents-search-wrap">
+                    <Search className="chat-documents-search-icon" size={12} />
+                    <input
+                      type="text"
+                      value={documentSearchQuery}
+                      onChange={(e) => setDocumentSearchQuery(e.target.value)}
+                      placeholder="Rechercher un fichier..."
+                      className="chat-documents-search-input"
+                      aria-label="Rechercher dans les documents"
+                    />
+                  </div>
+                )}
                 {documentsError && (
                   <div className="chat-documents-error">{documentsError}</div>
                 )}
                 {!documentsError && documents.length === 0 && !documentsLoading && (
                   <div className="chat-documents-empty">Aucun document</div>
                 )}
-                {!documentsError && documents.length > 0 && (
-                  <div className="chat-documents-items">
-                    {documents.map((row, idx) => (
-                      <DocumentRow
-                        key={row.id ?? idx}
-                        title={row.title}
-                        url={row.url}
-                      />
-                    ))}
-                  </div>
-                )}
+                {!documentsError && documents.length > 0 && (() => {
+                  const q = documentSearchQuery.trim().toLowerCase();
+                  const filtered = q ? documents.filter((row) => (row.title || '').toLowerCase().includes(q)) : documents;
+                  return (
+                    <div className="chat-documents-items">
+                      {filtered.length === 0 ? (
+                        <div className="chat-documents-empty">Aucun résultat</div>
+                      ) : (
+                        filtered.map((row, idx) => (
+                          <DocumentRow
+                            key={row.id ?? idx}
+                            title={row.title}
+                            url={row.url}
+                          />
+                        ))
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -391,7 +414,7 @@ function Chat() {
           <div className="chat-header-info">
             <ZoniaAvatar />
             <div>
-              <div className="chat-title">Assistant n8n</div>
+              <div className="chat-title">Assistant Zonia</div>
               <div className="chat-status">
                 <span className="chat-status-dot" />
                 En ligne
