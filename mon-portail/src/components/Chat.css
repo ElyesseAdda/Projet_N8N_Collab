@@ -96,6 +96,103 @@
   border-color: var(--chat-slate-600);
 }
 
+.chat-file-item-clickable {
+  cursor: pointer;
+}
+
+.chat-file-item-expanded {
+  border-color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.05);
+}
+
+.chat-file-item-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--chat-slate-400);
+}
+
+.chat-docs-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--chat-slate-600);
+  border-top-color: var(--chat-cyan);
+  border-radius: 50%;
+  animation: chatSpin 0.8s linear infinite;
+}
+
+.chat-documents-list {
+  margin-top: 0.5rem;
+  padding-left: 0.25rem;
+  border-left: 2px solid var(--chat-slate-700);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.chat-documents-error {
+  font-size: 0.75rem;
+  color: #f87171;
+  padding: 0.5rem 0;
+}
+
+.chat-documents-empty {
+  font-size: 0.75rem;
+  color: var(--chat-slate-500);
+  padding: 0.5rem 0;
+}
+
+.chat-documents-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.chat-document-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--chat-slate-300);
+  width: 100%;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+
+.chat-document-row:hover {
+  background: rgba(51, 65, 85, 0.3);
+}
+
+.chat-document-row-clickable {
+  cursor: pointer;
+}
+
+.chat-document-row-clickable:hover {
+  background: rgba(25, 228, 250, 0.08);
+}
+
+.chat-document-row-clickable:focus {
+  outline: 1px solid var(--chat-cyan);
+  outline-offset: 2px;
+}
+
+.chat-document-row-clickable:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.chat-document-row .chat-file-item-icon {
+  flex-shrink: 0;
+}
+
+.chat-document-row-title {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .chat-file-item-icon {
   padding: 0.5rem;
   border-radius: 0.25rem;
@@ -117,6 +214,11 @@
 .chat-file-icon-green {
   background: rgba(74, 222, 128, 0.2);
   color: #4ade80;
+}
+
+.chat-file-icon-cyan {
+  background: rgba(25, 228, 250, 0.2);
+  color: var(--chat-cyan);
 }
 
 .chat-file-item-text {

@@ -1,6 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Send, Search, FileText, FileBarChart, FileSpreadsheet, Zap } from 'lucide-react';
+import { User, Send, Search, Database, Zap, FileText, FileSpreadsheet, FileBarChart, ChevronDown, ChevronUp } from 'lucide-react';
+import { supabase, isSupabaseAvailable, logSupabaseConfig } from '../lib/supabase';
 import './Chat.css';
+
+const TABLE_DOCUMENT_METADATA = 'document_metadata';
+
+/** Retourne l'icône et la classe CSS selon l'extension du fichier */
+function getDocumentIcon(extension) {
+  const ext = (extension || '').toLowerCase().replace(/^\./, '');
+  switch (ext) {
+    case 'pdf':
+      return { icon: <FileText size={16} />, iconClass: 'chat-file-icon-red' };
+    case 'xlsx':
+    case 'xls':
+    case 'csv':
+      return { icon: <FileSpreadsheet size={16} />, iconClass: 'chat-file-icon-green' };
+    case 'doc':
+    case 'docx':
+      return { icon: <FileText size={16} />, iconClass: 'chat-file-icon-blue' };
+    default:
+      return { icon: <FileText size={16} />, iconClass: 'chat-file-icon-cyan' };
+  }
+}
+
+/** Extrait l'extension du titre si pas fournie (ex: "Rapport.pdf" -> "pdf") */
+function getExtensionFromTitle(title, extension) {
+  if (extension) return extension.replace(/^\./, '');
+  const match = (title || '').match(/\.([a-z0-9]+)$/i);
+  return match ? match[1] : '';
+}
 
 // Génère un ID de session unique
 const generateSessionId = () => {
@@ -18,15 +46,46 @@ const ZoniaAvatar = ({ loading = false }) => (
   </div>
 );
 
-const ChatFileItem = ({ icon, iconClass, name, info }) => (
-  <div className="chat-file-item">
+const ChatFileItem = ({ icon, iconClass, name, info, onClick, isExpanded, isLoading }) => (
+  <div
+    className={`chat-file-item chat-file-item-card ${onClick ? 'chat-file-item-clickable' : ''} ${isExpanded ? 'chat-file-item-expanded' : ''}`}
+    onClick={onClick}
+    role={onClick ? 'button' : undefined}
+    aria-expanded={onClick ? isExpanded : undefined}
+  >
     <div className={`chat-file-item-icon ${iconClass}`}>{icon}</div>
     <div className="chat-file-item-text">
       <div className="chat-file-item-name">{name}</div>
       <div className="chat-file-item-info">{info}</div>
     </div>
+    {onClick && (
+      <span className="chat-file-item-chevron">
+        {isLoading ? <span className="chat-docs-spinner" /> : isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </span>
+    )}
   </div>
 );
+
+const DocumentRow = ({ title, url }) => {
+  const ext = getExtensionFromTitle(title, null);
+  const { icon, iconClass } = getDocumentIcon(ext);
+  const handleClick = () => {
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  };
+  return (
+    <div
+      className={`chat-document-row ${url ? 'chat-document-row-clickable' : ''}`}
+      onClick={url ? handleClick : undefined}
+      onKeyDown={url ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick(); } } : undefined}
+      role={url ? 'button' : undefined}
+      tabIndex={url ? 0 : undefined}
+      title={url ? 'Ouvrir dans un nouvel onglet' : undefined}
+    >
+      <div className={`chat-file-item-icon ${iconClass}`}>{icon}</div>
+      <span className="chat-document-row-title">{title || 'Sans titre'}</span>
+    </div>
+  );
+};
 
 function Chat() {
   const [messages, setMessages] = useState([]);
@@ -34,11 +93,52 @@ function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [sessionId] = useState(() => generateSessionId());
+  const [documentsExpanded, setDocumentsExpanded] = useState(false);
+  const [documents, setDocuments] = useState([]);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [documentsError, setDocumentsError] = useState(null);
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
   const inputRef = useRef(null);
 
   const WEBHOOK_URL = 'https://zoniahub.fr/n8n/webhook-test/415ff9ab-535b-4b03-a19a-1afde95867be';
+
+  const loadDocuments = async () => {
+    logSupabaseConfig();
+    if (!isSupabaseAvailable() || !supabase) {
+      console.warn('[Supabase] Client non disponible — VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY doivent être définis dans .env');
+      return;
+    }
+    setDocumentsLoading(true);
+    setDocumentsError(null);
+    console.log('[Supabase] Requête:', { table: TABLE_DOCUMENT_METADATA, select: 'id, title, url' });
+    try {
+      const response = await supabase
+        .from(TABLE_DOCUMENT_METADATA)
+        .select('id, title, url');
+      const { data, error: err } = response;
+      console.log('[Supabase] Réponse brute:', {
+        data,
+        error: err ? { message: err.message, code: err.code, details: err.details, hint: err.hint } : null,
+        count: Array.isArray(data) ? data.length : 0
+      });
+      if (err) throw err;
+      const items = Array.isArray(data) ? data : [];
+      setDocuments(items);
+    } catch (err) {
+      console.error('[Supabase] Erreur:', err);
+      setDocumentsError(err?.message || 'Erreur chargement documents');
+      setDocuments([]);
+    } finally {
+      setDocumentsLoading(false);
+    }
+  };
+
+  const toggleDocumentsExpanded = () => {
+    const next = !documentsExpanded;
+    setDocumentsExpanded(next);
+    if (next && documents.length === 0 && !documentsLoading) loadDocuments();
+  };
 
   const scrollToBottom = () => {
     if (chatContainerRef.current) {
@@ -132,23 +232,35 @@ function Chat() {
           <div className="chat-sidebar-title">Base de Connaissances</div>
           <div className="chat-file-list">
             <ChatFileItem
-              icon={<FileText size={16} />}
-              iconClass="chat-file-icon-red"
-              name="Procédure_RH.pdf"
-              info="1.2 MB • Hier"
+              icon={<Database size={16} />}
+              iconClass="chat-file-icon-cyan"
+              name="Base de données"
+              info={documentsExpanded ? `${documents.length} document(s)` : 'Supabase • Connectée'}
+              onClick={isSupabaseAvailable() ? toggleDocumentsExpanded : undefined}
+              isExpanded={documentsExpanded}
+              isLoading={documentsLoading}
             />
-            <ChatFileItem
-              icon={<FileBarChart size={16} />}
-              iconClass="chat-file-icon-blue"
-              name="Factures_Oct.pdf"
-              info="840 KB • 2h"
-            />
-            <ChatFileItem
-              icon={<FileSpreadsheet size={16} />}
-              iconClass="chat-file-icon-green"
-              name="Stock_Q4.xlsx"
-              info="2.4 MB • 1j"
-            />
+            {documentsExpanded && (
+              <div className="chat-documents-list">
+                {documentsError && (
+                  <div className="chat-documents-error">{documentsError}</div>
+                )}
+                {!documentsError && documents.length === 0 && !documentsLoading && (
+                  <div className="chat-documents-empty">Aucun document</div>
+                )}
+                {!documentsError && documents.length > 0 && (
+                  <div className="chat-documents-items">
+                    {documents.map((row, idx) => (
+                      <DocumentRow
+                        key={row.id ?? idx}
+                        title={row.title}
+                        url={row.url}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="chat-sidebar-footer">
             <div className="chat-sidebar-footer-title">
