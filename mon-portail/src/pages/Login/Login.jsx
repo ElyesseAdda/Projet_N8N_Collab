@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Spinner } from '../../components/ui';
 import './Login.css';
 
 function Login({ onLogin }) {
@@ -17,9 +18,7 @@ function Login({ onLogin }) {
     try {
       const response = await fetch('/api/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
@@ -30,19 +29,18 @@ function Login({ onLogin }) {
         data = text ? JSON.parse(text) : {};
       } catch (parseError) {
         console.error('Erreur de parsing JSON:', parseError);
-        setError('Erreur de connexion au serveur (réponse invalide)');
+        setError('Erreur de connexion au serveur (reponse invalide)');
         return;
       }
 
       if (response.ok && data.success) {
         onLogin(data.user);
-        // Rediriger vers /dashboard (affiche n8n dans iframe avec ControlCard)
         navigate('/dashboard');
       } else {
         setError(data.error || 'Erreur de connexion');
       }
-    } catch (error) {
-      console.error('Erreur:', error);
+    } catch (err) {
+      console.error('Erreur:', err);
       setError('Erreur de connexion au serveur');
     } finally {
       setLoading(false);
@@ -51,11 +49,8 @@ function Login({ onLogin }) {
 
   return (
     <div className="login-container">
-      {/* Background Elements */}
       <div className="bg-grid"></div>
       <div className="glow-blob"></div>
-
-      {/* Floating Decor Elements */}
       <div className="floating-decor decor-top-left">
         <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
           <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="white" strokeWidth="2"/>
@@ -66,12 +61,8 @@ function Login({ onLogin }) {
           <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="white" strokeWidth="2"/>
         </svg>
       </div>
-
-      {/* Main Login Card Container */}
       <main className="login-main">
-        {/* Glassmorphism Card */}
         <div className="login-card">
-          {/* Logo Header */}
           <div className="logo-header">
             <div className="logo-container">
               <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -81,29 +72,8 @@ function Login({ onLogin }) {
                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
                   </filter>
                 </defs>
-                {/* Glow Layer - Gold */}
-                <path 
-                  d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" 
-                  stroke="#FFD700" 
-                  strokeWidth="4" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  fill="none" 
-                  opacity="0.4" 
-                  filter="url(#glow)" 
-                  className="draw-path"
-                />
-                {/* Main Sharp White Line */}
-                <path 
-                  d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" 
-                  stroke="white" 
-                  strokeWidth="4" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  fill="none"
-                  className="draw-path"
-                />
-                {/* Tech Dot - Gold */}
+                <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="#FFD700" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.4" filter="url(#glow)" className="draw-path"/>
+                <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none" className="draw-path"/>
                 <circle cx="50" cy="50" r="5" fill="#FFD700" className="ping-dot"/>
                 <circle cx="50" cy="50" r="5" fill="#FFD700"/>
               </svg>
@@ -111,60 +81,25 @@ function Login({ onLogin }) {
             <h1 className="logo-title">ZONIA</h1>
             <p className="logo-subtitle">Bienvenue dans le flux</p>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          {/* Login Form */}
+          {error && <div className="error-message">{error}</div>}
           <form onSubmit={handleSubmit} className="login-form">
-            {/* Username Input */}
             <div className="form-field">
-              <label htmlFor="username" className="form-label">Nom d'utilisateur</label>
+              <label htmlFor="username" className="form-label">Nom d utilisateur</label>
               <div className="input-wrapper">
-                <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  autoComplete="username"
-                  className="form-input"
-                  placeholder="nom@zonia.com"
-                />
+                <input type="text" id="username" value={username} onChange={(e) => setUsername(e.target.value)} required autoComplete="username" className="form-input" placeholder="nom@zonia.com"/>
               </div>
             </div>
-
-            {/* Password Input */}
             <div className="form-field">
               <div className="form-label-row">
                 <label htmlFor="password" className="form-label">Mot de passe</label>
-                <a href="#" className="forgot-link">Oublié ?</a>
+                <a href="#" className="forgot-link">Oublie ?</a>
               </div>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="form-input"
-                placeholder="••••••••"
-              />
+              <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" className="form-input" placeholder="********"/>
             </div>
-
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="submit-button"
-            >
+            <button type="submit" disabled={loading} className="submit-button">
               {loading ? (
                 <>
-                  <span className="loading-spinner"></span>
+                  <Spinner size="sm" className="login-spinner" />
                   <span>CONNEXION...</span>
                 </>
               ) : (
@@ -177,17 +112,11 @@ function Login({ onLogin }) {
               )}
             </button>
           </form>
-
-          {/* Footer Links */}
           <div className="login-footer">
-            Pas encore de compte ? <a href="#" className="footer-link">Demander un accès</a>
+            Pas encore de compte ? <a href="#" className="footer-link">Demander un acces</a>
           </div>
         </div>
-
-        {/* Copyright */}
-        <div className="copyright">
-          &copy; 2024 Zonia Systems. Secure Login.
-        </div>
+        <div className="copyright">2024 Zonia Systems. Secure Login.</div>
       </main>
     </div>
   );

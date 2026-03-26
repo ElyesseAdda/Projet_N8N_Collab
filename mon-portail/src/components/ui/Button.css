@@ -1,0 +1,58 @@
+/* ─── Button ───────────────────────────────────────────────────────────────── */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, opacity 0.2s;
+}
+
+.ui-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ui-btn__icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+/* ── Sizes ─────────────────────────────────────────────────────────────────── */
+.ui-btn--sm { padding: 0.25rem 0.5rem; font-size: 0.8125rem; border-radius: 0.375rem; }
+.ui-btn--md { padding: 0.5rem 1rem; font-size: 0.875rem; border-radius: 0.5rem; }
+
+/* ── Primary (cyan) ────────────────────────────────────────────────────────── */
+.ui-btn--primary {
+  background: var(--chat-cyan);
+  color: #0f172a;
+  font-weight: 600;
+}
+.ui-btn--primary:hover:not(:disabled) {
+  background: #22d3ee;
+}
+
+/* ── Ghost (transparent, slate border) ─────────────────────────────────────── */
+.ui-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--chat-slate-600);
+  color: var(--chat-slate-400);
+}
+.ui-btn--ghost:hover:not(:disabled) {
+  color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.08);
+  border-color: var(--chat-slate-500);
+}
+
+/* ── Icon-only (square ghost) ──────────────────────────────────────────────── */
+.ui-btn--icon {
+  background: transparent;
+  border: none;
+  color: var(--chat-slate-500);
+  border-radius: 0.375rem;
+}
+.ui-btn--icon.ui-btn--sm { padding: 0.25rem; }
+.ui-btn--icon.ui-btn--md { padding: 0.375rem; }
+.ui-btn--icon:hover:not(:disabled) {
+  color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.1);
+}

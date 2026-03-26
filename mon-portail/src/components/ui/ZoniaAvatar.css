@@ -1,0 +1,21 @@
+/* ─── ZoniaAvatar ──────────────────────────────────────────────────────────── */
+.ui-zonia-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--chat-cyan), #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(25, 228, 250, 0.3);
+}
+
+.ui-zonia-avatar--loading {
+  animation: uiAvatarPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes uiAvatarPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(25, 228, 250, 0.3); }
+  50%      { box-shadow: 0 0 20px rgba(25, 228, 250, 0.6); }
+}

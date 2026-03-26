@@ -21,3 +21,30 @@ body {
   min-height: 100vh;
 }
 
+/* ─── Scrollbar Zonia (sidebar uniquement ici ; tableaux dans ZoniaProject.css) ── */
+.sidebar-nav::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: calc(var(--scrollbar-width) / 2);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:active {
+  background: var(--scrollbar-thumb-active);
+}
+
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+

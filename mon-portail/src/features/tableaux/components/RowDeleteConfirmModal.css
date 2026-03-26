@@ -1,0 +1,29 @@
+/* ============================================================================
+   ROW DELETE CONFIRM MODAL (feature tableaux)
+   ============================================================================ */
+.row-delete-confirm-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--chat-slate-300);
+  line-height: 1.5;
+}
+
+.row-delete-confirm-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--chat-slate-700);
+}
+
+.row-delete-confirm-btn.ui-btn--primary {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: var(--chat-slate-300);
+}
+
+.row-delete-confirm-btn.ui-btn--primary:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.4);
+  border-color: rgba(239, 68, 68, 0.7);
+}

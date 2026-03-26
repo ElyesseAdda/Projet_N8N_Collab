@@ -1,0 +1,300 @@
+/* ============================================================================
+   TABLEAU DETAIL SECTION (collapsible)
+   ============================================================================ */
+.tableau-detail-section {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--chat-slate-700);
+  border-radius: 1rem;
+  overflow: visible;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.tableau-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tableau-detail-header:hover {
+  background: rgba(51, 65, 85, 0.3);
+}
+
+.tableau-detail-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: white;
+}
+
+.tableau-detail-title-actions {
+  color: var(--chat-slate-400);
+}
+
+.tableau-detail-title-actions:hover {
+  color: var(--chat-cyan);
+}
+
+.tableau-detail-toggle {
+  color: var(--chat-cyan);
+}
+
+.tableau-detail-body {
+  flex: 0 0 auto;
+  padding: 0 1.25rem 1.25rem;
+  overflow: visible;
+}
+
+.tableau-detail-table-wrap {
+  overflow: visible;
+  border-radius: 0.5rem;
+  border: 1px solid var(--chat-slate-700);
+}
+
+.tableau-detail-grid-header-row {
+  display: grid;
+  width: 100%;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid var(--chat-slate-700);
+  min-width: 0;
+}
+
+.tableau-detail-grid-header {
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  font-weight: 600;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tableau-detail-grid-row {
+  display: grid;
+  width: 100%;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid var(--chat-slate-700);
+}
+
+.tableau-detail-grid-row:hover {
+  background: rgba(51, 65, 85, 0.2);
+}
+
+.tableau-detail-grid-cell {
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  color: var(--chat-slate-300);
+  border-bottom: none;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tableau-detail-website-link {
+  display: block;
+  color: var(--chat-cyan);
+  text-decoration: none;
+  transition: color 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tableau-detail-website-link:hover {
+  color: var(--chat-gold);
+  text-decoration: underline;
+}
+
+.tableau-detail-cell-expand {
+  padding: 0.375rem 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.tableau-detail-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: transparent;
+  border: none;
+  color: var(--chat-cyan);
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.tableau-detail-expand-btn:hover {
+  background: rgba(25, 228, 250, 0.15);
+}
+
+.tableau-detail-no-contacts {
+  font-size: 0.75rem;
+  color: var(--chat-slate-500);
+  padding-left: 0.25rem;
+}
+
+.tableau-detail-sub-row {
+  background: rgba(15, 23, 42, 0.7);
+  border-bottom: 1px solid var(--chat-slate-700);
+}
+
+.tableau-detail-sub-cell {
+  border-left: 3px solid var(--chat-cyan);
+  padding: 0;
+}
+
+.tableau-detail-contacts-block {
+  padding: 0.75rem 1rem 1rem;
+}
+
+.tableau-detail-contacts-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--chat-cyan);
+  margin-bottom: 0.5rem;
+  padding-left: 2.5rem;
+}
+
+.tableau-detail-contacts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  font-size: 0.8125rem;
+  margin-top: 0.25rem;
+  margin-left: 2.5rem;
+}
+
+.tableau-detail-contacts-row {
+  display: grid;
+  width: 100%;
+  border: 1px solid var(--chat-slate-700);
+  border-top: none;
+}
+
+.tableau-detail-contacts-row:first-child {
+  border-top: 1px solid var(--chat-slate-700);
+}
+
+.tableau-detail-contacts-header-row .tableau-detail-contacts-header {
+  background: rgba(30, 41, 59, 0.9);
+  color: white;
+  font-weight: 600;
+}
+
+.tableau-detail-contacts-header,
+.tableau-detail-contacts-cell {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-right: 1px solid var(--chat-slate-700);
+}
+
+.tableau-detail-contacts-header:last-child,
+.tableau-detail-contacts-cell:last-child {
+  border-right: none;
+}
+
+.tableau-detail-contacts-cell {
+  color: var(--chat-slate-300);
+  background: rgba(30, 41, 59, 0.4);
+}
+
+.tableau-detail-cell-actions,
+.tableau-detail-contacts-cell-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.375rem;
+}
+
+.tableau-detail-row-btn {
+  transition: color 0.2s, background 0.2s;
+  border-radius: 0.375rem;
+}
+
+.tableau-detail-row-btn--edit {
+  color: var(--chat-cyan);
+}
+
+.tableau-detail-row-btn--edit:hover {
+  color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.15);
+}
+
+.tableau-detail-row-btn--delete {
+  color: var(--chat-red);
+}
+
+.tableau-detail-row-btn--delete:hover {
+  color: var(--chat-red);
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.tableau-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tableau-detail-enrich-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.1);
+  border: 1px solid rgba(25, 228, 250, 0.3);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.tableau-detail-enrich-btn:hover {
+  color: white;
+  background: rgba(25, 228, 250, 0.2);
+  border-color: var(--chat-cyan);
+}
+
+/* ============================================================================
+   EnrichModal (body uses generic Modal from UI kit)
+   ============================================================================ */
+.tableau-enrich-modal-body {
+  padding: 0;
+}
+
+.tableau-enrich-modal-label {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--chat-slate-400);
+}
+
+.tableau-enrich-modal-error {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  border-radius: 0.375rem;
+}
+
+.tableau-enrich-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tableau-enrich-send {
+  align-self: flex-end;
+}

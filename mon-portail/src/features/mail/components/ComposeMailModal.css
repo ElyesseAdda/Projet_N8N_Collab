@@ -1,0 +1,129 @@
+.mail-compose-modal {
+  width: min(1300px, 98vw);
+}
+
+.mail-compose-modal-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mail-compose-modal-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mail-compose-modal-row--inline {
+  justify-content: space-between;
+}
+
+.mail-compose-modal-label {
+  width: 58px;
+  color: var(--chat-slate-300);
+  font-size: 0.82rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.mail-compose-modal-input {
+  width: 100%;
+}
+
+.mail-compose-modal-textarea {
+  width: 100%;
+  min-height: 240px;
+}
+
+.mail-compose-link-btn {
+  border: none;
+  background: transparent;
+  color: var(--chat-cyan);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.mail-compose-priority-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mail-compose-select {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--chat-slate-600);
+  color: var(--chat-slate-200);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.78rem;
+}
+
+.mail-compose-modal-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.mail-compose-tool-btn {
+  border: 1px solid var(--chat-slate-600);
+  background: rgba(15, 23, 42, 0.5);
+  color: var(--chat-slate-300);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.mail-compose-schedule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--chat-slate-400);
+}
+
+.mail-compose-schedule-input {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--chat-slate-600);
+  color: var(--chat-slate-200);
+  border-radius: 0.4rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.78rem;
+}
+
+.mail-compose-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border: 1px solid var(--chat-slate-700);
+  border-radius: 0.5rem;
+  background: rgba(15, 23, 42, 0.35);
+}
+
+.mail-compose-attachment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: var(--chat-slate-300);
+  font-size: 0.78rem;
+}
+
+.mail-compose-attachment-item button {
+  border: none;
+  background: transparent;
+  color: #f87171;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.mail-compose-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}

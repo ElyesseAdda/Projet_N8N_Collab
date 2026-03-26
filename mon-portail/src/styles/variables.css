@@ -1,0 +1,25 @@
+/* ─── Zonia Design Tokens ──────────────────────────────────────────────────── */
+
+:root {
+  --chat-cyan: #19E4FA;
+  --chat-gold: #FFD700;
+  --chat-red: #ef4444;
+  --chat-slate-900: #0f172a;
+  --chat-slate-800: #1e293b;
+  --chat-slate-700: #334155;
+  --chat-slate-600: #475569;
+  --chat-slate-500: #64748b;
+  --chat-slate-400: #94a3b8;
+  --chat-slate-300: #cbd5e1;
+  --chat-slate-100: #f1f5f9;
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
+  --chat-content-max-width: 1500px;
+
+  /* Scrollbar (design tokens) */
+  --scrollbar-width: 10px;
+  --scrollbar-track: var(--chat-slate-800);
+  --scrollbar-thumb: var(--chat-slate-600);
+  --scrollbar-thumb-hover: var(--chat-slate-500);
+  --scrollbar-thumb-active: var(--chat-cyan);
+}

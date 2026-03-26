@@ -1,0 +1,22 @@
+/* ─── StatusMessage ────────────────────────────────────────────────────────── */
+.ui-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.ui-status__text {
+  font-size: 0.875rem;
+}
+
+/* ── loading ───────────────────────────────────────────────────────────────── */
+.ui-status--loading { color: var(--chat-slate-400); }
+
+/* ── error ─────────────────────────────────────────────────────────────────── */
+.ui-status--error { color: #f87171; }
+
+/* ── empty ─────────────────────────────────────────────────────────────────── */
+.ui-status--empty { color: var(--chat-slate-500); font-style: italic; }

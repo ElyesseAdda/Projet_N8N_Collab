@@ -1,0 +1,26 @@
+/* ─── Card ─────────────────────────────────────────────────────────────────── */
+.ui-card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+/* ── Interactive (hover scale + glow) ──────────────────────────────────────── */
+.ui-card--interactive {
+  cursor: pointer;
+}
+
+.ui-card--interactive:hover {
+  transform: translateY(-2px);
+  border-color: var(--chat-cyan);
+  box-shadow: 0 0 24px rgba(25, 228, 250, 0.12);
+}
+
+/* ── Selected ──────────────────────────────────────────────────────────────── */
+.ui-card--selected {
+  border-color: var(--chat-cyan);
+  box-shadow: 0 0 16px rgba(25, 228, 250, 0.15);
+}

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import Vitrine from './components/Vitrine';
-import Chat from './components/Chat';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Vitrine from './pages/Vitrine';
+import ZoniaProject from './pages/ZoniaProject';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Composant pour rediriger vers dashboard
 function RedirectToN8n() {
   useEffect(() => {
-    // Rediriger vers /dashboard (affiche n8n dans iframe avec ControlCard)
     window.location.href = '/dashboard';
   }, []);
   return null;
@@ -28,7 +27,7 @@ function AppContent() {
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/me', {
-        credentials: 'include', // Inclure les cookies pour maintenir la session
+        credentials: 'include',
       });
       if (response.ok) {
         try {
@@ -58,9 +57,9 @@ function AppContent() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/logout', { 
+      const response = await fetch('/api/logout', {
         method: 'POST',
-        credentials: 'include', // Inclure les cookies pour maintenir la session
+        credentials: 'include',
       });
       if (response.ok) {
         setUser(null);
@@ -74,11 +73,11 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
       }}>
         <div>Chargement...</div>
       </div>
@@ -89,33 +88,33 @@ function AppContent() {
     <Routes>
       {/* Route racine : Vitrine publique */}
       <Route path="/" element={<Vitrine />} />
-      
-      {/* Route chat : Interface de chat pour tester les workflows n8n */}
-      <Route path="/chat" element={<Chat />} />
-      
-      {/* Route de connexion : Login si non connecté, sinon rediriger vers n8n */}
-      <Route 
-        path="/connect" 
+
+      {/* Route ZoniaProject : Interface complète (chat, tableaux, etc.) */}
+      <Route path="/ZoniaProject" element={<ZoniaProject />} />
+
+      {/* Route de connexion */}
+      <Route
+        path="/connect"
         element={
           isAuthenticated ? (
             <RedirectToN8n />
           ) : (
             <Login onLogin={handleLogin} />
           )
-        } 
+        }
       />
-      
-      {/* Route dashboard (optionnelle, gardée pour compatibilité) */}
-      <Route 
-        path="/dashboard" 
+
+      {/* Route dashboard */}
+      <Route
+        path="/dashboard"
         element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
             <Dashboard user={user} onLogout={handleLogout} />
           </ProtectedRoute>
-        } 
+        }
       />
-      
-      {/* Route catch-all pour les routes non trouvées */}
+
+      {/* Route catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -130,4 +129,3 @@ function App() {
 }
 
 export default App;
-

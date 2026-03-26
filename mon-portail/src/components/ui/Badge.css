@@ -1,0 +1,32 @@
+/* ─── Badge ────────────────────────────────────────────────────────────────── */
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.ui-badge--default {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--chat-slate-400);
+}
+.ui-badge--cyan {
+  background: rgba(25, 228, 250, 0.15);
+  color: var(--chat-cyan);
+}
+.ui-badge--gold {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+}
+.ui-badge--green {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+.ui-badge--red {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}

@@ -1,0 +1,116 @@
+/* ============================================================================
+   TABLEAU ACTIONS MODAL (feature tableaux)
+   ============================================================================ */
+.tableau-actions-choice-label {
+  margin: 0 0 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--chat-gold);
+}
+
+.tableau-actions-choice-btns {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+@media (min-width: 480px) {
+  .tableau-actions-choice-btns {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.tableau-actions-choice-btn {
+  justify-content: flex-start;
+}
+
+.tableau-actions-choice-btn--edit {
+  color: var(--chat-cyan);
+}
+
+.tableau-actions-choice-btn--edit:hover:not(:disabled) {
+  color: var(--chat-cyan);
+  background: rgba(25, 228, 250, 0.1);
+}
+
+.tableau-actions-choice-btn--danger {
+  color: var(--chat-red);
+}
+
+.tableau-actions-choice-btn--danger:hover:not(:disabled),
+.tableau-actions-choice-btn--danger:hover:not(:disabled) .ui-btn__icon,
+.tableau-actions-choice-btn--danger:hover:not(:disabled) .ui-btn__label {
+  color: var(--chat-red) !important;
+}
+
+.tableau-actions-choice-btn--danger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.25);
+}
+
+.tableau-actions-back {
+  margin-bottom: 1rem;
+}
+
+.tableau-actions-error {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: var(--chat-slate-300);
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.5rem;
+}
+
+.tableau-actions-edit .tableau-actions-field,
+.tableau-actions-edit .tableau-actions-edit-footer {
+  margin-top: 1rem;
+}
+
+.tableau-actions-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.tableau-actions-field span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--chat-slate-400);
+}
+
+.tableau-actions-field-label {
+  color: var(--chat-cyan);
+}
+
+.tableau-actions-edit-footer,
+.tableau-actions-delete-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--chat-slate-700);
+}
+
+.tableau-actions-delete-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--chat-slate-300);
+  line-height: 1.5;
+}
+
+.tableau-actions-delete-footer {
+  margin-top: 1.25rem;
+}
+
+.tableau-actions-delete-btn.ui-btn--primary {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: var(--chat-slate-300);
+}
+
+.tableau-actions-delete-btn.ui-btn--primary:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.4);
+  border-color: rgba(239, 68, 68, 0.7);
+}
