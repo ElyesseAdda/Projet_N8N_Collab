@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Sparkles, Send, RotateCcw } from 'lucide-react';
-import { Button } from '../../../components/ui';
+import { Button, SearchInput } from '../../../components/ui';
 
 /**
  * Brouillon de reponse genere par l'IA, editable par l'utilisateur.
@@ -8,13 +8,30 @@ import { Button } from '../../../components/ui';
  * @param {Object} draft
  * @param {function} onDraftChange
  * @param {Array} driveFiles
+ * @param {Array} suggestedFiles
  * @param {Array} selectedFiles - ids des fichiers coches
  * @param {function} onFileToggle
  * @param {function} onSend
  * @param {function} onRegenerate
  */
-const MailAIDraft = ({ draft, onDraftChange, driveFiles = [], selectedFiles = [], onFileToggle, onSend, onRegenerate }) => {
+const MailAIDraft = ({
+  draft,
+  onDraftChange,
+  driveFiles = [],
+  suggestedFiles = [],
+  selectedFiles = [],
+  onFileToggle,
+  onSend,
+  onRegenerate,
+}) => {
   if (!draft) return null;
+  const [driveSearchQuery, setDriveSearchQuery] = useState('');
+
+  const filteredDriveFiles = useMemo(() => {
+    const q = driveSearchQuery.trim().toLowerCase();
+    if (!q) return driveFiles;
+    return driveFiles.filter((file) => file.name.toLowerCase().includes(q));
+  }, [driveFiles, driveSearchQuery]);
 
   return (
     <div className="mail-ai-draft">
@@ -44,25 +61,60 @@ const MailAIDraft = ({ draft, onDraftChange, driveFiles = [], selectedFiles = []
         rows={10}
       />
 
-      {driveFiles.length > 0 && (
+      {(suggestedFiles.length > 0 || driveFiles.length > 0) && (
         <div className="mail-ai-draft-files">
-          <div className="mail-ai-draft-files-title">
-            Pièces jointes 
-          </div>
-          <div className="mail-ai-draft-files-list">
-            {driveFiles.map((file) => (
-              <label key={file.id} className="mail-ai-draft-file-row">
-                <input
-                  type="checkbox"
-                  checked={selectedFiles.includes(file.id)}
-                  onChange={() => onFileToggle(file.id)}
-                  className="mail-ai-draft-file-checkbox"
+          {suggestedFiles.length > 0 && (
+            <>
+              <div className="mail-ai-draft-files-title">Pièces jointes suggérées</div>
+              <div className="mail-ai-draft-files-list">
+                {suggestedFiles.map((file) => (
+                  <label key={`suggested-${file.id}`} className="mail-ai-draft-file-row">
+                    <input
+                      type="checkbox"
+                      checked={selectedFiles.includes(file.id)}
+                      onChange={() => onFileToggle(file.id)}
+                      className="mail-ai-draft-file-checkbox"
+                    />
+                    <span className="mail-ai-draft-file-name">{file.name}</span>
+                    <span className="mail-ai-draft-file-size">{file.size}</span>
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
+
+          {driveFiles.length > 0 && (
+            <>
+              <div className="mail-ai-draft-files-title mail-ai-draft-files-title--drive">
+                Fichiers Drive
+              </div>
+              <div className="mail-ai-draft-drive-search">
+                <SearchInput
+                  value={driveSearchQuery}
+                  onChange={(e) => setDriveSearchQuery(e.target.value)}
+                  placeholder="Rechercher un fichier Drive..."
+                  size="sm"
                 />
-                <span className="mail-ai-draft-file-name">{file.name}</span>
-                <span className="mail-ai-draft-file-size">{file.size}</span>
-              </label>
-            ))}
-          </div>
+              </div>
+              <div className="mail-ai-draft-files-list">
+                {filteredDriveFiles.length === 0 && (
+                  <div className="mail-ai-draft-files-empty">Aucun fichier Drive trouvé</div>
+                )}
+                {filteredDriveFiles.map((file) => (
+                  <label key={`drive-${file.id}`} className="mail-ai-draft-file-row">
+                    <input
+                      type="checkbox"
+                      checked={selectedFiles.includes(file.id)}
+                      onChange={() => onFileToggle(file.id)}
+                      className="mail-ai-draft-file-checkbox"
+                    />
+                    <span className="mail-ai-draft-file-name">{file.name}</span>
+                    <span className="mail-ai-draft-file-size">{file.size}</span>
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 

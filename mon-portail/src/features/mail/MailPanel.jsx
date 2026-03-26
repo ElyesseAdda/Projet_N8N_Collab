@@ -199,11 +199,6 @@ const MailPanel = () => {
     return counts;
   }, [folders]);
 
-  const unreadCount = useMemo(
-    () => MOCK_MAILS.filter((m) => m.unread && m.mailbox === 'recus').length,
-    []
-  );
-
   const mailboxCounts = useMemo(
     () =>
       MAILBOX_FILTERS.reduce((acc, mailbox) => {
@@ -215,6 +210,11 @@ const MailPanel = () => {
         return acc;
       }, {}),
     []
+  );
+
+  const mailboxTotalCount = useMemo(
+    () => Object.values(mailboxCounts).reduce((sum, count) => sum + count, 0),
+    [mailboxCounts]
   );
 
   const filteredMails = useMemo(() => {
@@ -359,14 +359,29 @@ const MailPanel = () => {
           <div>
             <div className="mail-panel-title-row">
               <h2 className="mail-panel-title">Mes Mails</h2>
-              {unreadCount > 0 && (
+              {mailboxTotalCount > 0 && (
                 <Badge variant="cyan" className="mail-panel-unread-badge">
-                  {unreadCount} non lu{unreadCount > 1 ? 's' : ''}
+                  {mailboxTotalCount} au total
                 </Badge>
               )}
             </div>
             <div className="mail-panel-subtitle">Tri automatique • Réponses assistées</div>
           </div>
+        </div>
+        <div className="mail-mailbox-filters mail-mailbox-filters--header">
+          {MAILBOX_FILTERS.map((mailbox) => (
+            <button
+              key={mailbox.id}
+              type="button"
+              className={`mail-mailbox-filter-btn ${activeMailbox === mailbox.id ? 'mail-mailbox-filter-btn--active' : ''}`}
+              onClick={() => setActiveMailbox(mailbox.id)}
+            >
+              <span>{mailbox.label}</span>
+              <Badge variant={activeMailbox === mailbox.id ? 'cyan' : 'default'} className="mail-mailbox-filter-badge">
+                {mailboxCounts[mailbox.id] || 0}
+              </Badge>
+            </button>
+          ))}
         </div>
       </header>
 
@@ -380,21 +395,6 @@ const MailPanel = () => {
             onCreateFolder={handleCreateFolder}
             onRenameFolder={handleRenameFolder}
           />
-          <div className="mail-mailbox-filters">
-            {MAILBOX_FILTERS.map((mailbox) => (
-              <button
-                key={mailbox.id}
-                type="button"
-                className={`mail-mailbox-filter-btn ${activeMailbox === mailbox.id ? 'mail-mailbox-filter-btn--active' : ''}`}
-                onClick={() => setActiveMailbox(mailbox.id)}
-              >
-                <span>{mailbox.label}</span>
-                <Badge variant={activeMailbox === mailbox.id ? 'cyan' : 'default'} className="mail-mailbox-filter-badge">
-                  {mailboxCounts[mailbox.id] || 0}
-                </Badge>
-              </button>
-            ))}
-          </div>
           <div className="mail-list-search-wrap">
             <SearchInput
               value={searchQuery}
@@ -470,6 +470,7 @@ const MailPanel = () => {
                         draft={currentDraft}
                         onDraftChange={handleDraftChange}
                         driveFiles={driveFiles}
+                        suggestedFiles={selectedMail?.attachments || []}
                         selectedFiles={selectedDriveFiles}
                         onFileToggle={handleFileToggle}
                         onSend={handleSend}

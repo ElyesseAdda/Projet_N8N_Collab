@@ -180,6 +180,15 @@
   margin-bottom: 0.5rem;
 }
 
+.mail-mailbox-filters--header {
+  margin-bottom: 0;
+  justify-content: flex-end;
+  align-content: flex-start;
+  min-height: 68px;
+  max-width: min(62%, 560px);
+}
+
+
 .mail-mailbox-filter-btn {
   display: inline-flex;
   align-items: center;
@@ -642,6 +651,19 @@
 
 .mail-center-layout--history-open {
   --mail-center-main-max-height: min(40vh, 380px);
+  height: min(62vh, 620px);
+}
+
+.mail-center-layout--history-open .mail-center-scroll {
+  flex: 1 1 60%;
+  max-height: none;
+  min-height: 0;
+}
+
+.mail-center-layout--history-open .mail-center-history {
+  flex: 1 1 40%;
+  max-height: none;
+  min-height: 0;
 }
 
 .mail-center-scroll {
@@ -678,6 +700,7 @@
   flex: 0 0 auto;
   min-height: 0;
   overflow: hidden;
+  max-height: min(30vh, 300px);
 }
 
 .mail-center-empty {
@@ -1037,10 +1060,24 @@
   margin-bottom: 0.45rem;
 }
 
+.mail-ai-draft-files-title--drive {
+  margin-top: 0.75rem;
+}
+
+.mail-ai-draft-drive-search {
+  margin-bottom: 0.45rem;
+}
+
 .mail-ai-draft-files-list {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+}
+
+.mail-ai-draft-files-empty {
+  font-size: 0.76rem;
+  color: var(--chat-slate-500);
+  padding: 0.35rem 0.2rem;
 }
 
 .mail-ai-draft-file-row {
@@ -1109,8 +1146,10 @@
   padding-top: 0.65rem;
   min-height: 0;
   height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .mail-thread-history-toggle {
@@ -1135,12 +1174,14 @@
 .mail-thread-history-list {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 0.4rem;
   margin-top: 0.5rem;
   padding-left: 0.5rem;
   border-left: 2px solid var(--chat-slate-700);
   overflow-y: auto;
   min-height: 0;
+  max-height: 100%;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) transparent;
 }
@@ -1500,4 +1541,11 @@
   .mail-folders-title {
     display: none;
   }
+
+  .mail-mailbox-filters--header {
+    max-width: 100%;
+    min-height: 0;
+    justify-content: flex-start;
+  }
+
 }
