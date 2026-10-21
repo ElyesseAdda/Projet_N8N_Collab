@@ -203,12 +203,24 @@ app.get('/api/me', (req, res) => {
 // Route pour envoyer les demandes d'audit par email
 app.post('/api/contact', async (req, res) => {
     try {
-        const { email } = req.body;
+        const { email, name, company, formula, need } = req.body;
 
         // Validation de l'email
         if (!email || !email.includes('@')) {
             return res.status(400).json({ error: 'Email invalide' });
         }
+
+        const clean = (value, max = 500) => String(value ?? '')
+            .replace(/[<>&"]/g, (char) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[char]))
+            .trim()
+            .slice(0, max);
+
+        const details = {
+            name: clean(name, 120),
+            company: clean(company, 160),
+            formula: clean(formula, 80),
+            need: clean(need, 2000).replace(/\n/g, '<br>'),
+        };
 
         // Vérification des variables d'environnement
         const gmailUser = process.env.GMAIL_USER || 'zonia.ai.pro@gmail.com';
@@ -272,21 +284,28 @@ app.post('/api/contact', async (req, res) => {
         const mailOptions = {
             from: process.env.GMAIL_USER || 'zonia.ai.pro@gmail.com',
             to: 'zonia.ai.pro@gmail.com',
-            subject: 'Nouvelle demande d\'audit gratuit - Zonia',
+            subject: 'Nouvelle demande d\'audit - Zonia',
             html: `
-                <h2>Nouvelle demande d'audit gratuit</h2>
-                <p><strong>Email du client:</strong> ${email}</p>
-                <p><strong>Date:</strong> ${new Date().toLocaleString('fr-FR')}</p>
+                <h2>Nouvelle demande d'audit</h2>
+                <p><strong>Email :</strong> ${clean(email, 200)}</p>
+                <p><strong>Nom :</strong> ${details.name || '—'}</p>
+                <p><strong>Société :</strong> ${details.company || '—'}</p>
+                <p><strong>Formule envisagée :</strong> ${details.formula || '—'}</p>
+                <p><strong>Besoin :</strong></p>
+                <p>${details.need || '—'}</p>
+                <p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
                 <hr>
                 <p>Cette demande provient du formulaire de contact sur le site Zonia.</p>
             `,
             text: `
-                Nouvelle demande d'audit gratuit
-                
-                Email du client: ${email}
+                Nouvelle demande d'audit
+
+                Email: ${email}
+                Nom: ${name || '—'}
+                Société: ${company || '—'}
+                Formule: ${formula || '—'}
+                Besoin: ${need || '—'}
                 Date: ${new Date().toLocaleString('fr-FR')}
-                
-                Cette demande provient du formulaire de contact sur le site Zonia.
             `
         };
 

@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 // L'import externe est supprimé pour éviter l'erreur de compilation dans l'environnement de prévisualisation
 // import './Vitrine.css'; 
 import { 
-  Menu, ArrowRight, Mail, CalendarClock, Bot, FileCheck, 
-  Database, Sparkles, Clock, Infinity, TrendingUp, FileText, 
-  FileBarChart, FileSpreadsheet, Zap, User, Search, Check, 
-  AlertCircle, Send, X, HelpCircle, Shield, FileText as FileTextIcon
+  Menu, ArrowRight, Mail, ClipboardCheck, Compass, PenLine, RefreshCw,
+  Layers, Workflow, FileSearch, Cable, Send, X, HelpCircle, Shield,
+  FileText as FileTextIcon, Check
 } from 'lucide-react';
 
 // --- STYLES CSS INTÉGRÉS ---
@@ -115,76 +114,127 @@ const cssStyles = `
   }
 `;
 
-// --- DONNÉES DE LA DÉMO RAG ---
-const DEMO_SCENARIOS = {
-  finance: {
-    id: 'finance',
-    fileName: 'Factures_Oct.pdf',
-    fileType: 'pdf-blue',
-    query: "Quel est le total des factures fournisseurs pour Octobre ?",
-    response: (
-      <span>
-        D'après le fichier <span className="text-[#19E4FA] font-medium bg-[#19E4FA]/10 px-1 rounded">Factures_Oct.pdf</span>, le total des factures fournisseurs s'élève à <strong>14 250,00 €</strong>.
-      </span>
-    ),
-    widget: (
-      <div className="bg-slate-800 rounded-lg p-3 border border-slate-600 mt-2 text-xs font-mono animate-fade-in">
-        <div className="flex justify-between text-slate-500 mb-1 border-b border-slate-700 pb-1"><span>Poste</span><span>Montant</span></div>
-        <div className="flex justify-between text-slate-300 py-1"><span>Hébergement Web</span><span>1 200 €</span></div>
-        <div className="flex justify-between text-slate-300 py-1"><span>Licences Logiciels</span><span>4 500 €</span></div>
-        <div className="flex justify-between text-slate-300 py-1"><span>Prestataires</span><span>8 550 €</span></div>
-        <div className="flex justify-between text-[#FFD700] font-bold pt-2 border-t border-slate-700 mt-1"><span>TOTAL</span><span>14 250 €</span></div>
-      </div>
-    )
+const METHOD_STEPS = [
+  {
+    n: '01',
+    icon: <ClipboardCheck />,
+    title: 'Audit',
+    text: 'Nous regardons vos flux réels : qui fait quoi, où le temps part, et ce qui peut attendre.',
   },
-  rh: {
-    id: 'rh',
-    fileName: 'Procédure_RH.pdf',
-    fileType: 'pdf-red',
-    query: "Quelle est la procédure pour demander du télétravail ?",
-    response: (
-      <span>
-        Le document <span className="text-[#FFD700] font-medium bg-[#FFD700]/10 px-1 rounded">Procédure_RH.pdf</span> stipule que le télétravail doit être validé 48h à l'avance.
-      </span>
-    ),
-    widget: (
-      <div className="bg-slate-800 rounded-lg p-3 border border-slate-600 mt-2 text-xs animate-fade-in">
-        <div className="text-slate-500 uppercase font-bold mb-2 text-[10px]">Conditions Requises</div>
-        <ul className="space-y-1 text-slate-300">
-          <li className="flex items-center gap-2"><Check className="w-3 h-3 text-[#19E4FA]" /> Validation Manager</li>
-          <li className="flex items-center gap-2"><Check className="w-3 h-3 text-[#19E4FA]" /> VPN Configuré</li>
-          <li className="flex items-center gap-2"><AlertCircle className="w-3 h-3 text-[#FFD700]" /> Jours: Mar / Jeu</li>
-        </ul>
-      </div>
-    )
+  {
+    n: '02',
+    icon: <Compass />,
+    title: 'Cadrage',
+    text: 'Le périmètre est écrit : ce qui est construit, ce qui est reporté, et dans quel ordre.',
   },
-  stock: {
-    id: 'stock',
-    fileName: 'Stock_Q4.xlsx',
-    fileType: 'xls-green',
-    query: "Quel est le niveau de stock pour les écrans 27 pouces ?",
-    response: (
-      <span>
-        Le fichier <span className="text-[#19E4FA] font-medium bg-[#19E4FA]/10 px-1 rounded">Stock_Q4.xlsx</span> indique qu'il reste <strong>12 unités</strong>.
-      </span>
-    ),
-    widget: (
-      <div className="bg-slate-800 rounded-lg p-3 border border-slate-600 mt-2 text-xs animate-fade-in">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-slate-400">Référence</span>
-          <span className="text-white font-mono">MON-27-4K</span>
-        </div>
-        <div className="w-full bg-slate-700 rounded-full h-2 mb-1">
-          <div className="bg-[#19E4FA] h-2 rounded-full" style={{ width: '20%' }}></div>
-        </div>
-        <div className="flex justify-between text-[10px]">
-          <span className="text-[#FFD700] font-bold">Niveau Bas (12)</span>
-          <span className="text-slate-500">Seuil: 15</span>
-        </div>
-      </div>
-    )
-  }
-};
+  {
+    n: '03',
+    icon: <PenLine />,
+    title: 'Construction',
+    text: 'L’outil est fait pour votre métier. Un assistant peut en faire partie, il n’en est pas le sujet.',
+  },
+  {
+    n: '04',
+    icon: <RefreshCw />,
+    title: 'Évolution',
+    text: 'Les corrections sont incluses. Les nouvelles fonctions se décident au rythme de votre activité.',
+  },
+];
+
+const SOLUTIONS = [
+  {
+    icon: <ClipboardCheck />,
+    title: 'Audit de processus',
+    desc: 'Cartographie de vos flux, des irritants et des gains réalistes, avant toute ligne de devis.',
+    tone: 'cyan',
+  },
+  {
+    icon: <Layers />,
+    title: 'Application métier',
+    desc: 'Un outil interne dédié à votre façon de travailler : clients, interventions, suivi, documents.',
+    tone: 'gold',
+  },
+  {
+    icon: <Workflow />,
+    title: 'Automatisation ciblée',
+    desc: 'Un flux de bout en bout — relances, pièces, planning — sans refaire tout le système.',
+    tone: 'cyan',
+  },
+  {
+    icon: <FileSearch />,
+    title: 'Connaissance documentaire',
+    desc: 'Vos procédures et dossiers deviennent interrogeables. Une brique possible, jamais le produit vendu seul.',
+    tone: 'gold',
+  },
+  {
+    icon: <Cable />,
+    title: 'Connexion à l’existant',
+    desc: 'Mails, agendas, tableurs, facturation : on relie ce que vous utilisez déjà quand c’est utile.',
+    tone: 'cyan',
+  },
+  {
+    icon: <RefreshCw />,
+    title: 'Accompagnement',
+    desc: 'L’outil reste vivant. On corrige, puis on étend le périmètre seulement quand vous le décidez.',
+    tone: 'gold',
+  },
+];
+
+const FORMULAS = [
+  {
+    id: 'audit',
+    eyebrow: 'Point d’entrée',
+    title: 'Diagnostic',
+    desc: 'On comprend le métier avant de proposer un outil. Aucun engagement de construction.',
+    points: [
+      'Entretien avec les personnes qui font le travail',
+      'Cartographie des flux et des irritants',
+      'Priorités et feuille de route',
+      'Recommandation : cibler, intégrer, ou ne rien construire',
+    ],
+    note: 'Sans engagement de construction. S’il y a une suite, le devis vient ensuite.',
+  },
+  {
+    id: 'ciblee',
+    eyebrow: 'Un flux',
+    title: 'Solution ciblée',
+    desc: 'Une application ou un workflow autour d’un seul processus. Le premier outil métier, pas un système complet.',
+    points: [
+      'Un parcours de bout en bout',
+      'Les connexions utiles à ce seul flux',
+      'Prise en main de l’équipe concernée',
+      'Périmètre écrit, hors sujet exclu',
+    ],
+    note: 'Le montant suit le nombre d’étapes et de connexions.',
+  },
+  {
+    id: 'integree',
+    eyebrow: 'Cœur de l’offre',
+    title: 'Solution intégrée',
+    desc: 'Un logiciel métier dédié, qui relie plusieurs processus. C’est l’entrée de gamme d’un vrai outil interne.',
+    points: [
+      'Plusieurs métiers dans le même outil',
+      'Règles propres à votre façon de travailler',
+      'Socle prévu pour évoluer',
+      'Livré par lots, pas en une fois opaque',
+    ],
+    note: 'Le devis dépend du périmètre. Pas de forfait catalogue.',
+    featured: true,
+  },
+  {
+    id: 'plateforme',
+    eyebrow: 'Besoin large',
+    title: 'Plateforme métier',
+    desc: 'Clients, projets, facturation et cœur d’activité dans un même environnement, construit par étapes.',
+    points: [
+      'Cadrage en lots successifs',
+      'Livraison progressive, utilisable tôt',
+      'Accompagnement au déploiement',
+      'Hors ERP généraliste construit de zéro',
+    ],
+    note: 'Réservée aux besoins qui dépassent un seul flux. Le calendrier se fixe après l’audit.',
+  },
+];
 
 const ZoniaLogo = ({ size = 40, strokeColor = 'white' }) => (
   <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
@@ -192,139 +242,44 @@ const ZoniaLogo = ({ size = 40, strokeColor = 'white' }) => (
   </svg>
 );
 
-const ZoniaAvatar = () => (
-  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FFD700] to-[#19E4FA] flex-shrink-0 flex items-center justify-center shadow-lg">
-    <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
-        <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="black" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  </div>
-);
-
-const RagDemo = () => {
-  const [activeScenario, setActiveScenario] = useState('finance');
-  const [messages, setMessages] = useState([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const chatEndRef = useRef(null);
-  const chatContainerRef = useRef(null);
-
-  const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
-        behavior: "smooth"
-      });
-    }
-  };
-
-  useEffect(() => {
-    setMessages([{ 
-      type: 'system', 
-      content: "Bonjour ! Je suis connecté à votre base documentaire. Quelle information recherchez-vous aujourd'hui ?" 
-    }]);
-    
-    const scenario = DEMO_SCENARIOS[activeScenario];
-    if (!scenario) return;
-
-    const timers = [];
-    timers.push(setTimeout(() => {
-      setMessages(prev => [...prev, { type: 'user', content: scenario.query }]);
-      scrollToBottom();
-    }, 800));
-
-    timers.push(setTimeout(() => {
-      setIsProcessing(true);
-      scrollToBottom();
-    }, 1800));
-
-    timers.push(setTimeout(() => {
-      setIsProcessing(false);
-      setMessages(prev => [...prev, { 
-        type: 'ai', 
-        content: scenario.response, 
-        widget: scenario.widget 
-      }]);
-      scrollToBottom();
-    }, 3500));
-
-    return () => timers.forEach(clearTimeout);
-  }, [activeScenario]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isProcessing]);
-
+const ServiceCard = ({ icon, title, desc, tone }) => {
+  const gold = tone === 'gold';
   return (
-    <div className="mt-20 relative max-w-5xl mx-auto">
-      <div className="absolute inset-0 bg-[#19E4FA] blur-[120px] opacity-10 rounded-full"></div>
-      <div className="relative bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-700 overflow-hidden shadow-2xl h-[550px] md:h-[500px] flex text-left font-sans flex-col md:flex-row">
-        <div className="w-full md:w-64 bg-slate-900/80 border-b md:border-b-0 md:border-r border-slate-700 p-4 flex flex-col gap-4 overflow-y-auto">
-          <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 hidden md:block">Base de Connaissances</div>
-          <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
-            <FileItem icon={<FileText className="w-4 h-4 text-red-400" />} bg="bg-red-500/20" name="Procédure_RH.pdf" info="1.2 MB • Hier" isActive={activeScenario === 'rh'} isScanning={activeScenario === 'rh' && isProcessing} onClick={() => setActiveScenario('rh')} />
-            <FileItem icon={<FileBarChart className="w-4 h-4 text-blue-400" />} bg="bg-blue-500/20" name="Factures_Oct.pdf" info="840 KB • 2h" isActive={activeScenario === 'finance'} isScanning={activeScenario === 'finance' && isProcessing} onClick={() => setActiveScenario('finance')} />
-            <FileItem icon={<FileSpreadsheet className="w-4 h-4 text-green-400" />} bg="bg-green-500/20" name="Stock_Q4.xlsx" info="2.4 MB • 1j" isActive={activeScenario === 'stock'} isScanning={activeScenario === 'stock' && isProcessing} onClick={() => setActiveScenario('stock')} />
-          </div>
-          <div className="mt-auto p-3 bg-slate-800 rounded-lg border border-slate-700 hidden md:block">
-            <div className="flex items-center gap-2 text-[#FFD700] text-xs font-bold mb-1"><Zap className="w-3 h-3" /> Zonia RAG Engine</div>
-            <div className="text-[10px] text-slate-400">Cliquez sur un fichier pour tester</div>
-          </div>
-        </div>
-        <div className="flex-1 bg-slate-800/50 p-6 flex flex-col relative">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-700 mb-4">
-            <div className="flex items-center gap-3">
-              <ZoniaAvatar />
-              <div><div className="text-sm font-bold text-white">Assistant Zonia</div><div className="text-xs text-[#19E4FA] flex items-center gap-1 font-medium"><span className="w-1.5 h-1.5 bg-[#19E4FA] rounded-full shadow-[0_0_5px_#19E4FA]"></span> En ligne</div></div>
-            </div>
-            <div className="text-xs text-slate-500">v2.4.0</div>
-          </div>
-          <div ref={chatContainerRef} className="flex-1 overflow-y-auto space-y-4 pr-2 scrollbar-thin scrollbar-thumb-slate-700">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex gap-3 msg-enter ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                {msg.type === 'user' ? <div className="w-8 h-8 rounded-full bg-slate-600 flex-shrink-0 flex items-center justify-center text-white"><User className="w-4 h-4" /></div> : <ZoniaAvatar />}
-                <div className={`p-3 text-sm max-w-[85%] shadow-lg ${msg.type === 'user' ? 'bg-[#19E4FA] text-slate-900 font-medium rounded-2xl rounded-tr-none shadow-lg shadow-[#19E4FA]/20' : 'bg-slate-700/50 text-slate-300 rounded-2xl rounded-tl-none border border-slate-600'}`}>
-                  {msg.content}{msg.widget}
-                  {msg.type === 'ai' && msg.widget && (<div className="mt-3 flex gap-2"><button className="text-xs bg-slate-600 hover:bg-slate-500 px-3 py-1.5 rounded-full transition-colors">Voir source</button><button className="text-xs bg-slate-600 hover:bg-slate-500 px-3 py-1.5 rounded-full transition-colors">Exporter</button></div>)}
-                </div>
-              </div>
-            ))}
-            {isProcessing && (<div className="flex gap-3 msg-enter"><ZoniaAvatar /><div className="flex items-center gap-2 text-xs text-[#FFD700] mt-2"><Search className="w-3 h-3 animate-spin" /><span>Analyse en cours...</span></div></div>)}
-            <div ref={chatEndRef} />
-          </div>
-          <div className="mt-4 pt-4 border-t border-slate-700 relative">
-            <input type="text" disabled placeholder="Cliquez sur un fichier à gauche..." className="w-full bg-slate-900/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-400 text-sm focus:outline-none cursor-not-allowed opacity-70" />
-            <button className="absolute right-3 top-6 text-[#FFD700]"><Send className="w-4 h-4" /></button>
-          </div>
-        </div>
+    <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] hover:border-[#19E4FA] hover:-translate-y-1 transition-all duration-300">
+      <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 border ${gold ? 'bg-[#FFD700]/20 border-[#EAB308]/40' : 'bg-[#19E4FA]/15 border-[#19E4FA]/30'}`}>
+        {React.cloneElement(icon, { className: `w-7 h-7 ${gold ? 'text-[#A16207]' : 'text-[#0E7490]'}` })}
       </div>
+      <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
+      <p className="text-slate-600 text-sm leading-relaxed">{desc}</p>
     </div>
   );
 };
 
-const FileItem = ({ icon, bg, name, info, isActive, isScanning, onClick }) => (
-  <div onClick={onClick} className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer min-w-[200px] md:min-w-0 ${isScanning ? 'file-scan overflow-hidden relative' : ''} ${isActive ? 'bg-[#FFD700]/5 border-[#FFD700]' : 'border-slate-700/50 hover:bg-slate-800'}`}>
-    <div className={`${bg} p-2 rounded relative z-10`}>{icon}</div>
-    <div className="relative z-10"><div className={`text-sm font-medium ${isActive ? 'text-white' : 'text-slate-300'}`}>{name}</div><div className="text-[10px] text-slate-500">{info}</div></div>
-  </div>
+const FormulaCard = ({ formula, onChoose }) => (
+  <article className={`flex flex-col rounded-2xl border p-7 bg-white shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] ${formula.featured ? 'border-slate-950 ring-1 ring-slate-950' : 'border-slate-200'}`}>
+    <p className={`text-xs font-bold uppercase tracking-[0.16em] mb-3 ${formula.featured ? 'text-[#0E7490]' : 'text-slate-500'}`}>{formula.eyebrow}</p>
+    <h3 className="text-2xl font-bold text-slate-950 mb-3">{formula.title}</h3>
+    <p className="text-sm text-slate-600 leading-relaxed mb-6">{formula.desc}</p>
+    <ul className="space-y-3 mb-6 flex-1">
+      {formula.points.map((point) => (
+        <li key={point} className="flex gap-2 text-sm text-slate-700">
+          <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0E7490]" />
+          <span>{point}</span>
+        </li>
+      ))}
+    </ul>
+    <p className="text-sm font-medium text-slate-900 mb-5">{formula.note}</p>
+    <a
+      href="#contact"
+      onClick={() => onChoose(formula.title)}
+      className={`text-center rounded-full px-4 py-3 text-sm font-bold transition-colors ${formula.featured ? 'bg-slate-950 text-white hover:bg-[#0891B2]' : 'border border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white'}`}
+    >
+      En parler dans l’audit
+    </a>
+  </article>
 );
 
-const ServiceCard = ({ icon, title, desc, bgClass, iconClass }) => (
-  <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] hover:border-[#19E4FA] hover:-translate-y-1 transition-all duration-300">
-    <div className={`w-14 h-14 ${bgClass} rounded-xl flex items-center justify-center mb-6`}>
-      {React.cloneElement(icon, { className: `w-7 h-7 ${iconClass}` })}
-    </div>
-    <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
-    <p className="text-slate-600 text-sm leading-relaxed">{desc}</p>
-  </div>
-);
 
-const BenefitItem = ({ icon, title, desc }) => (
-  <div className="flex gap-4">
-    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#19E4FA]/10 flex items-center justify-center border border-[#19E4FA]/30">
-      {React.cloneElement(icon, { className: "text-[#0E7490] w-6 h-6" })}
-    </div>
-    <div><h4 className="text-slate-900 font-bold text-lg">{title}</h4><p className="text-slate-600 text-sm">{desc}</p></div>
-  </div>
-);
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -342,10 +297,11 @@ const Navbar = () => {
               </span>
               <span className="text-lg font-bold tracking-[0.22em] text-slate-950">ZONIA</span>
             </a>
-            <div className="hidden md:flex items-center gap-2">
-              <a href="#services" className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full text-sm font-medium">Solutions</a>
-              <a href="#benefits" className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full text-sm font-medium">Avantages</a>
-              <a href="#contact" className="ml-1 bg-slate-950 text-white border border-slate-950 hover:bg-[#0891B2] hover:border-[#0891B2] px-5 py-2.5 rounded-full text-sm font-bold transition-colors">Démarrer un projet</a>
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#methode" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Méthode</a>
+              <a href="#solutions" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Solutions</a>
+              <a href="#formules" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Formules</a>
+              <a href="#contact" className="bg-slate-950 text-white border border-slate-950 hover:bg-[#0891B2] hover:border-[#0891B2] px-5 py-2.5 rounded-full text-sm font-bold transition-colors">Demander un audit</a>
             </div>
             <button
               type="button"
@@ -360,9 +316,10 @@ const Navbar = () => {
         </div>
         {open && (
           <div className="md:hidden border-t border-slate-200 px-4 py-4 space-y-2">
-            <a href="#services" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Solutions</a>
-            <a href="#benefits" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Avantages</a>
-            <a href="#contact" onClick={close} className="block text-center bg-slate-950 text-white border border-slate-950 px-4 py-3 rounded-full text-sm font-bold">Démarrer un projet</a>
+            <a href="#methode" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Méthode</a>
+            <a href="#solutions" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Solutions</a>
+            <a href="#formules" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Formules</a>
+            <a href="#contact" onClick={close} className="block text-center bg-slate-950 text-white border border-slate-950 px-4 py-3 rounded-full text-sm font-bold">Demander un audit</a>
           </div>
         )}
       </nav>
@@ -399,18 +356,23 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   );
 };
 
+const EMPTY_FORM = { name: '', company: '', email: '', formula: 'Diagnostic', need: '' };
+
 const Vitrine = () => {
-  console.log('Vitrine: Composant rendu');
-  const [email, setEmail] = useState('');
+  const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
-  const [openModal, setOpenModal] = useState(null); // 'legal', 'privacy', 'support', null
+  const [openModal, setOpenModal] = useState(null);
+
+  const setField = (key) => (event) => {
+    setForm((current) => ({ ...current, [key]: event.target.value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage({ type: '', text: '' });
-    
-    if (!email || !email.includes('@')) {
+
+    if (!form.email || !form.email.includes('@')) {
       setMessage({ type: 'error', text: 'Veuillez entrer un email valide' });
       return;
     }
@@ -419,17 +381,15 @@ const Vitrine = () => {
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
 
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setMessage({ type: 'success', text: data.message || 'Votre demande a été envoyée avec succès. Nous vous répondrons sous 24h ouvrées.' });
-        setEmail('');
+        setMessage({ type: 'success', text: data.message || 'Votre demande a été envoyée. Nous vous répondrons sous 24h ouvrées.' });
+        setForm(EMPTY_FORM);
       } else {
         setMessage({ type: 'error', text: data.error || 'Erreur lors de l\'envoi de la demande. Veuillez réessayer plus tard.' });
       }
@@ -443,7 +403,7 @@ const Vitrine = () => {
 
   return (
     // Ajout de overflow-x-hidden ici pour protéger le scroll vertical
-    <div id="top" className="bg-[#F4F7FB] text-slate-800 min-h-screen selection:bg-[#FFD700] selection:text-slate-900 overflow-x-hidden">
+    <div id="top" className="relative bg-[#F4F7FB] text-slate-800 min-h-screen selection:bg-[#FFD700] selection:text-slate-900 overflow-x-hidden">
       {/* Intégration des styles via une balise style */}
       <style>{cssStyles}</style>
 
@@ -451,106 +411,156 @@ const Vitrine = () => {
       <div className="glow-blob top-[-200px] left-[-200px]" />
       <div className="glow-blob bottom-[-200px] right-[-200px]" style={{ background: 'radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(15, 23, 42, 0) 70%)' }} />
       <Navbar />
-      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 px-4 z-10">
-        <div className="max-w-7xl mx-auto text-center">
+      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-20 px-4 z-10">
+        <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-700 text-sm font-medium mb-8 shadow-sm">
             <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#19E4FA] opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-[#0891B2]"></span></span>
-            Automatisation sur mesure pour entreprises
+            Agence IA · audit et outils métier
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold text-slate-950 tracking-tight mb-6 leading-tight">Libérez votre potentiel,<br/><span className="text-gradient">automatisez le reste.</span></h1>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-600">Zonia conçoit des outils d'IA personnalisés pour traiter vos emails, gérer vos documents et piloter votre service client.</p>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-950 tracking-tight mb-6 leading-tight">D’abord l’audit.<br/><span className="text-gradient">Ensuite, votre outil.</span></h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-600">Zonia étudie votre façon de travailler, puis construit la solution qui correspond à ce périmètre. Pas un assistant à brancher. Pas de prix catalogue.</p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-            <a href="#contact" className="px-8 py-4 bg-slate-950 hover:bg-[#0891B2] text-white rounded-full font-bold text-lg shadow-[0_12px_30px_-12px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">Audit Gratuit <ArrowRight className="w-5 h-5" /></a>
-            <a href="#services" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-900 rounded-full font-bold text-lg border border-slate-200 hover:border-slate-300 transition-all hover:-translate-y-0.5">Nos Services</a>
+            <a href="#contact" className="px-8 py-4 bg-slate-950 hover:bg-[#0891B2] text-white rounded-full font-bold text-lg shadow-[0_12px_30px_-12px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">Demander un audit <ArrowRight className="w-5 h-5" /></a>
+            <a href="#formules" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-900 rounded-full font-bold text-lg border border-slate-200 hover:border-slate-300 transition-all hover:-translate-y-0.5">Voir les formules</a>
           </div>
-          <RagDemo />
         </div>
-      </section>
-      <section id="services" className="scroll-mt-24 py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16"><h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Nos Solutions Intelligentes</h2><p className="text-slate-600 max-w-2xl mx-auto">Nous déployons des briques technologiques adaptées à vos flux de travail existants.</p></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <ServiceCard icon={<Mail />} title="Traitement d'Emails IA" desc="Analyse, tri et réponse automatique aux emails entrants. Détecte les urgences et prépare les brouillons." bgClass="bg-[#19E4FA]/15 border border-[#19E4FA]/30" iconClass="text-[#0E7490]" />
-            <ServiceCard icon={<CalendarClock />} title="Prise de RDV Automatisée" desc="Synchronisation intelligente avec vos agendas. Vos clients réservent sans friction, sans allers-retours." bgClass="bg-[#FFD700]/20 border border-[#EAB308]/40" iconClass="text-[#A16207]" />
-            <ServiceCard icon={<Bot />} title="Chatbot de Commande" desc="Assistant virtuel capable de guider l'achat, vérifier les stocks et valider les commandes 24/7." bgClass="bg-[#19E4FA]/15 border border-[#19E4FA]/30" iconClass="text-[#0E7490]" />
-            <ServiceCard icon={<FileCheck />} title="Envoi Auto de Documents" desc="Génération et envoi automatique des factures à votre comptable et aux clients." bgClass="bg-[#FFD700]/20 border border-[#EAB308]/40" iconClass="text-[#A16207]" />
-            <ServiceCard icon={<Database />} title="Système RAG Documentaire" desc="&quot;Parlez&quot; à votre Drive. Notre IA indexe vos PDF et docs techniques pour répondre instantanément." bgClass="bg-[#19E4FA]/15 border border-[#19E4FA]/30" iconClass="text-[#0E7490]" />
-            <div className="bg-white border border-dashed border-slate-300 p-8 rounded-2xl hover:border-[#A16207] transition-colors shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)]">
-              <div className="w-14 h-14 bg-[#FFD700]/20 border border-[#EAB308]/40 rounded-xl flex items-center justify-center mb-6"><Sparkles className="w-7 h-7 text-[#A16207]" /></div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Solution Sur Mesure</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Vous avez un besoin spécifique ? Nous auditons vos processus pour créer l'outil parfait.</p>
+        <div className="max-w-6xl mx-auto mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {METHOD_STEPS.map((step) => (
+            <div key={step.n} className="bg-white rounded-2xl border border-slate-200 p-5 text-left shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)]">
+              <div className="text-xs font-bold tracking-[0.18em] text-[#0E7490] mb-3">{step.n}</div>
+              <h2 className="text-lg font-bold text-slate-950 mb-2">{step.title}</h2>
+              <p className="text-sm text-slate-600 leading-relaxed">{step.text}</p>
             </div>
-          </div>
+          ))}
         </div>
       </section>
-      <section id="benefits" className="scroll-mt-24 py-24 relative overflow-hidden z-10 bg-white/70">
+      <section id="methode" className="scroll-mt-24 py-20 relative z-10 bg-white/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
             <div>
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-6">Pourquoi déléguer les tâches secondaires à l'IA ?</h2>
-              <p className="text-slate-600 text-lg mb-8">L'automatisation ne remplace pas l'humain, elle le libère. Concentrez-vous sur la stratégie.</p>
-              <div className="space-y-6">
-                <BenefitItem icon={<Clock />} title="Gain de Temps Massif" desc="Économisez entre 1h et 3h par jour sur la saisie de données." />
-                <BenefitItem icon={<Infinity />} title="Service Client 24/7" desc="Ne ratez plus aucune opportunité. Vos chatbots répondent aux prospects instantanément." />
-                <BenefitItem icon={<TrendingUp />} title="Fiabilité & Scalabilité" desc="Zéro erreur de saisie. Capacité à traiter 1000 demandes simultanément sans surcoût." />
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Méthode</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-6">On cadre avant de construire.</h2>
+              <p className="text-slate-600 text-lg mb-8">Un outil métier utile tient dans un périmètre tenu. L’audit dit ce qui entre dans la première version, et ce qui attendra.</p>
+              <ul className="space-y-4">
+                {[
+                  'Le devis décrit le périmètre, le calendrier et ce qui n’est pas inclus.',
+                  'Une équipe suit le projet. Vous avez un interlocuteur, pas un produit en boîte.',
+                  'Nous visons l’outil accessible : précis pour votre métier, sans ERP généraliste de plusieurs années.',
+                ].map((item) => (
+                  <li key={item} className="flex gap-3 text-slate-700">
+                    <Check className="w-5 h-5 mt-0.5 flex-shrink-0 text-[#0E7490]" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-xl">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 mb-6">Ce que l’audit rend visible</p>
+              <div className="space-y-5">
+                {[
+                  ['Le flux réel', 'Qui saisit, qui relance, où l’information se perd.'],
+                  ['Le premier lot', 'Ce qui soulage l’équipe sans tout reconstruire.'],
+                  ['La suite', 'Ce qui pourra s’ajouter une fois l’outil en usage.'],
+                ].map(([title, text]) => (
+                  <div key={title} className="border-t border-slate-200 pt-5 first:border-0 first:pt-0">
+                    <h3 className="font-bold text-slate-950">{title}</h3>
+                    <p className="text-sm text-slate-600 mt-1">{text}</p>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-[#FFD700] to-[#19E4FA] rounded-2xl blur-lg opacity-20"></div>
-              <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-xl">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-50 p-6 rounded-xl text-center border border-slate-200"><div className="text-4xl font-bold text-[#0E7490] mb-2">+40%</div><div className="text-xs uppercase tracking-wider text-slate-500">De Productivité</div></div>
-                  <div className="bg-slate-50 p-6 rounded-xl text-center border border-slate-200"><div className="text-4xl font-bold text-[#A16207] mb-2">0</div><div className="text-xs uppercase tracking-wider text-slate-500">Email perdu</div></div>
-                  <div className="bg-slate-50 p-6 rounded-xl text-center col-span-2 border border-slate-200"><div className="text-4xl font-bold text-slate-950 mb-2">ROI &lt; 3 mois</div><div className="text-xs uppercase tracking-wider text-slate-500">Retour sur investissement moyen</div></div>
-                </div>
-              </div>
+          </div>
+        </div>
+      </section>
+      <section id="solutions" className="scroll-mt-24 py-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Après l’audit</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">La solution suit le métier</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Chaque chantier est écrit pour vous. Un assistant peut être une brique du livrable. Il n’est pas le point de départ.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {SOLUTIONS.map((item) => (
+              <ServiceCard key={item.title} {...item} />
+            ))}
+          </div>
+        </div>
+      </section>
+      <section id="formules" className="scroll-mt-24 py-24 relative z-10 bg-white/70">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-14">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Formules</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Quatre façons d’avancer, aucun prix affiché</h2>
+            <p className="text-slate-600 text-lg">Le montant suit le périmètre. Après l’audit, le devis dit ce qui est construit, ce qui est reporté, et comment l’outil pourra évoluer. « Sur devis » n’est pas un prix caché : c’est l’absence de forfait qui ne correspondrait pas à votre métier.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            {FORMULAS.map((formula) => (
+              <FormulaCard
+                key={formula.id}
+                formula={formula}
+                onChoose={(title) => setForm((current) => ({ ...current, formula: title }))}
+              />
+            ))}
+          </div>
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-10">
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-slate-950 mb-2">L’outil continue après la livraison</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">Les corrections font partie de l’accompagnement. Les évolutions — un nouveau flux, un écran, une connexion — se chiffrent à part, selon le rythme que vous choisissez. Pas d’abonnement catalogue.</p>
             </div>
+            <a href="#contact" onClick={() => setForm((current) => ({ ...current, formula: 'Accompagnement' }))} className="shrink-0 text-center border border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white rounded-full px-5 py-3 text-sm font-bold transition-colors">Parler de l’accompagnement</a>
           </div>
         </div>
       </section>
       <section id="contact" className="scroll-mt-24 py-20 relative z-10">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="bg-white rounded-3xl p-10 md:p-16 border border-slate-200 shadow-xl relative overflow-hidden">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#19E4FA] via-white to-[#FFD700]"></div>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-6">Prêt à digitaliser votre avenir ?</h2>
-            <p className="text-slate-600 mb-10 text-lg">Discutons de vos challenges. Nous vous proposerons une démonstration adaptée.</p>
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4 text-left">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-3">Parlons de votre métier</h2>
+            <p className="text-slate-600 mb-8">Décrivez le flux qui vous coûte du temps. Nous revenons avec une proposition d’audit, pas avec un prix tout fait.</p>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
               <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Email Professionnel</label>
-                <input 
-                  type="email" 
-                  placeholder="contact@entreprise.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
-                  required
-                />
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2" htmlFor="contact-name">Nom</label>
+                <input id="contact-name" type="text" placeholder="Votre nom" value={form.name} onChange={setField('name')} disabled={loading} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2" htmlFor="contact-company">Société</label>
+                <input id="contact-company" type="text" placeholder="Votre entreprise" value={form.company} onChange={setField('company')} disabled={loading} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2" htmlFor="contact-email">Email professionnel</label>
+                <input id="contact-email" type="email" placeholder="contact@entreprise.com" value={form.email} onChange={setField('email')} disabled={loading} required className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2" htmlFor="contact-formula">Formule envisagée</label>
+                <select id="contact-formula" value={form.formula} onChange={setField('formula')} disabled={loading} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50">
+                  <option>Diagnostic</option>
+                  <option>Solution ciblée</option>
+                  <option>Solution intégrée</option>
+                  <option>Plateforme métier</option>
+                  <option>Accompagnement</option>
+                  <option>Je ne sais pas encore</option>
+                </select>
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2" htmlFor="contact-need">Le flux à regarder</label>
+                <textarea id="contact-need" rows={4} placeholder="Ex. suivi des interventions, relances clients, dossiers qui circulent par email…" value={form.need} onChange={setField('need')} disabled={loading} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50 resize-y" />
               </div>
               {message.text && (
-                <div className={`p-3 rounded-lg text-sm ${
-                  message.type === 'success' 
-                    ? 'bg-green-500/20 border border-green-500/50 text-green-300' 
-                    : 'bg-red-500/20 border border-red-500/50 text-red-300'
-                }`}>
+                <div className={`sm:col-span-2 p-3 rounded-lg text-sm ${message.type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-red-50 border border-red-200 text-red-800'}`}>
                   {message.text}
                 </div>
               )}
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-slate-950 hover:bg-[#0891B2] text-white font-bold py-4 rounded-full transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
+              <button type="submit" disabled={loading} className="sm:col-span-2 bg-slate-950 hover:bg-[#0891B2] text-white font-bold py-4 rounded-full transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {loading ? (
                   <>
                     <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     Envoi en cours...
                   </>
                 ) : (
-                  'Demander mon audit gratuit'
+                  'Demander l’audit'
                 )}
               </button>
-              <p className="text-center text-xs text-slate-500 mt-4">Réponse sous 24h ouvrées.</p>
+              <p className="sm:col-span-2 text-center text-xs text-slate-500">Réponse sous 24h ouvrées. Aucun prix n’est fixé avant d’avoir vu le périmètre.</p>
             </form>
           </div>
         </div>
@@ -565,7 +575,7 @@ const Vitrine = () => {
               <button onClick={() => setOpenModal('support')} className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full font-medium">Support</button>
             </div>
           </div>
-          <div className="text-center text-slate-500 text-xs">&copy; 2024 Zonia Systems. Tous droits réservés.          </div>
+          <div className="text-center text-slate-500 text-xs">&copy; {new Date().getFullYear()} Zonia Systems. Tous droits réservés.</div>
         </div>
       </footer>
 
@@ -855,36 +865,35 @@ const Vitrine = () => {
             <h3 className="text-xl font-bold text-white mb-3">Questions fréquentes (FAQ)</h3>
             <div className="space-y-4">
               <div className="bg-slate-800/50 rounded-lg p-4">
-                <h4 className="font-bold text-white mb-2">Comment puis-je demander une démonstration ?</h4>
+                <h4 className="font-bold text-white mb-2">Comment demander un audit ?</h4>
                 <p className="text-sm text-slate-300">
-                  Utilisez le formulaire de contact sur la page d'accueil ou envoyez-nous un email à 
-                  <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline ml-1">zonia.ai.pro@gmail.com</a>. 
+                  Utilisez le formulaire en bas de la page ou écrivez à
+                  <a href="mailto:zonia.ai.pro@gmail.com" className="text-[#19E4FA] hover:underline ml-1">zonia.ai.pro@gmail.com</a>.
                   Nous vous répondrons sous 24h ouvrées.
                 </p>
               </div>
 
               <div className="bg-slate-800/50 rounded-lg p-4">
-                <h4 className="font-bold text-white mb-2">Quels types de solutions proposez-vous ?</h4>
+                <h4 className="font-bold text-white mb-2">Quelles formules proposez-vous ?</h4>
                 <p className="text-sm text-slate-300">
-                  Nous proposons des solutions d'automatisation sur mesure : traitement d'emails IA, chatbots, 
-                  systèmes RAG documentaires, prise de rendez-vous automatisée, et bien plus. 
-                  Consultez notre section "Solutions" pour plus de détails.
+                  Diagnostic, solution ciblée, solution intégrée et plateforme métier. Aucun prix n’est affiché :
+                  le devis décrit le périmètre après l’audit. Un assistant peut faire partie du livrable, il n’est pas le produit.
                 </p>
               </div>
 
               <div className="bg-slate-800/50 rounded-lg p-4">
-                <h4 className="font-bold text-white mb-2">Combien de temps prend l'implémentation ?</h4>
+                <h4 className="font-bold text-white mb-2">Combien de temps prend un projet ?</h4>
                 <p className="text-sm text-slate-300">
-                  Le délai dépend de la complexité de votre projet. Pour une solution standard, comptez 2 à 4 semaines. 
-                  Pour des projets sur mesure, nous établissons un planning personnalisé lors de l'audit initial.
+                  Le calendrier se fixe après le cadrage. Un flux ciblé est plus court qu’une plateforme métier,
+                  qui se livre par lots. Nous ne partons pas sur un ERP généraliste de longue durée.
                 </p>
               </div>
 
               <div className="bg-slate-800/50 rounded-lg p-4">
-                <h4 className="font-bold text-white mb-2">Proposez-vous un support après l'installation ?</h4>
+                <h4 className="font-bold text-white mb-2">Que se passe-t-il après la livraison ?</h4>
                 <p className="text-sm text-slate-300">
-                  Oui, nous proposons différents niveaux de support : maintenance, formation, et assistance technique. 
-                  Contactez-nous pour connaître nos offres de support.
+                  Les corrections font partie de l’accompagnement. Les évolutions se chiffrent à part,
+                  selon le rythme que vous choisissez.
                 </p>
               </div>
 
