@@ -4,9 +4,15 @@ import { supabase, isSupabaseAvailable } from '../../lib/supabase';
 import { TABLE_TABLEAU } from '../../config/constants';
 import { SearchInput, StatusMessage, Button } from '../../components/ui';
 import TableauCard from './TableauCard';
-import './MesTableauxPanel.css';
+import './EnrichissementLeadPanel.css';
 
-const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onTableauUpdated, onRefresh }) => {
+const EnrichissementLeadPanel = ({
+  openTableaux,
+  onTableauToggle,
+  onTableauDeleted,
+  onTableauUpdated,
+  onRefresh,
+}) => {
   const [tableaux, setTableaux] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -26,8 +32,8 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
       if (err) throw err;
       setTableaux(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('[Supabase] Erreur chargement tableaux:', err);
-      setError(err?.message || 'Erreur lors du chargement des tableaux');
+      console.error('[Supabase] Erreur chargement listes enrichissement:', err);
+      setError(err?.message || 'Erreur lors du chargement des listes');
       setTableaux([]);
     } finally {
       setLoading(false);
@@ -62,12 +68,17 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
   return (
     <div className={`tableaux-panel ${showReduced ? 'tableaux-panel--reduced' : ''}`}>
       <div className="tableaux-header">
-        <h2 className="tableaux-title">Mes Tableaux</h2>
+        <div className="tableaux-title-block">
+          <h2 className="tableaux-title">Enrichissement de lead</h2>
+          <p className="tableaux-subtitle">
+            Ouvrez vos listes pour enrichir et suivre vos leads.
+          </p>
+        </div>
         <div className="tableaux-filters">
           <SearchInput
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={showReduced ? 'Rechercher pour ajouter...' : 'Rechercher...'}
+            placeholder={showReduced ? 'Rechercher une liste à ajouter...' : 'Rechercher une liste...'}
             className="tableaux-search-wrap"
           />
           {!showReduced && categories.length > 0 && (
@@ -76,7 +87,7 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="tableaux-category-select"
             >
-              <option value="">Toutes les categories</option>
+              <option value="">Toutes les catégories</option>
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
@@ -98,7 +109,7 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
         </div>
       </div>
 
-      {loading && <StatusMessage type="loading" message="Chargement des tableaux..." />}
+      {loading && <StatusMessage type="loading" message="Chargement des listes..." />}
 
       {error && <StatusMessage type="error" message={error} />}
 
@@ -108,8 +119,8 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
             {selectedFiltered.length === 0 ? (
               <p className="tableaux-selected-empty">
                 {searchQuery.trim()
-                  ? 'Aucun tableau sélectionné ne correspond à la recherche.'
-                  : 'Aucun tableau sélectionné.'}
+                  ? 'Aucune liste ouverte ne correspond à la recherche.'
+                  : 'Aucune liste ouverte.'}
               </p>
             ) : (
               selectedFiltered.map((tableau, idx) => (
@@ -127,9 +138,12 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
           </div>
           {searchQuery.trim() && (
             <div className="tableaux-add-more">
-              <h3 className="tableaux-add-more-title">Ajouter des tableaux</h3>
+              <h3 className="tableaux-add-more-title">Ajouter une liste</h3>
               {addableCandidates.length === 0 ? (
-                <StatusMessage type="empty" message="Aucun autre tableau ne correspond à la recherche" />
+                <StatusMessage
+                  type="empty"
+                  message="Aucune autre liste ne correspond à la recherche"
+                />
               ) : (
                 <div className="tableaux-grid tableaux-grid--addable">
                   {addableCandidates.map((tableau, idx) => (
@@ -153,7 +167,11 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
       {!loading && !error && !showReduced && filteredTableaux.length === 0 && (
         <StatusMessage
           type="empty"
-          message={searchQuery || selectedCategory ? 'Aucun resultat trouve' : 'Aucun tableau disponible'}
+          message={
+            searchQuery || selectedCategory
+              ? 'Aucun résultat trouvé'
+              : 'Aucune liste d’enrichissement disponible'
+          }
         />
       )}
 
@@ -176,4 +194,4 @@ const MesTableauxPanel = ({ openTableaux, onTableauToggle, onTableauDeleted, onT
   );
 };
 
-export default MesTableauxPanel;
+export default EnrichissementLeadPanel;

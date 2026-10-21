@@ -159,6 +159,66 @@
   color: var(--chat-cyan);
 }
 
+.sidebar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sidebar-nav-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: var(--chat-slate-400);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.sidebar-nav-group-toggle:hover {
+  background: rgba(51, 65, 85, 0.4);
+  color: var(--chat-slate-300);
+}
+
+.sidebar-nav-group-toggle-active {
+  color: var(--chat-cyan);
+}
+
+.sidebar-nav-group-toggle-active:hover {
+  color: var(--chat-cyan);
+}
+
+.sidebar-nav-group-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  color: var(--chat-slate-500);
+}
+
+.sidebar-nav-group-toggle-active .sidebar-nav-group-chevron {
+  color: var(--chat-cyan);
+}
+
+.sidebar-nav-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-left: 0.25rem;
+}
+
+.sidebar-nav-subitem {
+  padding-left: 1.75rem;
+  font-size: 0.875rem;
+}
+
 .sidebar-nav-label {
   transition: opacity 0.2s ease;
 }
@@ -212,8 +272,26 @@
     white-space: nowrap;
   }
 
+  .sidebar-nav-group-toggle {
+    display: none;
+  }
+
+  .sidebar-nav-group-items {
+    display: contents;
+  }
+
+  /* Le titre « Mes Tableaux » est masqué : la sous-entrée reste toujours visible dans la rangée. */
+  .sidebar-nav-group-items[hidden] {
+    display: contents !important;
+  }
+
+  .sidebar-nav-subitem {
+    padding-left: 0.625rem;
+  }
+
   .sidebar-nav-item .sidebar-nav-label,
-  .sidebar-nav-item span { display: none; }
+  .sidebar-nav-item span,
+  .sidebar-nav-group-toggle .sidebar-nav-label { display: none; }
 
   .sidebar-footer { display: none; }
 }

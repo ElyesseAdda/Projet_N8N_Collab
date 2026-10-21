@@ -36,7 +36,7 @@ const TableauActionsModal = ({
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const title = tableau?.resume_table ?? tableau?.Resume_table ?? 'Tableau';
+  const title = tableau?.resume_table ?? tableau?.Resume_table ?? 'Liste';
 
   useEffect(() => {
     if (!isOpen || !tableau) return;
@@ -121,8 +121,8 @@ const TableauActionsModal = ({
     view === VIEW.CHOICE
       ? 'Actions'
       : view === VIEW.EDIT
-        ? 'Modifier le tableau'
-        : 'Supprimer le tableau';
+        ? 'Modifier la liste'
+        : 'Supprimer la liste';
 
   return (
     <Modal
@@ -181,7 +181,7 @@ const TableauActionsModal = ({
             <Input
               value={resumeTable}
               onChange={(e) => setResumeTable(e.target.value)}
-              placeholder="Nom du tableau"
+              placeholder="Nom de la liste"
               disabled={loading}
             />
           </label>

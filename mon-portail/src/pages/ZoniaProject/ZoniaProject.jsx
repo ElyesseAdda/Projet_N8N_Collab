@@ -7,7 +7,7 @@ import { useDocuments } from '../../hooks/useDocuments';
 import { useFileUpload } from '../../hooks/useFileUpload';
 import { Sidebar } from '../../features/sidebar';
 import { ChatPanel } from '../../features/chat';
-import { MesTableauxPanel, TableauDetailSection } from '../../features/tableaux';
+import { EnrichissementLeadPanel, TableauDetailSection } from '../../features/tableaux';
 import { MailPanel } from '../../features/mail';
 import '../../styles/variables.css';
 import './ZoniaProject.css';
@@ -113,7 +113,7 @@ function ZoniaProject() {
 
           {activeSection === 'tableaux' && (
             <div className="content-panel content-panel-enter content-panel-tableaux">
-              <MesTableauxPanel
+              <EnrichissementLeadPanel
                 openTableaux={openTableaux}
                 onTableauToggle={handleTableauToggle}
                 onTableauDeleted={handleTableauDeleted}

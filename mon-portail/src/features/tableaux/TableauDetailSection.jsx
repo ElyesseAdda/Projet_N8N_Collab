@@ -38,7 +38,7 @@ const TableauDetailSection = ({ selectedTableau, onClose, sessionId, onTableauDe
     const entreprises = getEntreprisesFromRows(rows);
     if (entreprises.length === 0) {
       setEnrichError(
-        'Aucune entreprise trouvée dans le tableau (vérifiez la colonne Nom Société).',
+        'Aucune entreprise trouvée dans cette liste (vérifiez la colonne Nom Société).',
       );
       return;
     }
@@ -153,7 +153,7 @@ const TableauDetailSection = ({ selectedTableau, onClose, sessionId, onTableauDe
       : [];
 
   const contactColumnsToHide = CONTACT_COLUMNS_TO_HIDE;
-  const title = selectedTableau.resume_table ?? selectedTableau.Resume_table ?? 'Détails du tableau';
+  const title = selectedTableau.resume_table ?? selectedTableau.Resume_table ?? 'Liste sans titre';
 
   return (
     <div className="tableau-detail-section">
@@ -178,8 +178,8 @@ const TableauDetailSection = ({ selectedTableau, onClose, sessionId, onTableauDe
               e.stopPropagation();
               setTableauActionsOpen(true);
             }}
-            title="Modifier ou supprimer le tableau"
-            aria-label="Actions sur le tableau"
+            title="Modifier ou supprimer la liste"
+            aria-label="Actions sur la liste"
           />
         </div>
         <div className="tableau-detail-header-actions">
@@ -191,10 +191,10 @@ const TableauDetailSection = ({ selectedTableau, onClose, sessionId, onTableauDe
               setEnrichError(null);
               setShowEnrichModal(true);
             }}
-            title="Enrichir mes données"
+            title="Lancer l’enrichissement des leads"
           >
             <Sparkles size={16} />
-            Enrichir mes données
+            Enrichir les leads
           </button>
           <Button
             variant="icon"
@@ -239,7 +239,7 @@ const TableauDetailSection = ({ selectedTableau, onClose, sessionId, onTableauDe
           {loading && <StatusMessage type="loading" message="Chargement des lignes..." />}
           {error && <StatusMessage type="error" message={error} />}
           {!loading && !error && rows.length === 0 && (
-            <StatusMessage type="empty" message="Aucune ligne dans ce tableau" />
+            <StatusMessage type="empty" message="Aucune ligne dans cette liste" />
           )}
           {!loading && !error && rows.length > 0 && (
             <div className="tableau-detail-table-wrap">

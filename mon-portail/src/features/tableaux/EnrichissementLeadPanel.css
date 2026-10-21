@@ -1,5 +1,5 @@
 /* ============================================================================
-   MES TABLEAUX PANEL
+   ENRICHISSEMENT LEAD PANEL (listes / tableaux Supabase)
    ============================================================================ */
 .tableaux-panel {
   width: 100%;
@@ -21,11 +21,25 @@
   gap: 1rem;
 }
 
+.tableaux-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
 .tableaux-title {
   font-size: 1.125rem;
   font-weight: 700;
   color: white;
   margin: 0;
+}
+
+.tableaux-subtitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--chat-slate-500);
 }
 
 .tableaux-filters {

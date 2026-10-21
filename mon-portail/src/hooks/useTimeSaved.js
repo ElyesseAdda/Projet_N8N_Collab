@@ -87,7 +87,7 @@ import { useState, useMemo, useCallback } from 'react';
 // ║       → après upload réussi sur le Drive :
 // ║         logTimeSaved('DRIVE_UPLOAD', 'Gestion Drive', 5, { fileName })
 // ║
-// ║     • features/tableaux/MesTableauxPanel.jsx
+// ║     • features/tableaux/EnrichissementLeadPanel.jsx
 // ║       → après création automatique d'une tâche :
 // ║         logTimeSaved('TASK_CREATE', 'Création tâche', 3, { tableauId })
 // ║       → après enrichissement de données :

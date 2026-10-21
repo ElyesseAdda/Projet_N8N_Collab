@@ -26,10 +26,24 @@ const cssStyles = `
 
   /* Background Grid */
   .bg-grid {
-    background-size: 60px 60px;
+    background-size: 56px 56px;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      linear-gradient(to right, rgba(15, 23, 42, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(15, 23, 42, 0.045) 1px, transparent 1px);
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 12px 40px -24px rgba(15, 23, 42, 0.35);
+  }
+
+  .glass-card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 16px 40px -28px rgba(15, 23, 42, 0.45);
   }
 
   /* Glow Blobs */
@@ -45,7 +59,7 @@ const cssStyles = `
 
   /* Text Gradient Animation - Gold -> Cyan -> Gold */
   .text-gradient {
-    background: linear-gradient(to right, #FFD700, #19E4FA, #FFD700);
+    background: linear-gradient(to right, #A16207, #0E7490, #A16207);
     background-size: 200% auto;
     color: #000;
     background-clip: text;
@@ -172,10 +186,9 @@ const DEMO_SCENARIOS = {
   }
 };
 
-const ZoniaLogo = ({ size = 40, circleSize = 5 }) => (
+const ZoniaLogo = ({ size = 40, strokeColor = 'white' }) => (
   <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
-    <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="50" cy="50" r={circleSize} fill="#FFD700" />
+    <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke={strokeColor} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
@@ -183,7 +196,6 @@ const ZoniaAvatar = () => (
   <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FFD700] to-[#19E4FA] flex-shrink-0 flex items-center justify-center shadow-lg">
     <svg width="20" height="20" viewBox="0 0 100 100" fill="none">
         <path d="M 25 25 H 75 L 25 75 H 75 L 25 25 Z" stroke="black" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round"/>
-        <circle cx="50" cy="50" r="8" fill="black" />
     </svg>
   </div>
 );
@@ -296,41 +308,67 @@ const FileItem = ({ icon, bg, name, info, isActive, isScanning, onClick }) => (
 );
 
 const ServiceCard = ({ icon, title, desc, bgClass, iconClass }) => (
-  <div className="glass-card bg-gradient-to-br from-slate-800/60 to-slate-900/80 p-8 rounded-2xl border border-slate-700/50 hover:border-[#FFD700] hover:-translate-y-1 transition-all duration-300 group hover:shadow-[0_10px_30px_-10px_rgba(255,215,0,0.15)]">
-    <div className={`w-14 h-14 ${bgClass} rounded-xl flex items-center justify-center mb-6 group-hover:bg-opacity-100 transition-colors`}>
-      {React.cloneElement(icon, { className: `w-7 h-7 ${iconClass} group-hover:text-white` })}
+  <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] hover:border-[#19E4FA] hover:-translate-y-1 transition-all duration-300">
+    <div className={`w-14 h-14 ${bgClass} rounded-xl flex items-center justify-center mb-6`}>
+      {React.cloneElement(icon, { className: `w-7 h-7 ${iconClass}` })}
     </div>
-    <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
-    <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+    <h3 className="text-xl font-bold text-slate-900 mb-3">{title}</h3>
+    <p className="text-slate-600 text-sm leading-relaxed">{desc}</p>
   </div>
 );
 
 const BenefitItem = ({ icon, title, desc }) => (
   <div className="flex gap-4">
     <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#19E4FA]/10 flex items-center justify-center border border-[#19E4FA]/30">
-      {React.cloneElement(icon, { className: "text-[#19E4FA] w-6 h-6" })}
+      {React.cloneElement(icon, { className: "text-[#0E7490] w-6 h-6" })}
     </div>
-    <div><h4 className="text-white font-bold text-lg">{title}</h4><p className="text-slate-400 text-sm">{desc}</p></div>
+    <div><h4 className="text-slate-900 font-bold text-lg">{title}</h4><p className="text-slate-600 text-sm">{desc}</p></div>
   </div>
 );
 
-const Navbar = () => (
-  <nav className="fixed w-full left-0 right-0 z-50 glass-panel border-b border-white/5">
-    <div className="w-full px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between h-20">
-        <div className="flex items-center gap-3"><ZoniaLogo /><span className="text-xl font-bold tracking-[0.2em] text-white">ZONIA</span></div>
-        <div className="hidden md:block">
-          <div className="ml-10 flex items-baseline space-x-8">
-            <a href="#services" className="text-slate-300 hover:text-[#FFD700] transition-colors px-3 py-2 rounded-md text-sm font-medium">Solutions</a>
-            <a href="#benefits" className="text-slate-300 hover:text-[#FFD700] transition-colors px-3 py-2 rounded-md text-sm font-medium">Avantages IA</a>
-            <a href="#contact" className="bg-[#19E4FA] hover:bg-[#FFD700] text-slate-900 px-5 py-2.5 rounded-lg text-sm font-bold transition-all hover:scale-105 shadow-[0_0_20px_-5px_rgba(25,228,250,0.5)] hover:shadow-[0_0_20px_-5px_rgba(255,215,0,0.5)]">Démarrer un projet</a>
+const Navbar = () => {
+  const [open, setOpen] = useState(false);
+
+  const close = () => setOpen(false);
+
+  return (
+    <header className="fixed top-0 inset-x-0 z-50">
+      <nav className="bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-[0_16px_40px_-24px_rgba(15,23,42,0.35)]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-[72px]">
+            <a href="#top" className="flex items-center gap-3" onClick={close}>
+              <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 ring-1 ring-slate-200">
+                <ZoniaLogo size={26} strokeColor="#0f172a" />
+              </span>
+              <span className="text-lg font-bold tracking-[0.22em] text-slate-950">ZONIA</span>
+            </a>
+            <div className="hidden md:flex items-center gap-2">
+              <a href="#services" className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full text-sm font-medium">Solutions</a>
+              <a href="#benefits" className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full text-sm font-medium">Avantages</a>
+              <a href="#contact" className="ml-1 bg-slate-950 text-white border border-slate-950 hover:bg-[#0891B2] hover:border-[#0891B2] px-5 py-2.5 rounded-full text-sm font-bold transition-colors">Démarrer un projet</a>
+            </div>
+            <button
+              type="button"
+              className="md:hidden text-slate-900 p-2 rounded-lg hover:bg-slate-100"
+              aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={open}
+              onClick={() => setOpen((value) => !value)}
+            >
+              {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
-        <div className="md:hidden"><button className="text-gray-300 hover:text-white focus:outline-none p-2"><Menu className="w-6 h-6" /></button></div>
-      </div>
-    </div>
-  </nav>
-);
+        {open && (
+          <div className="md:hidden border-t border-slate-200 px-4 py-4 space-y-2">
+            <a href="#services" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Solutions</a>
+            <a href="#benefits" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Avantages</a>
+            <a href="#contact" onClick={close} className="block text-center bg-slate-950 text-white border border-slate-950 px-4 py-3 rounded-full text-sm font-bold">Démarrer un projet</a>
+          </div>
+        )}
+      </nav>
+    </header>
+  );
+};
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
@@ -405,7 +443,7 @@ const Vitrine = () => {
 
   return (
     // Ajout de overflow-x-hidden ici pour protéger le scroll vertical
-    <div className="bg-slate-900 text-slate-200 min-h-screen selection:bg-[#FFD700] selection:text-slate-900 overflow-x-hidden">
+    <div id="top" className="bg-[#F4F7FB] text-slate-800 min-h-screen selection:bg-[#FFD700] selection:text-slate-900 overflow-x-hidden">
       {/* Intégration des styles via une balise style */}
       <style>{cssStyles}</style>
 
@@ -413,44 +451,44 @@ const Vitrine = () => {
       <div className="glow-blob top-[-200px] left-[-200px]" />
       <div className="glow-blob bottom-[-200px] right-[-200px]" style={{ background: 'radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(15, 23, 42, 0) 70%)' }} />
       <Navbar />
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 z-10">
+      <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-24 px-4 z-10">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-[#FFD700]/30 text-[#FFD700] text-sm font-medium mb-8">
-            <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FFD700] opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-[#FFD700]"></span></span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 text-slate-700 text-sm font-medium mb-8 shadow-sm">
+            <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#19E4FA] opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-[#0891B2]"></span></span>
             Automatisation sur mesure pour entreprises
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight">Libérez votre potentiel,<br/><span className="text-gradient">automatisez le reste.</span></h1>
-          <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-400">Zonia conçoit des outils d'IA personnalisés pour traiter vos emails, gérer vos documents et piloter votre service client.</p>
+          <h1 className="text-5xl md:text-7xl font-extrabold text-slate-950 tracking-tight mb-6 leading-tight">Libérez votre potentiel,<br/><span className="text-gradient">automatisez le reste.</span></h1>
+          <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-600">Zonia conçoit des outils d'IA personnalisés pour traiter vos emails, gérer vos documents et piloter votre service client.</p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-            <a href="#contact" className="px-8 py-4 bg-[#19E4FA] hover:bg-[#FFD700] text-slate-900 rounded-xl font-bold text-lg shadow-[0_0_20px_-5px_rgba(25,228,250,0.5)] hover:shadow-[0_0_20px_-5px_rgba(255,215,0,0.5)] transition-all hover:-translate-y-1 flex items-center justify-center gap-2">Audit Gratuit <ArrowRight className="w-5 h-5" /></a>
-            <a href="#services" className="px-8 py-4 glass-panel hover:bg-white/5 text-white rounded-xl font-bold text-lg border border-white/10 hover:border-[#FFD700]/50 hover:text-[#FFD700] transition-all hover:-translate-y-1">Nos Services</a>
+            <a href="#contact" className="px-8 py-4 bg-slate-950 hover:bg-[#0891B2] text-white rounded-full font-bold text-lg shadow-[0_12px_30px_-12px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">Audit Gratuit <ArrowRight className="w-5 h-5" /></a>
+            <a href="#services" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-900 rounded-full font-bold text-lg border border-slate-200 hover:border-slate-300 transition-all hover:-translate-y-0.5">Nos Services</a>
           </div>
           <RagDemo />
         </div>
       </section>
-      <section id="services" className="py-24 relative z-10">
+      <section id="services" className="scroll-mt-24 py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16"><h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Nos Solutions Intelligentes</h2><p className="text-slate-400 max-w-2xl mx-auto">Nous déployons des briques technologiques adaptées à vos flux de travail existants.</p></div>
+          <div className="text-center mb-16"><h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Nos Solutions Intelligentes</h2><p className="text-slate-600 max-w-2xl mx-auto">Nous déployons des briques technologiques adaptées à vos flux de travail existants.</p></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <ServiceCard icon={<Mail />} title="Traitement d'Emails IA" desc="Analyse, tri et réponse automatique aux emails entrants. Détecte les urgences et prépare les brouillons." bgClass="bg-[#19E4FA]/10 group-hover:bg-[#19E4FA] border border-[#19E4FA]/20" iconClass="text-[#19E4FA] group-hover:text-slate-900" />
-            <ServiceCard icon={<CalendarClock />} title="Prise de RDV Automatisée" desc="Synchronisation intelligente avec vos agendas. Vos clients réservent sans friction, sans allers-retours." bgClass="bg-[#FFD700]/10 group-hover:bg-[#FFD700] border border-[#FFD700]/20" iconClass="text-[#FFD700] group-hover:text-slate-900" />
-            <ServiceCard icon={<Bot />} title="Chatbot de Commande" desc="Assistant virtuel capable de guider l'achat, vérifier les stocks et valider les commandes 24/7." bgClass="bg-[#19E4FA]/10 group-hover:bg-[#19E4FA] border border-[#19E4FA]/20" iconClass="text-[#19E4FA] group-hover:text-slate-900" />
-            <ServiceCard icon={<FileCheck />} title="Envoi Auto de Documents" desc="Génération et envoi automatique des factures à votre comptable et aux clients." bgClass="bg-[#FFD700]/10 group-hover:bg-[#FFD700] border border-[#FFD700]/20" iconClass="text-[#FFD700] group-hover:text-slate-900" />
-            <ServiceCard icon={<Database />} title="Système RAG Documentaire" desc="&quot;Parlez&quot; à votre Drive. Notre IA indexe vos PDF et docs techniques pour répondre instantanément." bgClass="bg-[#19E4FA]/10 group-hover:bg-[#19E4FA] border border-[#19E4FA]/20" iconClass="text-[#19E4FA] group-hover:text-slate-900" />
-            <div className="glass-card bg-transparent border-dashed border-slate-600 p-8 rounded-2xl hover:border-[#FFD700] transition-colors group">
-              <div className="w-14 h-14 bg-slate-800 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#FFD700] transition-colors"><Sparkles className="w-7 h-7 text-slate-300 group-hover:text-slate-900" /></div>
-              <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#FFD700] transition-colors">Solution Sur Mesure</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">Vous avez un besoin spécifique ? Nous auditons vos processus pour créer l'outil parfait.</p>
+            <ServiceCard icon={<Mail />} title="Traitement d'Emails IA" desc="Analyse, tri et réponse automatique aux emails entrants. Détecte les urgences et prépare les brouillons." bgClass="bg-[#19E4FA]/15 border border-[#19E4FA]/30" iconClass="text-[#0E7490]" />
+            <ServiceCard icon={<CalendarClock />} title="Prise de RDV Automatisée" desc="Synchronisation intelligente avec vos agendas. Vos clients réservent sans friction, sans allers-retours." bgClass="bg-[#FFD700]/20 border border-[#EAB308]/40" iconClass="text-[#A16207]" />
+            <ServiceCard icon={<Bot />} title="Chatbot de Commande" desc="Assistant virtuel capable de guider l'achat, vérifier les stocks et valider les commandes 24/7." bgClass="bg-[#19E4FA]/15 border border-[#19E4FA]/30" iconClass="text-[#0E7490]" />
+            <ServiceCard icon={<FileCheck />} title="Envoi Auto de Documents" desc="Génération et envoi automatique des factures à votre comptable et aux clients." bgClass="bg-[#FFD700]/20 border border-[#EAB308]/40" iconClass="text-[#A16207]" />
+            <ServiceCard icon={<Database />} title="Système RAG Documentaire" desc="&quot;Parlez&quot; à votre Drive. Notre IA indexe vos PDF et docs techniques pour répondre instantanément." bgClass="bg-[#19E4FA]/15 border border-[#19E4FA]/30" iconClass="text-[#0E7490]" />
+            <div className="bg-white border border-dashed border-slate-300 p-8 rounded-2xl hover:border-[#A16207] transition-colors shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)]">
+              <div className="w-14 h-14 bg-[#FFD700]/20 border border-[#EAB308]/40 rounded-xl flex items-center justify-center mb-6"><Sparkles className="w-7 h-7 text-[#A16207]" /></div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Solution Sur Mesure</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">Vous avez un besoin spécifique ? Nous auditons vos processus pour créer l'outil parfait.</p>
             </div>
           </div>
         </div>
       </section>
-      <section id="benefits" className="py-24 relative overflow-hidden z-10 bg-slate-900/50">
+      <section id="benefits" className="scroll-mt-24 py-24 relative overflow-hidden z-10 bg-white/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Pourquoi déléguer les tâches secondaires à l'IA ?</h2>
-              <p className="text-slate-400 text-lg mb-8">L'automatisation ne remplace pas l'humain, elle le libère. Concentrez-vous sur la stratégie.</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-6">Pourquoi déléguer les tâches secondaires à l'IA ?</h2>
+              <p className="text-slate-600 text-lg mb-8">L'automatisation ne remplace pas l'humain, elle le libère. Concentrez-vous sur la stratégie.</p>
               <div className="space-y-6">
                 <BenefitItem icon={<Clock />} title="Gain de Temps Massif" desc="Économisez entre 1h et 3h par jour sur la saisie de données." />
                 <BenefitItem icon={<Infinity />} title="Service Client 24/7" desc="Ne ratez plus aucune opportunité. Vos chatbots répondent aux prospects instantanément." />
@@ -459,33 +497,33 @@ const Vitrine = () => {
             </div>
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-[#FFD700] to-[#19E4FA] rounded-2xl blur-lg opacity-20"></div>
-              <div className="relative bg-slate-800/60 backdrop-blur-xl rounded-2xl p-8 border border-slate-600">
+              <div className="relative bg-white rounded-2xl p-8 border border-slate-200 shadow-xl">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-800/50 p-6 rounded-xl text-center border border-slate-700"><div className="text-4xl font-bold text-[#19E4FA] mb-2">+40%</div><div className="text-xs uppercase tracking-wider text-slate-400">De Productivité</div></div>
-                  <div className="bg-slate-800/50 p-6 rounded-xl text-center border border-slate-700"><div className="text-4xl font-bold text-[#FFD700] mb-2">0</div><div className="text-xs uppercase tracking-wider text-slate-400">Email perdu</div></div>
-                  <div className="bg-slate-800/50 p-6 rounded-xl text-center col-span-2 border border-slate-700"><div className="text-4xl font-bold text-white mb-2">ROI &lt; 3 mois</div><div className="text-xs uppercase tracking-wider text-slate-400">Retour sur investissement moyen</div></div>
+                  <div className="bg-slate-50 p-6 rounded-xl text-center border border-slate-200"><div className="text-4xl font-bold text-[#0E7490] mb-2">+40%</div><div className="text-xs uppercase tracking-wider text-slate-500">De Productivité</div></div>
+                  <div className="bg-slate-50 p-6 rounded-xl text-center border border-slate-200"><div className="text-4xl font-bold text-[#A16207] mb-2">0</div><div className="text-xs uppercase tracking-wider text-slate-500">Email perdu</div></div>
+                  <div className="bg-slate-50 p-6 rounded-xl text-center col-span-2 border border-slate-200"><div className="text-4xl font-bold text-slate-950 mb-2">ROI &lt; 3 mois</div><div className="text-xs uppercase tracking-wider text-slate-500">Retour sur investissement moyen</div></div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-      <section id="contact" className="py-20 relative z-10">
+      <section id="contact" className="scroll-mt-24 py-20 relative z-10">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="glass-panel rounded-3xl p-10 md:p-16 border border-[#FFD700]/30 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#FFD700] to-transparent"></div>
-            <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">Prêt à digitaliser votre avenir ?</h2>
-            <p className="text-slate-300 mb-10 text-lg">Discutons de vos challenges. Nous vous proposerons une démonstration adaptée.</p>
+          <div className="bg-white rounded-3xl p-10 md:p-16 border border-slate-200 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#19E4FA] via-white to-[#FFD700]"></div>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-6">Prêt à digitaliser votre avenir ?</h2>
+            <p className="text-slate-600 mb-10 text-lg">Discutons de vos challenges. Nous vous proposerons une démonstration adaptée.</p>
             <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4 text-left">
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Email Professionnel</label>
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Email Professionnel</label>
                 <input 
                   type="email" 
                   placeholder="contact@entreprise.com" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
-                  className="w-full bg-slate-900/80 border border-slate-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed" 
                   required
                 />
               </div>
@@ -501,11 +539,11 @@ const Vitrine = () => {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-[#19E4FA] hover:bg-[#FFD700] text-slate-900 font-bold py-4 rounded-lg transition-all text-lg shadow-[0_0_20px_-5px_rgba(25,228,250,0.5)] hover:shadow-[0_0_20px_-5px_rgba(255,215,0,0.5)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-slate-950 hover:bg-[#0891B2] text-white font-bold py-4 rounded-full transition-all text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
-                    <span className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></span>
+                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     Envoi en cours...
                   </>
                 ) : (
@@ -517,17 +555,17 @@ const Vitrine = () => {
           </div>
         </div>
       </section>
-      <footer className="border-t border-slate-800 bg-slate-900 pt-16 pb-8 relative z-10">
+      <footer className="border-t border-slate-200 bg-white pt-16 pb-8 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-            <div className="flex items-center gap-2 mb-4 md:mb-0"><ZoniaLogo size={30} circleSize={5} /><span className="text-xl font-bold tracking-widest text-white">ZONIA</span></div>
-            <div className="flex space-x-6 text-slate-400 text-sm">
-              <button onClick={() => setOpenModal('legal')} className="hover:text-[#FFD700] transition-colors">Mentions Légales</button>
-              <button onClick={() => setOpenModal('privacy')} className="hover:text-[#FFD700] transition-colors">Politique de Confidentialité</button>
-              <button onClick={() => setOpenModal('support')} className="hover:text-[#FFD700] transition-colors">Support</button>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-8">
+            <div className="flex items-center gap-3"><span className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 ring-1 ring-slate-200"><ZoniaLogo size={26} strokeColor="#0f172a" /></span><span className="text-lg font-bold tracking-[0.22em] text-slate-950">ZONIA</span></div>
+            <div className="flex flex-wrap justify-center gap-2 text-sm">
+              <button onClick={() => setOpenModal('legal')} className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full font-medium">Mentions Légales</button>
+              <button onClick={() => setOpenModal('privacy')} className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full font-medium">Politique de Confidentialité</button>
+              <button onClick={() => setOpenModal('support')} className="text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white transition-colors px-4 py-2 rounded-full font-medium">Support</button>
             </div>
           </div>
-          <div className="text-center text-slate-600 text-xs">&copy; 2024 Zonia Systems. Tous droits réservés.          </div>
+          <div className="text-center text-slate-500 text-xs">&copy; 2024 Zonia Systems. Tous droits réservés.          </div>
         </div>
       </footer>
 

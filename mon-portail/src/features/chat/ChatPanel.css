@@ -558,22 +558,23 @@
   flex: 1;
   padding: 0.75rem 1rem;
   padding-right: 3rem;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid var(--chat-slate-600);
+  background: rgba(25, 228, 250, 0.08);
+  border: 1px solid var(--chat-cyan);
   border-radius: 0.75rem;
   font-size: 0.875rem;
-  color: var(--chat-slate-300);
+  color: var(--chat-cyan);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .chat-input::placeholder {
-  color: var(--chat-slate-500);
+  color: rgba(25, 228, 250, 0.45);
 }
 
 .chat-input:focus {
   border-color: var(--chat-cyan);
-  box-shadow: 0 0 0 2px rgba(25, 228, 250, 0.2);
+  box-shadow: 0 0 0 2px rgba(25, 228, 250, 0.25);
+  background: rgba(25, 228, 250, 0.12);
 }
 
 .chat-input:disabled {

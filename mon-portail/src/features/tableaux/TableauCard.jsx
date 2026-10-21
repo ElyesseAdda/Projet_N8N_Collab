@@ -38,8 +38,8 @@ const TableauCard = ({ tableau, isSelected, onClick, onRefresh, onTableauDeleted
               className="tableau-card-actions"
               icon={<MoreVertical size={18} />}
               onClick={handleActionsClick}
-              title="Modifier ou supprimer"
-              aria-label="Actions sur le tableau"
+              title="Modifier ou supprimer la liste"
+              aria-label="Actions sur la liste d’enrichissement"
             />
           </div>
         </div>
