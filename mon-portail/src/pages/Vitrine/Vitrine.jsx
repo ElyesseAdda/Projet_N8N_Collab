@@ -274,61 +274,163 @@ const SOLUTIONS = [
   },
 ];
 
-const FORMULAS = [
+const AUDITS = [
   {
-    id: 'audit',
-    eyebrow: 'Point d’entrée',
-    title: 'Diagnostic',
-    desc: 'On comprend le métier avant de proposer un outil. Aucun engagement de construction.',
-    points: [
-      'Entretien avec les personnes qui font le travail',
-      'Cartographie des flux et des irritants',
-      'Priorités et feuille de route',
-      'Recommandation : cibler, intégrer, ou ne rien construire',
-    ],
-    note: 'Sans engagement de construction. S’il y a une suite, le devis vient ensuite.',
+    id: 'flash',
+    title: 'Audit Flash',
+    price: '600 €',
+    duration: '1 jour',
+    idealFor: 'Une tâche précise vous fait perdre du temps.',
+    points: ['Un processus passé au crible', 'Les gains possibles chiffrés', 'Une recommandation claire : quoi automatiser, ou pas'],
   },
   {
-    id: 'ciblee',
-    eyebrow: 'Un flux',
-    title: 'Solution ciblée',
-    desc: 'Une application ou un workflow autour d’un seul processus. Le premier outil métier, pas un système complet.',
-    points: [
-      'Un parcours de bout en bout',
-      'Les connexions utiles à ce seul flux',
-      'Prise en main de l’équipe concernée',
-      'Périmètre écrit, hors sujet exclu',
-    ],
-    note: 'Le montant suit le nombre d’étapes et de connexions.',
-  },
-  {
-    id: 'integree',
-    eyebrow: 'Cœur de l’offre',
-    title: 'Solution intégrée',
-    desc: 'Un logiciel métier dédié, qui relie plusieurs processus. C’est l’entrée de gamme d’un vrai outil interne.',
-    points: [
-      'Plusieurs métiers dans le même outil',
-      'Règles propres à votre façon de travailler',
-      'Socle prévu pour évoluer',
-      'Livré par lots, pas en une fois opaque',
-    ],
-    note: 'Le devis dépend du périmètre. Pas de forfait catalogue.',
+    id: 'standard',
+    title: 'Audit Standard',
+    price: '1 200 à 1 800 €',
+    duration: '2 à 3 jours',
+    idealFor: 'Plusieurs équipes ressaisissent les mêmes informations.',
+    points: ['Plusieurs processus cartographiés', 'Entretiens avec les personnes qui font le travail', 'Feuille de route priorisée'],
     featured: true,
   },
   {
-    id: 'plateforme',
-    eyebrow: 'Besoin large',
-    title: 'Plateforme métier',
-    desc: 'Clients, projets, facturation et cœur d’activité dans un même environnement, construit par étapes.',
-    points: [
-      'Cadrage en lots successifs',
-      'Livraison progressive, utilisable tôt',
-      'Accompagnement au déploiement',
-      'Hors ERP généraliste construit de zéro',
-    ],
-    note: 'Réservée aux besoins qui dépassent un seul flux. Le calendrier se fixe après l’audit.',
+    id: 'approfondi',
+    title: 'Audit Approfondi',
+    price: '3 000 à 6 000 €',
+    duration: '5 à 10 jours',
+    idealFor: 'Vos outils actuels ne suivent plus votre activité.',
+    points: ['Toute l’activité analysée, équipe par équipe', 'Architecture cible et lots de déploiement', 'Cahier des charges prêt à chiffrer'],
   },
 ];
+
+const SOLUTION_OFFERS = [
+  {
+    id: 'essentiel',
+    title: 'Solution Essentiel',
+    desc: 'Une automatisation ciblée ou un chatbot simple, autour d’un seul flux.',
+    example: 'Ex. : relances de devis automatiques',
+  },
+  {
+    id: 'sur-mesure',
+    title: 'Solution Sur mesure',
+    desc: 'Une application web ou mobile, un assistant IA branché sur vos documents, et la formation de vos équipes.',
+    example: 'Ex. : outil interne de suivi des interventions',
+    featured: true,
+  },
+  {
+    id: 'integree',
+    title: 'Solution Intégrée',
+    desc: 'Un ERP ou un logiciel de gestion complet : clients, projets, facturation, stocks.',
+    example: 'Ex. : gestion complète d’une entreprise de travaux',
+  },
+];
+
+const SUBSCRIPTION_TIERS = [
+  { size: 'Outil simple', price: '150 €' },
+  { size: 'Outil intermédiaire', price: '300 €' },
+  { size: 'Outil complet', price: '600 € et +' },
+];
+
+const FORMULA_OPTIONS = [
+  ...AUDITS.map((a) => a.title),
+  ...SOLUTION_OFFERS.map((s) => s.title),
+  'Évolution technologique',
+  'Je ne sais pas encore',
+];
+
+const GUIDE_SCOPE = [
+  { id: 'un', label: 'Une seule tâche', audit: 'flash' },
+  { id: 'plusieurs', label: 'Plusieurs processus', audit: 'standard' },
+  { id: 'tout', label: 'Toute l’activité', audit: 'approfondi' },
+];
+
+const GUIDE_NEED = [
+  { id: 'auto', label: 'Automatiser une tâche', solution: 'essentiel' },
+  { id: 'app', label: 'Un outil pour l’équipe', solution: 'sur-mesure' },
+  { id: 'erp', label: 'Un logiciel de gestion complet', solution: 'integree' },
+];
+
+const ChoiceGroup = ({ label, options, value, onChange }) => (
+  <div>
+    <p className="text-sm font-semibold text-slate-700 mb-3">{label}</p>
+    <div className="flex flex-wrap gap-2">
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          onClick={() => onChange(option.id)}
+          className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${value === option.id ? 'bg-slate-950 text-white border-slate-950' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'}`}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
+const FormulaGuide = ({ onChoose }) => {
+  const [scope, setScope] = useState('un');
+  const [need, setNeed] = useState('auto');
+  const audit = AUDITS.find((a) => a.id === GUIDE_SCOPE.find((s) => s.id === scope).audit);
+  const solution = SOLUTION_OFFERS.find((s) => s.id === GUIDE_NEED.find((n) => n.id === need).solution);
+
+  return (
+    <div className="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="space-y-6">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 mb-2">Quelle formule pour vous ?</p>
+          <h3 className="text-2xl font-bold text-slate-950">Deux questions, une recommandation.</h3>
+        </div>
+        <ChoiceGroup label="Que voulez-vous améliorer ?" options={GUIDE_SCOPE} value={scope} onChange={setScope} />
+        <ChoiceGroup label="De quoi avez-vous besoin ?" options={GUIDE_NEED} value={need} onChange={setNeed} />
+      </div>
+      <div className="rounded-2xl bg-gradient-to-br from-slate-50 to-[#ECFEFF] border border-slate-100 p-6">
+        <p className="text-sm text-slate-600">Nous vous recommandons</p>
+        <div className="mt-3 space-y-3">
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="font-bold text-slate-950">1. {audit.title}</span>
+            <span className="text-sm font-semibold text-slate-700 whitespace-nowrap">{audit.price} HT</span>
+          </div>
+          <div className="flex items-baseline justify-between gap-4">
+            <span className="font-bold text-slate-950">2. {solution.title}</span>
+            <span className="text-sm font-semibold text-slate-700 whitespace-nowrap">sur devis</span>
+          </div>
+        </div>
+        <p className="text-xs text-[#0E7490] font-semibold mt-4">L’audit est offert si vous poursuivez : son montant est déduit de la solution.</p>
+        <a
+          href="#contact"
+          onClick={() => onChoose(audit.title)}
+          className="mt-5 w-full px-6 py-3 bg-slate-950 hover:bg-[#0891B2] text-white rounded-full font-bold transition-all flex items-center justify-center gap-2"
+        >
+          Démarrer par l’{audit.title} <ArrowRight className="w-4 h-4" />
+        </a>
+      </div>
+    </div>
+  );
+};
+
+const PriceCard = ({ title, price, pricePrefix, priceSuffix, meta, children, featured, onChoose }) => (
+  <article className={`h-full flex flex-col rounded-2xl border p-6 bg-white shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all hover:-translate-y-1 ${featured ? 'border-slate-950 ring-1 ring-slate-950' : 'border-slate-200 hover:border-[#19E4FA]/60'}`}>
+    <div className="flex items-center justify-between gap-3 mb-3">
+      <h4 className="text-lg font-bold text-slate-950">{title}</h4>
+      {meta && <span className="text-xs font-semibold text-slate-500 bg-slate-100 rounded-full px-3 py-1 whitespace-nowrap">{meta}</span>}
+    </div>
+    {price && (
+      <div className="mb-4">
+        {pricePrefix && <span className="text-sm text-slate-500 mr-1">{pricePrefix}</span>}
+        <span className="text-3xl font-extrabold tracking-tight text-gradient">{price}</span>
+        <span className="text-sm text-slate-500 ml-1">{priceSuffix}</span>
+      </div>
+    )}
+    <div className="flex-1">{children}</div>
+    <a
+      href="#contact"
+      onClick={() => onChoose(title)}
+      className={`mt-6 text-center rounded-full px-4 py-3 text-sm font-bold transition-colors ${featured ? 'bg-slate-950 text-white hover:bg-[#0891B2]' : 'border border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white'}`}
+    >
+      Choisir cette formule
+    </a>
+  </article>
+);
 
 const ZoniaLogo = ({ size = 40, strokeColor = 'white' }) => (
   <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
@@ -349,29 +451,6 @@ const ServiceCard = ({ icon, title, desc, tone }) => {
   );
 };
 
-const FormulaCard = ({ formula, onChoose }) => (
-  <article className={`flex flex-col rounded-2xl border p-7 bg-white shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] ${formula.featured ? 'border-slate-950 ring-1 ring-slate-950' : 'border-slate-200'}`}>
-    <p className={`text-xs font-bold uppercase tracking-[0.16em] mb-3 ${formula.featured ? 'text-[#0E7490]' : 'text-slate-500'}`}>{formula.eyebrow}</p>
-    <h3 className="text-2xl font-bold text-slate-950 mb-3">{formula.title}</h3>
-    <p className="text-sm text-slate-600 leading-relaxed mb-6">{formula.desc}</p>
-    <ul className="space-y-3 mb-6 flex-1">
-      {formula.points.map((point) => (
-        <li key={point} className="flex gap-2 text-sm text-slate-700">
-          <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0E7490]" />
-          <span>{point}</span>
-        </li>
-      ))}
-    </ul>
-    <p className="text-sm font-medium text-slate-900 mb-5">{formula.note}</p>
-    <a
-      href="#contact"
-      onClick={() => onChoose(formula.title)}
-      className={`text-center rounded-full px-4 py-3 text-sm font-bold transition-colors ${formula.featured ? 'bg-slate-950 text-white hover:bg-[#0891B2]' : 'border border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white'}`}
-    >
-      En parler dans l’audit
-    </a>
-  </article>
-);
 
 
 
@@ -452,7 +531,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   );
 };
 
-const EMPTY_FORM = { name: '', company: '', email: '', formula: 'Diagnostic', need: '' };
+const EMPTY_FORM = { name: '', company: '', email: '', formula: 'Je ne sais pas encore', need: '' };
 
 const Vitrine = () => {
   const [form, setForm] = useState(EMPTY_FORM);
@@ -463,6 +542,8 @@ const Vitrine = () => {
   const setField = (key) => (event) => {
     setForm((current) => ({ ...current, [key]: event.target.value }));
   };
+
+  const chooseFormula = (title) => setForm((current) => ({ ...current, formula: title }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -620,27 +701,91 @@ const Vitrine = () => {
       </section>
       <section id="formules" className="scroll-mt-24 py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-14">
+          <div className="max-w-3xl mb-10">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Formules</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Quatre façons d’avancer, aucun prix affiché</h2>
-            <p className="text-slate-600 text-lg">Le montant suit le périmètre. Après l’audit, le devis dit ce qui est construit, ce qui est reporté, et comment l’outil pourra évoluer. « Sur devis » n’est pas un prix caché : c’est l’absence de forfait qui ne correspondrait pas à votre métier.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Choisissez votre point de départ</h2>
+            <p className="text-slate-600 text-lg">Des prix clairs pour commencer. Le devis final suit le périmètre défini pendant l’audit.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {FORMULAS.map((formula) => (
-              <FormulaCard
-                key={formula.id}
-                formula={formula}
-                onChoose={(title) => setForm((current) => ({ ...current, formula: title }))}
-              />
+
+          <FormulaGuide onChoose={chooseFormula} />
+
+          <div className="mt-16 flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+            <div>
+              <p className="text-xs font-bold tracking-[0.18em] text-slate-400 mb-1">ÉTAPE 1</p>
+              <h3 className="text-2xl font-bold text-slate-950">Commencer par un audit</h3>
+            </div>
+            <span className="self-start md:self-auto text-sm font-semibold text-[#0E7490] bg-[#ECFEFF] border border-[#19E4FA]/40 rounded-full px-4 py-2">Offert si vous poursuivez avec Zonia</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {AUDITS.map((audit) => (
+              <PriceCard key={audit.id} title={audit.title} price={audit.price} priceSuffix="HT" meta={audit.duration} featured={audit.featured} onChoose={chooseFormula}>
+                <p className="text-sm text-slate-600 mb-4"><span className="font-semibold text-slate-900">Idéal si :</span> {audit.idealFor}</p>
+                <ul className="space-y-2">
+                  {audit.points.map((point) => (
+                    <li key={point} className="flex gap-2 text-sm text-slate-700">
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#0E7490]" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </PriceCard>
             ))}
           </div>
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-10">
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-slate-950 mb-2">L’outil continue après la livraison</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Les corrections sont incluses. Chaque évolution — un nouveau flux, un écran, une connexion — se chiffre à part, au rythme que vous choisissez. Pas d’abonnement catalogue.</p>
+
+          <div className="mt-16 mb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold tracking-[0.18em] text-slate-400 mb-1">ÉTAPE 2</p>
+              <h3 className="text-2xl font-bold text-slate-950">Construire votre solution</h3>
+              <p className="text-slate-600 mt-2 max-w-2xl">Sur devis : le prix dépend de votre besoin et de la solution retenue. L’audit le chiffre précisément, et son montant est déduit.</p>
             </div>
-            <a href="#contact" onClick={() => setForm((current) => ({ ...current, formula: 'Accompagnement' }))} className="shrink-0 text-center border border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white rounded-full px-5 py-3 text-sm font-bold transition-colors">Parler de l’accompagnement</a>
+            <div className="flex flex-wrap items-center gap-2 md:justify-end md:max-w-md">
+              <span className="w-full md:text-right text-xs font-semibold text-slate-500">Ce qui fait varier le prix :</span>
+              {['Nombre de flux', 'Outils à connecter', 'Volume traité', 'Formation des équipes'].map((factor) => (
+                <span key={factor} className="text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-full px-3 py-1.5">{factor}</span>
+              ))}
+            </div>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {SOLUTION_OFFERS.map((offer) => (
+              <PriceCard key={offer.id} title={offer.title} meta="Sur devis" featured={offer.featured} onChoose={chooseFormula}>
+                <p className="text-sm text-slate-600 leading-relaxed">{offer.desc}</p>
+                <p className="text-xs text-slate-500 mt-3 italic">{offer.example}</p>
+              </PriceCard>
+            ))}
+          </div>
+
+          <div className="mt-16 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
+            <div className="lg:col-span-2">
+              <p className="text-xs font-bold tracking-[0.18em] text-slate-400 mb-1">ÉTAPE 3</p>
+              <h3 className="text-2xl font-bold text-slate-950 mb-2">Faire évoluer l’outil</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">Les corrections sont incluses. L’abonnement couvre les évolutions : un nouveau flux, un écran, une connexion.</p>
+            </div>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {SUBSCRIPTION_TIERS.map((tier) => (
+                <a key={tier.size} href="#contact" onClick={() => chooseFormula('Évolution technologique')} className="rounded-xl bg-slate-50 border border-slate-100 hover:border-[#19E4FA]/60 p-4 transition-colors">
+                  <p className="text-xs font-semibold text-slate-500">{tier.size}</p>
+                  <p className="mt-1"><span className="text-2xl font-extrabold tracking-tight text-gradient">{tier.price}</span><span className="text-sm text-slate-500"> HT / mois</span></p>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              ['Audit offert', 'Son montant est déduit de votre solution si vous poursuivez avec Zonia.'],
+              ['Données en Europe', 'Hébergement européen, traitement conforme au RGPD.'],
+              ['Vous êtes propriétaire', 'L’outil livré et ses données vous appartiennent.'],
+            ].map(([title, text]) => (
+              <div key={title} className="flex gap-3">
+                <Shield className="w-5 h-5 mt-0.5 flex-shrink-0 text-[#0E7490]" />
+                <div>
+                  <p className="font-bold text-slate-950 text-sm">{title}</p>
+                  <p className="text-sm text-slate-600">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-6 text-xs text-slate-400">Prix hors taxes. Les coûts d’API et de licences logicielles sont facturés directement au client. Les travaux hors forfait sont sur devis.</p>
         </div>
       </section>
       <section id="contact" className="scroll-mt-24 py-20 relative z-10">
@@ -665,12 +810,9 @@ const Vitrine = () => {
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-2" htmlFor="contact-formula">Formule envisagée</label>
                 <select id="contact-formula" value={form.formula} onChange={setField('formula')} disabled={loading} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:ring-2 focus:ring-[#19E4FA] outline-none transition-all disabled:opacity-50">
-                  <option>Diagnostic</option>
-                  <option>Solution ciblée</option>
-                  <option>Solution intégrée</option>
-                  <option>Plateforme métier</option>
-                  <option>Accompagnement</option>
-                  <option>Je ne sais pas encore</option>
+                  {FORMULA_OPTIONS.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
                 </select>
               </div>
               <div className="sm:col-span-2">
@@ -692,7 +834,7 @@ const Vitrine = () => {
                   'Demander l’audit'
                 )}
               </button>
-              <p className="sm:col-span-2 text-center text-xs text-slate-500">Réponse sous 24h ouvrées. Aucun prix n’est fixé avant d’avoir vu le périmètre.</p>
+              <p className="sm:col-span-2 text-center text-xs text-slate-500">Réponse sous 24h ouvrées. Le devis de la solution est établi après l’audit.</p>
             </form>
           </div>
         </div>
@@ -1008,15 +1150,16 @@ const Vitrine = () => {
               <div className="bg-slate-800/50 rounded-lg p-4">
                 <h4 className="font-bold text-white mb-2">Quelles formules proposez-vous ?</h4>
                 <p className="text-sm text-slate-300">
-                  Diagnostic, solution ciblée, solution intégrée et plateforme métier. Aucun prix n’est affiché :
-                  le devis décrit le périmètre après l’audit. Un assistant peut faire partie du livrable, il n’est pas le produit.
+                  Trois audits (Flash à 600 € HT, Standard de 1 200 à 1 800 € HT, Approfondi de 3 000 à 6 000 € HT),
+                  puis trois solutions sur devis : Essentiel, Sur mesure et Intégrée. Leur prix dépend de votre besoin.
+                  L’audit est offert si vous poursuivez : son montant est déduit de la solution.
                 </p>
               </div>
 
               <div className="bg-slate-800/50 rounded-lg p-4">
                 <h4 className="font-bold text-white mb-2">Combien de temps prend un projet ?</h4>
                 <p className="text-sm text-slate-300">
-                  Le calendrier se fixe après le cadrage. Un flux ciblé est plus court qu’une plateforme métier,
+                  Le calendrier se fixe après l’audit. Une solution Essentiel est plus courte qu’une solution Intégrée,
                   qui se livre par lots. Nous ne partons pas sur un ERP généraliste de longue durée.
                 </p>
               </div>
@@ -1024,8 +1167,8 @@ const Vitrine = () => {
               <div className="bg-slate-800/50 rounded-lg p-4">
                 <h4 className="font-bold text-white mb-2">Que se passe-t-il après la livraison ?</h4>
                 <p className="text-sm text-slate-300">
-                  Les corrections font partie de l’accompagnement. Les évolutions se chiffrent à part,
-                  selon le rythme que vous choisissez.
+                  Les corrections sont incluses. Les évolutions sont couvertes par l’abonnement Évolution technologique,
+                  de 150 € à 600 € HT et plus par mois selon la taille de l’outil.
                 </p>
               </div>
 
