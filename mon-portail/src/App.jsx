@@ -6,7 +6,6 @@ import Vitrine from './pages/Vitrine';
 import ZoniaProject from './pages/ZoniaProject';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Composant pour rediriger vers dashboard
 function RedirectToN8n() {
   useEffect(() => {
     window.location.href = '/dashboard';
@@ -16,7 +15,7 @@ function RedirectToN8n() {
 
 function AppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -25,9 +24,12 @@ function AppContent() {
   }, []);
 
   const checkAuth = async () => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
     try {
       const response = await fetch('/api/me', {
         credentials: 'include',
+        signal: ctrl.signal,
       });
       if (response.ok) {
         try {
@@ -46,7 +48,8 @@ function AppContent() {
       console.error('Erreur de vérification:', error);
       setIsAuthenticated(false);
     } finally {
-      setLoading(false);
+      clearTimeout(timer);
+      setAuthReady(true);
     }
   };
 
@@ -71,50 +74,57 @@ function AppContent() {
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-      }}>
-        <div>Chargement...</div>
-      </div>
-    );
-  }
-
+  // Ne JAMAIS bloquer la vitrine publique derrière /api/me (sinon page blanche).
   return (
     <Routes>
-      {/* Route racine : Vitrine publique */}
       <Route path="/" element={<Vitrine />} />
-
-      {/* Route ZoniaProject : Interface complète (chat, tableaux, etc.) */}
       <Route path="/ZoniaProject" element={<ZoniaProject />} />
-
-      {/* Route de connexion */}
       <Route
         path="/connect"
         element={
-          isAuthenticated ? (
+          !authReady ? (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                background: '#0f172a',
+                color: '#94a3b8',
+              }}
+            >
+              Chargement…
+            </div>
+          ) : isAuthenticated ? (
             <RedirectToN8n />
           ) : (
             <Login onLogin={handleLogin} />
           )
         }
       />
-
-      {/* Route dashboard */}
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <Dashboard user={user} onLogout={handleLogout} />
-          </ProtectedRoute>
+          !authReady ? (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                background: '#0f172a',
+                color: '#94a3b8',
+              }}
+            >
+              Chargement…
+            </div>
+          ) : (
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <Dashboard user={user} onLogout={handleLogout} />
+            </ProtectedRoute>
+          )
         }
       />
-
-      {/* Route catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
