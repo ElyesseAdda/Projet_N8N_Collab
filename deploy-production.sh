@@ -5,6 +5,14 @@
 
 set -e  # Arrêter en cas d'erreur
 
+# Ce VPS partage déjà les ports 80/443 avec Nginx et d'autres sociétés.
+# Zonia s'y met à jour avec deploy-zonia.ps1, jamais avec ce script.
+if [ -f /opt/zonia/docker-compose.vps.yml ] || [ -d /opt/onlyoffice ]; then
+    echo "Arrêt : ce script ne doit pas tourner sur le VPS partagé."
+    echo "Depuis le PC, utilisez : powershell -ExecutionPolicy Bypass -File .\\deploy-zonia.ps1"
+    exit 1
+fi
+
 echo "╔══════════════════════════════════════════════════════════════╗"
 echo "║  DÉPLOIEMENT EN PRODUCTION                                    ║"
 echo "╚══════════════════════════════════════════════════════════════╝"

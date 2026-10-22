@@ -56,7 +56,13 @@ Ne jamais lancer `docker compose down` en dehors de `/opt/zonia`, et ne jamais a
 
 Le certificat Let’s Encrypt expire le 18 janvier 2027. Certbot le renouvelle seul.
 
-Le code sur le VPS a été copié par archive, ce n’est pas un clone Git. Pour mettre à jour, renvoyer les fichiers puis reconstruire le portail (commande plus bas). Ne pas écraser `/opt/zonia/.env` ni `mon-portail/users.json`.
+Le code sur le VPS a été copié par archive, ce n’est pas un clone Git. Pour une mise à jour, depuis un PC où `main` est poussé sur GitHub :
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\deploy-zonia.ps1
+```
+
+Le script envoie le commit de `main`, restaure `/opt/zonia/.env`, `mon-portail/users.json` et `docker-compose.vps.yml`, puis recrée seulement le conteneur `mon-portail`. Il ne relance pas n8n, Postgres, Nginx, ni les autres sites du VPS. Ne pas utiliser `deploy-production.sh` ici : ce script démarre Traefik sur les ports 80 et 443.
 
 ## Conteneurs Docker
 
