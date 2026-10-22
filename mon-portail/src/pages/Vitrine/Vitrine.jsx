@@ -118,34 +118,140 @@ const METHOD_STEPS = [
   {
     n: '01',
     icon: <ClipboardCheck />,
-    title: 'Audit',
-    text: 'Nous regardons vos flux réels : qui fait quoi, où le temps part, et ce qui peut attendre.',
+    title: 'Audit et analyse des besoins',
+    text: 'Nous observons vos flux, vos irritants et le résultat attendu, avant de proposer quoi que ce soit.',
+    stat: '60–70 %',
+    statLabel: 'du temps de travail est déjà automatisable',
+    evidence: 'Part des activités des salariés que l’IA générative et les outils actuels peuvent prendre en charge. L’audit identifie lesquelles, chez vous.',
+    source: 'McKinsey Global Institute, 2023',
   },
   {
     n: '02',
-    icon: <Compass />,
-    title: 'Cadrage',
-    text: 'Le périmètre est écrit : ce qui est construit, ce qui est reporté, et dans quel ordre.',
+    icon: <PenLine />,
+    title: 'Proposition et mise en place',
+    text: 'Nous présentons la solution qui correspond au périmètre, puis nous la construisons et la déployons.',
+    stat: '+15 %',
+    statLabel: 'de demandes traitées par heure',
+    evidence: 'Jusqu’à +30 % pour les équipes les moins expérimentées. Nous automatisons vos flux réels, pas un outil générique.',
+    source: 'Brynjolfsson, Li et Raymond, QJE, 5 172 agents, 2025',
   },
   {
     n: '03',
-    icon: <PenLine />,
-    title: 'Construction',
-    text: 'L’outil est fait pour votre métier. Un assistant peut en faire partie, il n’en est pas le sujet.',
+    icon: <Compass />,
+    title: 'Suivi des performances et formation',
+    text: 'Nous formons votre équipe à l’outil, puis nous mesurons ce qu’il change : temps, fiabilité, adoption.',
+    stat: '3,6 h',
+    statLabel: 'gagnées par semaine, sur les seuls e-mails',
+    evidence: 'Soit 31 % de temps en moins pour les utilisateurs réguliers. Le suivi mesure votre gain réel, chiffres à l’appui.',
+    source: 'Microsoft Research / Harvard, 7 137 salariés, 2025',
   },
   {
     n: '04',
     icon: <RefreshCw />,
-    title: 'Évolution',
-    text: 'Les corrections sont incluses. Les nouvelles fonctions se décident au rythme de votre activité.',
+    title: 'Maintenance et amélioration',
+    text: 'Nous corrigeons et faisons évoluer l’outil quand vos flux changent, pour que le gain dure.',
+    stat: '73 %',
+    statLabel: 'des entreprises utilisent l’IA pour gagner du temps',
+    evidence: 'Mais 53 % plafonnent ensuite faute d’expertise. C’est cet écart que l’accompagnement comble.',
+    source: 'Insee, enquête TIC 2025',
+  },
+];
+
+const BEFORE_AFTER = [
+  {
+    task: 'Relances de devis',
+    before: 'Relancés un par un, à la main. Certains finissent oubliés.',
+    after: 'Chaque relance part au bon moment. Vous êtes alerté dès que le client répond.',
+  },
+  {
+    task: 'Saisie de documents',
+    before: 'Factures et bons de commande recopiés dans le tableur ou le logiciel.',
+    after: 'Les informations sont lues et classées automatiquement. Vous n’avez qu’à valider.',
+  },
+  {
+    task: 'E-mails entrants',
+    before: 'La boîte est triée à la main, les demandes urgentes se perdent.',
+    after: 'Chaque e-mail est trié, résumé et transmis à la bonne personne.',
+  },
+];
+
+const TIME_GAIN_RATE = 0.31;
+const WORKED_WEEKS = 45;
+
+const TimeCalculator = () => {
+  const [people, setPeople] = useState(5);
+  const [hours, setHours] = useState(10);
+  const yearlyHours = Math.round(people * hours * TIME_GAIN_RATE * WORKED_WEEKS);
+  const workDays = Math.round(yearlyHours / 7);
+
+  return (
+    <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-xl lg:sticky lg:top-28">
+      <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 mb-2">Votre estimation</p>
+      <h3 className="text-2xl font-bold text-slate-950 mb-8">Combien de temps pourriez-vous récupérer ?</h3>
+
+      <div className="space-y-7">
+        <label className="block">
+          <div className="flex justify-between items-baseline mb-3">
+            <span className="text-sm font-semibold text-slate-700">Personnes concernées</span>
+            <span className="text-lg font-extrabold text-slate-950">{people}</span>
+          </div>
+          <input type="range" min="1" max="50" value={people} onChange={(e) => setPeople(Number(e.target.value))} className="w-full accent-[#0891B2] cursor-pointer" />
+        </label>
+        <label className="block">
+          <div className="flex justify-between items-baseline mb-3">
+            <span className="text-sm font-semibold text-slate-700">Heures de tâches répétitives, par personne et par semaine</span>
+            <span className="text-lg font-extrabold text-slate-950 whitespace-nowrap pl-3">{hours} h</span>
+          </div>
+          <input type="range" min="1" max="30" value={hours} onChange={(e) => setHours(Number(e.target.value))} className="w-full accent-[#0891B2] cursor-pointer" />
+        </label>
+      </div>
+
+      <div className="mt-8 rounded-2xl bg-gradient-to-br from-slate-50 to-[#ECFEFF] border border-slate-100 p-6">
+        <p className="text-sm text-slate-600">Temps récupérable par an</p>
+        <div className="text-5xl font-extrabold tracking-tight text-gradient leading-tight mt-1">{yearlyHours.toLocaleString('fr-FR')} h</div>
+        <p className="text-sm font-semibold text-slate-900 mt-1">soit environ {workDays.toLocaleString('fr-FR')} jours de travail</p>
+      </div>
+
+      <p className="text-[11px] text-slate-400 mt-4 leading-relaxed">
+        Estimation prudente : 31 % de temps gagné sur 45 semaines travaillées (Microsoft Research / Harvard, 2025). L’audit chiffre votre cas réel.
+      </p>
+
+      <a href="#contact" className="mt-6 w-full px-6 py-4 bg-slate-950 hover:bg-[#0891B2] text-white rounded-full font-bold shadow-[0_12px_30px_-12px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        Vérifier mon estimation en audit <ArrowRight className="w-5 h-5" />
+      </a>
+    </div>
+  );
+};
+
+const WHY_CUSTOM = [
+  {
+    stat: '50 %',
+    label: 'des budgets IA partent dans les ventes et le marketing',
+    text: 'Pourtant, les retours les plus rapides viennent souvent du back-office : facturation, saisie, documents, commandes.',
+    source: 'MIT NANDA, The GenAI Divide, 2025',
+    href: 'https://mlq.ai/media/quarterly_decks/v0.1_State_of_AI_in_Business_2025_Report.pdf',
+  },
+  {
+    stat: '3,7 €',
+    label: 'rapportés pour 1 € investi dans l’IA générative',
+    text: 'Retour moyen déclaré par plus de 4 000 décideurs. Les entreprises les plus avancées atteignent 10,3 €.',
+    source: 'IDC pour Microsoft, 2024',
+    href: 'https://info.microsoft.com/ww-landing-business-opportunity-of-ai.html',
+  },
+  {
+    stat: '89 %',
+    label: 'des salariés plus satisfaits de leur travail',
+    text: 'Après avoir été équipés d’outils d’automatisation. Moins de tâches rébarbatives, plus de temps pour le métier.',
+    source: 'Salesforce, 773 utilisateurs, 2021',
+    href: 'https://www.salesforce.com/news/stories/new-salesforce-research-links-lower-stress-levels-and-business-automation/',
   },
 ];
 
 const SOLUTIONS = [
   {
-    icon: <ClipboardCheck />,
-    title: 'Audit de processus',
-    desc: 'Cartographie de vos flux, des irritants et des gains réalistes, avant toute ligne de devis.',
+    icon: <Workflow />,
+    title: 'Automatisation ciblée',
+    desc: 'Un flux de bout en bout — relances, pièces, planning — sans refaire tout le système.',
     tone: 'cyan',
   },
   {
@@ -155,27 +261,15 @@ const SOLUTIONS = [
     tone: 'gold',
   },
   {
-    icon: <Workflow />,
-    title: 'Automatisation ciblée',
-    desc: 'Un flux de bout en bout — relances, pièces, planning — sans refaire tout le système.',
-    tone: 'cyan',
-  },
-  {
     icon: <FileSearch />,
     title: 'Connaissance documentaire',
     desc: 'Vos procédures et dossiers deviennent interrogeables. Une brique possible, jamais le produit vendu seul.',
-    tone: 'gold',
+    tone: 'cyan',
   },
   {
     icon: <Cable />,
     title: 'Connexion à l’existant',
     desc: 'Mails, agendas, tableurs, facturation : on relie ce que vous utilisez déjà quand c’est utile.',
-    tone: 'cyan',
-  },
-  {
-    icon: <RefreshCw />,
-    title: 'Accompagnement',
-    desc: 'L’outil reste vivant. On corrige, puis on étend le périmètre seulement quand vous le décidez.',
     tone: 'gold',
   },
 ];
@@ -298,8 +392,9 @@ const Navbar = () => {
               <span className="text-lg font-bold tracking-[0.22em] text-slate-950">ZONIA</span>
             </a>
             <div className="hidden md:flex items-center gap-8">
-              <a href="#methode" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Méthode</a>
+              <a href="#methode" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Vos gains</a>
               <a href="#solutions" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Solutions</a>
+              <a href="#pourquoi" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Pourquoi nous</a>
               <a href="#formules" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Formules</a>
               <a href="#contact" className="bg-slate-950 text-white border border-slate-950 hover:bg-[#0891B2] hover:border-[#0891B2] px-5 py-2.5 rounded-full text-sm font-bold transition-colors">Demander un audit</a>
             </div>
@@ -316,8 +411,9 @@ const Navbar = () => {
         </div>
         {open && (
           <div className="md:hidden border-t border-slate-200 px-4 py-4 space-y-2">
-            <a href="#methode" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Méthode</a>
+            <a href="#methode" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Vos gains</a>
             <a href="#solutions" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Solutions</a>
+            <a href="#pourquoi" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Pourquoi nous</a>
             <a href="#formules" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Formules</a>
             <a href="#contact" onClick={close} className="block text-center bg-slate-950 text-white border border-slate-950 px-4 py-3 rounded-full text-sm font-bold">Demander un audit</a>
           </div>
@@ -417,58 +513,71 @@ const Vitrine = () => {
             <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#19E4FA] opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-[#0891B2]"></span></span>
             Agence IA · audit et outils métier
           </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-950 tracking-tight mb-6 leading-tight">D’abord l’audit.<br/><span className="text-gradient">Ensuite, votre outil.</span></h1>
-          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-600">Zonia étudie votre façon de travailler, puis construit la solution qui correspond à ce périmètre. Pas un assistant à brancher. Pas de prix catalogue.</p>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-slate-950 tracking-tight mb-6 leading-tight">Moins de tâches répétitives.<br/><span className="text-gradient">Plus de temps pour votre métier.</span></h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-slate-600">Relances, saisies, e-mails, dossiers : Zonia automatise ce qui ralentit votre équipe, avec des outils IA construits sur mesure pour votre entreprise. On commence par un audit, vous gardez la main.</p>
           <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
             <a href="#contact" className="px-8 py-4 bg-slate-950 hover:bg-[#0891B2] text-white rounded-full font-bold text-lg shadow-[0_12px_30px_-12px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 flex items-center justify-center gap-2">Demander un audit <ArrowRight className="w-5 h-5" /></a>
             <a href="#formules" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-900 rounded-full font-bold text-lg border border-slate-200 hover:border-slate-300 transition-all hover:-translate-y-0.5">Voir les formules</a>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="max-w-6xl mx-auto mt-20 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Notre processus</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-950">4 étapes, des gains mesurables</h2>
+          <p className="mt-3 max-w-2xl mx-auto text-slate-600">Chaque étape s’appuie sur des résultats observés en entreprise, pas sur des promesses.</p>
+        </div>
+        <div className="max-w-6xl mx-auto mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {METHOD_STEPS.map((step) => (
-            <div key={step.n} className="bg-white rounded-2xl border border-slate-200 p-5 text-left shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)]">
-              <div className="text-xs font-bold tracking-[0.18em] text-[#0E7490] mb-3">{step.n}</div>
-              <h2 className="text-lg font-bold text-slate-950 mb-2">{step.title}</h2>
-              <p className="text-sm text-slate-600 leading-relaxed">{step.text}</p>
+            <div key={step.n} className="group h-full flex flex-col bg-white rounded-2xl border border-slate-200 p-5 text-left shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all hover:-translate-y-1 hover:border-[#19E4FA]/60">
+              <div className="flex items-center justify-between mb-4">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ECFEFF] text-[#0E7490] [&>svg]:h-5 [&>svg]:w-5">{step.icon}</span>
+                <span className="text-xs font-bold tracking-[0.18em] text-slate-400">ÉTAPE {step.n}</span>
+              </div>
+              <h3 className="text-base font-bold text-slate-950 mb-2 leading-snug min-h-[2.75rem]">{step.title}</h3>
+              <p className="text-sm text-slate-600 leading-relaxed lg:min-h-[5.75rem]">{step.text}</p>
+              <div className="flex-1 flex flex-col pt-5">
+                <div className="flex-1 rounded-xl bg-gradient-to-br from-slate-50 to-[#ECFEFF] border border-slate-100 p-4">
+                  <div className="text-4xl font-extrabold tracking-tight text-gradient leading-none">{step.stat}</div>
+                  <p className="text-sm font-semibold text-slate-900 mt-2 leading-snug">{step.statLabel}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed mt-2">{step.evidence}</p>
+                  <p className="text-[11px] text-slate-400 mt-3">{step.source}</p>
+                </div>
+              </div>
             </div>
           ))}
         </div>
+        <p className="max-w-3xl mx-auto mt-6 text-center text-xs text-slate-500 leading-relaxed">
+          Sources : <a className="underline hover:text-slate-800" href="https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-economic-potential-of-generative-ai-the-next-productivity-frontier" target="_blank" rel="noopener noreferrer">McKinsey</a>, <a className="underline hover:text-slate-800" href="https://www.insee.fr/fr/statistiques/9025878" target="_blank" rel="noopener noreferrer">Insee</a>, <a className="underline hover:text-slate-800" href="https://www.nber.org/papers/w31161" target="_blank" rel="noopener noreferrer">NBER / QJE</a>, <a className="underline hover:text-slate-800" href="https://arxiv.org/abs/2504.11436" target="_blank" rel="noopener noreferrer">Microsoft Research / Harvard</a>.
+        </p>
       </section>
       <section id="methode" className="scroll-mt-24 py-20 relative z-10 bg-white/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <div className="max-w-3xl mb-10">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Concrètement</p>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-6">Ce qui change dans votre semaine.</h2>
+            <p className="text-slate-600 text-lg">Trois exemples de tâches que nous automatisons le plus souvent.</p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Méthode</p>
-              <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-6">On cadre avant de construire.</h2>
-              <p className="text-slate-600 text-lg mb-8">Un outil métier utile tient dans un périmètre tenu. L’audit dit ce qui entre dans la première version, et ce qui attendra.</p>
-              <ul className="space-y-4">
-                {[
-                  'Le devis décrit le périmètre, le calendrier et ce qui n’est pas inclus.',
-                  'Une équipe suit le projet. Vous avez un interlocuteur, pas un produit en boîte.',
-                  'Nous visons l’outil accessible : précis pour votre métier, sans ERP généraliste de plusieurs années.',
-                ].map((item) => (
-                  <li key={item} className="flex gap-3 text-slate-700">
-                    <Check className="w-5 h-5 mt-0.5 flex-shrink-0 text-[#0E7490]" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 mb-6">Ce que l’audit rend visible</p>
-              <div className="space-y-5">
-                {[
-                  ['Le flux réel', 'Qui saisit, qui relance, où l’information se perd.'],
-                  ['Le premier lot', 'Ce qui soulage l’équipe sans tout reconstruire.'],
-                  ['La suite', 'Ce qui pourra s’ajouter une fois l’outil en usage.'],
-                ].map(([title, text]) => (
-                  <div key={title} className="border-t border-slate-200 pt-5 first:border-0 first:pt-0">
-                    <h3 className="font-bold text-slate-950">{title}</h3>
-                    <p className="text-sm text-slate-600 mt-1">{text}</p>
+              <div className="space-y-4">
+                {BEFORE_AFTER.map((item) => (
+                  <div key={item.task} className="bg-white rounded-2xl border border-slate-200 p-5">
+                    <h3 className="font-bold text-slate-950 mb-3">{item.task}</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="rounded-xl bg-slate-50 p-3">
+                        <p className="text-[11px] font-bold tracking-[0.16em] text-slate-400 mb-1">AVANT</p>
+                        <p className="text-sm text-slate-500 leading-relaxed">{item.before}</p>
+                      </div>
+                      <div className="rounded-xl bg-[#ECFEFF] border border-[#19E4FA]/40 p-3">
+                        <p className="text-[11px] font-bold tracking-[0.16em] text-[#0E7490] mb-1">APRÈS</p>
+                        <p className="text-sm text-slate-800 leading-relaxed">{item.after}</p>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
+              <p className="text-xs text-slate-400 mt-4">Exemples types. L’audit détermine ce qui s’applique à vos flux.</p>
             </div>
+            <TimeCalculator />
           </div>
         </div>
       </section>
@@ -477,16 +586,39 @@ const Vitrine = () => {
           <div className="text-center mb-16">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Après l’audit</p>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">La solution suit le métier</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">Chaque chantier est écrit pour vous. Un assistant peut être une brique du livrable. Il n’est pas le point de départ.</p>
+            <p className="text-slate-600 max-w-2xl mx-auto">Chaque chantier est écrit pour vous, à partir de ce que l’audit a mis en évidence.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {SOLUTIONS.map((item) => (
               <ServiceCard key={item.title} {...item} />
             ))}
           </div>
         </div>
       </section>
-      <section id="formules" className="scroll-mt-24 py-24 relative z-10 bg-white/70">
+      <section id="pourquoi" className="scroll-mt-24 py-24 relative z-10 bg-white/70">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+            <div className="lg:col-span-2">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Pourquoi le sur-mesure</p>
+              <div className="text-7xl md:text-8xl font-extrabold tracking-tight leading-none text-gradient">95 %</div>
+              <p className="text-xl md:text-2xl font-bold text-slate-950 mt-4 leading-snug">des entreprises n’obtiennent aucun résultat mesurable de leurs projets d’IA.</p>
+              <p className="text-slate-600 mt-4 leading-relaxed">La différence ne vient pas de l’outil, mais de son intégration dans vos processus. Un assistant générique ne connaît ni vos règles, ni vos logiciels, ni vos clients. C’est précisément ce que nous construisons.</p>
+              <a href="https://mlq.ai/media/quarterly_decks/v0.1_State_of_AI_in_Business_2025_Report.pdf" target="_blank" rel="noopener noreferrer" className="inline-block text-[11px] text-slate-400 hover:text-slate-700 underline mt-4">MIT NANDA, The GenAI Divide, 2025</a>
+            </div>
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {WHY_CUSTOM.map((item) => (
+                <div key={item.stat} className="h-full flex flex-col bg-white rounded-2xl border border-slate-200 p-5 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all hover:-translate-y-1 hover:border-[#19E4FA]/60">
+                  <div className="text-4xl font-extrabold tracking-tight text-gradient leading-none">{item.stat}</div>
+                  <p className="text-sm font-semibold text-slate-900 mt-3 leading-snug">{item.label}</p>
+                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">{item.text}</p>
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" className="mt-auto pt-4 text-[11px] text-slate-400 hover:text-slate-700 underline">{item.source}</a>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="formules" className="scroll-mt-24 py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-14">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Formules</p>
@@ -505,7 +637,7 @@ const Vitrine = () => {
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-4 md:gap-10">
             <div className="flex-1">
               <h3 className="text-xl font-bold text-slate-950 mb-2">L’outil continue après la livraison</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Les corrections font partie de l’accompagnement. Les évolutions — un nouveau flux, un écran, une connexion — se chiffrent à part, selon le rythme que vous choisissez. Pas d’abonnement catalogue.</p>
+              <p className="text-slate-600 text-sm leading-relaxed">Les corrections sont incluses. Chaque évolution — un nouveau flux, un écran, une connexion — se chiffre à part, au rythme que vous choisissez. Pas d’abonnement catalogue.</p>
             </div>
             <a href="#contact" onClick={() => setForm((current) => ({ ...current, formula: 'Accompagnement' }))} className="shrink-0 text-center border border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white rounded-full px-5 py-3 text-sm font-bold transition-colors">Parler de l’accompagnement</a>
           </div>
@@ -515,8 +647,8 @@ const Vitrine = () => {
         <div className="max-w-3xl mx-auto px-4">
           <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-xl relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#19E4FA] via-white to-[#FFD700]"></div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-3">Parlons de votre métier</h2>
-            <p className="text-slate-600 mb-8">Décrivez le flux qui vous coûte du temps. Nous revenons avec une proposition d’audit, pas avec un prix tout fait.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-3">Parlons de votre premier processus</h2>
+            <p className="text-slate-600 mb-8">Décrivez la tâche qui coûte le plus de temps à votre équipe. Nous revenons avec une proposition d’audit qui chiffre ce que son automatisation vous ferait gagner, avant tout engagement.</p>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase mb-2" htmlFor="contact-name">Nom</label>
