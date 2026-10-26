@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 
 // ╔══════════════════════════════════════════════════════════════════════════════
-// ║ ROADMAP — Branchement Supabase (3 étapes)
+// ║ ROADMAP - Branchement Supabase (3 étapes)
 // ║
-// ║ ÉTAPE 1 — Créer la table dans Supabase :
+// ║ ÉTAPE 1 - Créer la table dans Supabase :
 // ║
 // ║   CREATE TABLE time_saved_actions (
 // ║     id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -28,7 +28,7 @@ import { useState, useMemo, useCallback } from 'react';
 // ║     ON time_saved_actions FOR INSERT
 // ║     WITH CHECK (auth.uid() = user_id);
 // ║
-// ║ ÉTAPE 2 — Remplacer MOCK_ACTIONS dans ce hook :
+// ║ ÉTAPE 2 - Remplacer MOCK_ACTIONS dans ce hook :
 // ║
 // ║   - Supprimer generateMockActions() et MOCK_ACTIONS
 // ║   - Ajouter un state : const [actions, setActions] = useState([]);
@@ -51,7 +51,7 @@ import { useState, useMemo, useCallback } from 'react';
 // ║     import { supabase, isSupabaseAvailable } from '../lib/supabase';
 // ║     import { TABLE_TIME_SAVED_ACTIONS } from '../config/constants';
 // ║
-// ║ ÉTAPE 3 — Logger les actions depuis chaque feature :
+// ║ ÉTAPE 3 - Logger les actions depuis chaque feature :
 // ║
 // ║   Créer un helper utils/logTimeSaved.js :
 // ║
@@ -141,7 +141,7 @@ const MOCK_ACTIONS = generateMockActions();
 /**
  * Hook de comptage du temps économisé par Zonia.
  * Retourne les heures/minutes économisées filtrables par mois/année.
- * Utilise des données mockées pour le moment — préparé pour Supabase.
+ * Utilise des données mockées pour le moment - préparé pour Supabase.
  *
  * @returns {{
  *   totalMinutes: number,

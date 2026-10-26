@@ -251,7 +251,7 @@ const SOLUTIONS = [
   {
     icon: <Workflow />,
     title: 'Automatisation ciblée',
-    desc: 'Un flux de bout en bout — relances, pièces, planning — sans refaire tout le système.',
+    desc: 'Un flux de bout en bout - relances, pièces, planning - sans refaire tout le système.',
     tone: 'cyan',
   },
   {

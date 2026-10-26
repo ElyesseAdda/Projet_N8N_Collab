@@ -45,11 +45,11 @@ const ComposeMailModal = ({ isOpen, onClose }) => {
   };
 
   const handleComposeSaveDraft = () => {
-    alert('Brouillon enregistre (mock) — sera connecte a Supabase');
+    alert('Brouillon enregistre (mock) - sera connecte a Supabase');
   };
 
   const handleComposeSend = () => {
-    alert('Mail envoye (mock) — sera connecte au backend');
+    alert('Mail envoye (mock) - sera connecte au backend');
     onClose?.();
     resetComposeForm();
   };

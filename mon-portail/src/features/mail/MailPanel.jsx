@@ -11,7 +11,7 @@ import ComposeMailModal from './components/ComposeMailModal';
 import './MailPanel.css';
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   DONNEES DE DEMONSTRATION — seront remplacees par Supabase + webhook IA
+   DONNEES DE DEMONSTRATION - seront remplacees par Supabase + webhook IA
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const MOCK_MAILS = [
@@ -25,7 +25,7 @@ const MOCK_MAILS = [
     preview: 'Bonjour, je reviens vers vous concernant le devis envoyé la semaine dernière…',
     body: 'Bonjour,\n\nJe reviens vers vous concernant le devis envoyé la semaine dernière pour le Projet Alpha.\nPourriez-vous me confirmer votre accord sur les termes proposés ?\n\nNous aimerions lancer la phase de développement dès la semaine prochaine.\n\nCordialement,\nAlice Martin\nDirectrice de projet',
     date: '09:12',
-    fullDate: 'Mardi 25 Mars 2026 — 09:12',
+    fullDate: 'Mardi 25 Mars 2026 - 09:12',
     unread: true,
     hasDraft: true,
     attachments: [
@@ -42,7 +42,7 @@ const MOCK_MAILS = [
     preview: 'Veuillez trouver ci-joint notre nouvelle grille tarifaire…',
     body: 'Bonjour,\n\nVeuillez trouver ci-joint notre nouvelle grille tarifaire applicable à compter du 1er avril 2026.\n\nN\'hésitez pas à revenir vers nous pour toute question.\n\nCordialement,\nThomas Durand\nService Commercial',
     date: 'Hier',
-    fullDate: 'Lundi 24 Mars 2026 — 14:30',
+    fullDate: 'Lundi 24 Mars 2026 - 14:30',
     unread: false,
     hasDraft: true,
     attachments: [
@@ -57,9 +57,9 @@ const MOCK_MAILS = [
     email: 'compta@softcorp.io',
     subject: 'Facture #2026-0142',
     preview: 'Votre facture du mois de mars est disponible…',
-    body: 'Bonjour,\n\nVotre facture #2026-0142 d\'un montant de 4 800,00 € TTC est disponible en pièce jointe.\n\nDate d\'échéance : 15 Avril 2026.\n\nCordialement,\nService Comptabilité — SoftCorp',
+    body: 'Bonjour,\n\nVotre facture #2026-0142 d\'un montant de 4 800,00 € TTC est disponible en pièce jointe.\n\nDate d\'échéance : 15 Avril 2026.\n\nCordialement,\nService Comptabilité - SoftCorp',
     date: 'Lun',
-    fullDate: 'Lundi 24 Mars 2026 — 08:45',
+    fullDate: 'Lundi 24 Mars 2026 - 08:45',
     unread: true,
     hasDraft: true,
     attachments: [
@@ -72,11 +72,11 @@ const MOCK_MAILS = [
     folder: 'contrat',
     sender: 'Cabinet Légal Partenaire',
     email: 'juridique@cabinet-legal.fr',
-    subject: 'Contrat de prestation — signature requise',
+    subject: 'Contrat de prestation - signature requise',
     preview: 'Le contrat est prêt pour signature électronique…',
     body: 'Bonjour,\n\nLe contrat de prestation de service est finalisé.\nMerci de bien vouloir procéder à la signature électronique via le lien sécurisé ci-dessous.\n\nDate limite : 28 Mars 2026.\n\nCordialement,\nCabinet Légal Partenaire',
     date: 'Ven',
-    fullDate: 'Vendredi 21 Mars 2026 — 16:20',
+    fullDate: 'Vendredi 21 Mars 2026 - 16:20',
     unread: false,
     hasDraft: false,
     attachments: [
@@ -93,7 +93,7 @@ const MOCK_MAILS = [
     preview: 'Dans le cadre de la mise à jour de votre dossier…',
     body: 'Bonjour,\n\nDans le cadre de la mise à jour annuelle de votre dossier RH, merci de nous fournir un justificatif de domicile de moins de 3 mois.\n\nVous pouvez le déposer via le portail ou répondre à ce mail.\n\nCordialement,\nMarie Leroy\nService RH',
     date: 'Jeu',
-    fullDate: 'Jeudi 20 Mars 2026 — 11:05',
+    fullDate: 'Jeudi 20 Mars 2026 - 11:05',
     unread: true,
     hasDraft: true,
     attachments: [],
@@ -108,7 +108,7 @@ const MOCK_MAILS = [
     preview: 'Quelques ajustements demandés sur la page d\'accueil…',
     body: 'Bonjour,\n\nAprès relecture de la maquette V3, voici nos retours :\n- Agrandir le hero section\n- Changer la couleur d\'accroche\n- Ajouter une section témoignages\n\nMerci pour le travail réalisé !\n\nJulien Moreau',
     date: 'Mer',
-    fullDate: 'Mercredi 19 Mars 2026 — 17:50',
+    fullDate: 'Mercredi 19 Mars 2026 - 17:50',
     unread: false,
     hasDraft: true,
     attachments: [
@@ -154,10 +154,10 @@ const MOCK_DRIVE_FILES = [
 ];
 
 const MOCK_THREAD = [
-  { id: 'th-1', author: 'Alice Martin', date: '18 Mars — 10:30', preview: 'Bonjour, voici le devis initial pour le Projet Alpha…' },
-  { id: 'th-2', author: 'Moi', date: '19 Mars — 09:15', preview: 'Merci Alice, quelques ajustements nécessaires sur les postes 3 et 5…' },
-  { id: 'th-3', author: 'Alice Martin', date: '20 Mars — 14:45', preview: 'Voici la version révisée avec les modifications demandées…' },
-  { id: 'th-4', author: 'Alice Martin', date: '25 Mars — 09:12', preview: 'Relance — avez-vous pu valider ?' },
+  { id: 'th-1', author: 'Alice Martin', date: '18 Mars - 10:30', preview: 'Bonjour, voici le devis initial pour le Projet Alpha…' },
+  { id: 'th-2', author: 'Moi', date: '19 Mars - 09:15', preview: 'Merci Alice, quelques ajustements nécessaires sur les postes 3 et 5…' },
+  { id: 'th-3', author: 'Alice Martin', date: '20 Mars - 14:45', preview: 'Voici la version révisée avec les modifications demandées…' },
+  { id: 'th-4', author: 'Alice Martin', date: '25 Mars - 09:12', preview: 'Relance - avez-vous pu valider ?' },
 ];
 
 const MAILBOX_FILTERS = [
@@ -340,11 +340,11 @@ const MailPanel = () => {
   };
 
   const handleSend = () => {
-    alert('Envoi simulé — sera connecté à Supabase + webhook');
+    alert('Envoi simulé - sera connecté à Supabase + webhook');
   };
 
   const handleRegenerate = () => {
-    alert('Régénération IA simulée — sera connecté au webhook IA');
+    alert('Régénération IA simulée - sera connecté au webhook IA');
   };
 
   const handleCreateMessage = () => {
@@ -448,7 +448,7 @@ const MailPanel = () => {
                 >
                   <Sparkles size={14} />
                   Réponse Zonia
-                  {!currentDraft && <span className="mail-view-toggle-na">—</span>}
+                  {!currentDraft && <span className="mail-view-toggle-na">-</span>}
                 </button>
               </div>
 

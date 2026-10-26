@@ -15,8 +15,8 @@ const getInitials = (name = '') =>
     .slice(0, 2);
 
 const getTimeLabel = (dateTime = '') => {
-  const parts = dateTime.split('—');
-  return parts.length > 1 ? parts[1].trim() : dateTime;
+  const parts = String(dateTime).split(/\s[-–—]\s/);
+  return parts.length > 1 ? parts[parts.length - 1].trim() : dateTime;
 };
 
 /**
@@ -60,7 +60,7 @@ const MailMiniChat = ({ prefillContext = null, prefillToken = 0 }) => {
       const aiMsg = {
         id: `ai-${Date.now()}`,
         type: 'assistant',
-        content: 'Voici une suggestion alternative. (Donnée de test — sera connectée au webhook IA)',
+        content: 'Voici une suggestion alternative. (Donnée de test - sera connectée au webhook IA)',
       };
       setMessages((prev) => [...prev, aiMsg]);
       setIsLoading(false);
