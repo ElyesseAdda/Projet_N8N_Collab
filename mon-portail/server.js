@@ -288,11 +288,11 @@ app.post('/api/contact', async (req, res) => {
             html: `
                 <h2>Nouvelle demande d'audit</h2>
                 <p><strong>Email :</strong> ${clean(email, 200)}</p>
-                <p><strong>Nom :</strong> ${details.name || '—'}</p>
-                <p><strong>Société :</strong> ${details.company || '—'}</p>
-                <p><strong>Formule envisagée :</strong> ${details.formula || '—'}</p>
+                <p><strong>Nom :</strong> ${details.name || '-'}</p>
+                <p><strong>Société :</strong> ${details.company || '-'}</p>
+                <p><strong>Formule envisagée :</strong> ${details.formula || '-'}</p>
                 <p><strong>Besoin :</strong></p>
-                <p>${details.need || '—'}</p>
+                <p>${details.need || '-'}</p>
                 <p><strong>Date :</strong> ${new Date().toLocaleString('fr-FR')}</p>
                 <hr>
                 <p>Cette demande provient du formulaire de contact sur le site Zonia.</p>
@@ -301,10 +301,10 @@ app.post('/api/contact', async (req, res) => {
                 Nouvelle demande d'audit
 
                 Email: ${email}
-                Nom: ${name || '—'}
-                Société: ${company || '—'}
-                Formule: ${formula || '—'}
-                Besoin: ${need || '—'}
+                Nom: ${name || '-'}
+                Société: ${company || '-'}
+                Formule: ${formula || '-'}
+                Besoin: ${need || '-'}
                 Date: ${new Date().toLocaleString('fr-FR')}
             `
         };
@@ -339,7 +339,7 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Upload vers Google Drive (Zonia RAG Engine) — route publique, avant le middleware /api
+// Upload vers Google Drive (Zonia RAG Engine) - route publique, avant le middleware /api
 // Utilise OAuth2 avec refresh token (fonctionne avec compte Gmail personnel)
 const uploadMem = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } }); // 50 MB max
 
