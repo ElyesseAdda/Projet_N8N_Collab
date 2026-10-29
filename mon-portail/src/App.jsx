@@ -1,10 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Vitrine from './pages/Vitrine';
 import ZoniaProject from './pages/ZoniaProject';
 import ProtectedRoute from './components/ProtectedRoute';
+
+const PAGE_TITLES = {
+  '/': "Zonia - Service d'automatisation",
+  '/connect': 'Connexion portail',
+  '/dashboard': 'Zonia N8n',
+  '/ZoniaProject': 'Zonia',
+};
+
+function DocumentTitle() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    document.title = PAGE_TITLES[pathname] ?? "Zonia - Service d'automatisation";
+  }, [pathname]);
+
+  return null;
+}
 
 function RedirectToN8n() {
   useEffect(() => {
@@ -133,6 +150,7 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
+      <DocumentTitle />
       <AppContent />
     </BrowserRouter>
   );
