@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { 
   Menu, ArrowRight, Mail, ClipboardCheck, Compass, PenLine, RefreshCw,
   Layers, Workflow, FileSearch, Cable, Send, X, HelpCircle, Shield,
-  FileText as FileTextIcon, Check
+  FileText as FileTextIcon, Check, MessageSquare, Users, LayoutGrid, Plus
 } from 'lucide-react';
 
 // --- STYLES CSS INTÉGRÉS ---
@@ -274,6 +274,56 @@ const SOLUTIONS = [
   },
 ];
 
+const CATALOG = [
+  {
+    icon: <FileSearch />,
+    title: 'Recherche dans vos documents',
+    price: '8 000 €',
+    pricePrefix: 'à partir de',
+    desc: 'Posez une question, obtenez la réponse tirée de vos propres fichiers (contrats, procédures, devis, notices).',
+    tone: 'cyan',
+  },
+  {
+    icon: <MessageSquare />,
+    title: 'Chatbot',
+    price: '5 000 €',
+    pricePrefix: 'à partir de',
+    desc: 'Répond à vos clients ou à vos équipes à toute heure, avec les informations de votre entreprise.',
+    tone: 'gold',
+  },
+  {
+    icon: <Users />,
+    title: 'Gestion des leads',
+    price: '3 000 €',
+    pricePrefix: 'à partir de',
+    desc: 'Vous cherchez de nouveaux clients ? Nous complétons chaque contact (poste, entreprise, coordonnées vérifiées) pour que vous contactiez les bonnes personnes, avec le bon message.',
+    tone: 'cyan',
+  },
+  {
+    icon: <Mail />,
+    title: 'Gestion des mails',
+    price: '2 500 €',
+    pricePrefix: 'à partir de',
+    desc: 'Tri, classement et réponses préparées : votre boîte de réception se remplit moins vite.',
+    tone: 'gold',
+  },
+  {
+    icon: <LayoutGrid />,
+    title: 'ERP de gestion',
+    price: '6 000 €',
+    pricePrefix: 'à partir de',
+    desc: 'Devis, facturation, suivi, documents : un logiciel complet déjà éprouvé, adapté à votre métier.',
+    tone: 'cyan',
+  },
+  {
+    icon: <Plus />,
+    title: 'Un autre besoin ?',
+    price: 'Sur devis',
+    desc: 'Application web ou mobile, formation de vos équipes, automatisation spécifique : nous la concevons avec vous.',
+    tone: 'gold',
+  },
+];
+
 const AUDITS = [
   {
     id: 'flash',
@@ -286,8 +336,8 @@ const AUDITS = [
   {
     id: 'standard',
     title: 'Audit Standard',
-    price: '1 200 à 1 800 €',
-    duration: '2 à 3 jours',
+    price: '1 800 à 2 400 €',
+    duration: '3 à 4 jours',
     idealFor: 'Plusieurs équipes ressaisissent les mêmes informations.',
     points: ['Plusieurs processus cartographiés', 'Entretiens avec les personnes qui font le travail', 'Feuille de route priorisée'],
     featured: true,
@@ -295,8 +345,8 @@ const AUDITS = [
   {
     id: 'approfondi',
     title: 'Audit Approfondi',
-    price: '3 000 à 6 000 €',
-    duration: '5 à 10 jours',
+    price: 'Sur devis',
+    duration: 'Selon le projet',
     idealFor: 'Vos outils actuels ne suivent plus votre activité.',
     points: ['Toute l’activité analysée, équipe par équipe', 'Architecture cible et lots de déploiement', 'Cahier des charges prêt à chiffrer'],
   },
@@ -304,35 +354,32 @@ const AUDITS = [
 
 const SOLUTION_OFFERS = [
   {
-    id: 'essentiel',
-    title: 'Solution Essentiel',
-    desc: 'Une automatisation ciblée ou un chatbot simple, autour d’un seul flux.',
-    example: 'Ex. : relances de devis automatiques',
-  },
-  {
-    id: 'sur-mesure',
-    title: 'Solution Sur mesure',
-    desc: 'Une application web ou mobile, un assistant IA branché sur vos documents, et la formation de vos équipes.',
-    example: 'Ex. : outil interne de suivi des interventions',
+    id: 'catalogue',
+    title: 'Modules du catalogue',
+    price: '2 500 €',
+    pricePrefix: 'à partir de',
+    desc: 'Recherche dans vos documents, chatbot, leads, mails, ERP : vous choisissez les modules dont vous avez besoin.',
+    example: 'Les tarifs de chaque module sont détaillés dans le catalogue.',
     featured: true,
   },
   {
-    id: 'integree',
-    title: 'Solution Intégrée',
-    desc: 'Un ERP ou un logiciel de gestion complet : clients, projets, facturation, stocks.',
-    example: 'Ex. : gestion complète d’une entreprise de travaux',
+    id: 'sur-mesure',
+    title: 'Projet sur mesure',
+    desc: 'Application web ou mobile, IA et formation des équipes, besoin spécifique.',
+    example: 'Conçu avec vous, chiffré après l’audit.',
   },
 ];
 
 const SUBSCRIPTION_TIERS = [
-  { size: 'Outil simple', price: '150 €' },
-  { size: 'Outil intermédiaire', price: '300 €' },
-  { size: 'Outil complet', price: '600 € et +' },
+  { size: 'Outil simple', price: '250 €' },
+  { size: 'Outil standard', price: '500 €' },
+  { size: 'ERP ou plusieurs outils', price: '900 € et +' },
 ];
 
 const FORMULA_OPTIONS = [
   ...AUDITS.map((a) => a.title),
-  ...SOLUTION_OFFERS.map((s) => s.title),
+  ...CATALOG.map((item) => item.title),
+  'Projet sur mesure',
   'Évolution technologique',
   'Je ne sais pas encore',
 ];
@@ -344,9 +391,9 @@ const GUIDE_SCOPE = [
 ];
 
 const GUIDE_NEED = [
-  { id: 'auto', label: 'Automatiser une tâche', solution: 'essentiel' },
+  { id: 'auto', label: 'Automatiser une tâche', solution: 'catalogue' },
   { id: 'app', label: 'Un outil pour l’équipe', solution: 'sur-mesure' },
-  { id: 'erp', label: 'Un logiciel de gestion complet', solution: 'integree' },
+  { id: 'erp', label: 'Un logiciel de gestion complet', solution: 'catalogue' },
 ];
 
 const ChoiceGroup = ({ label, options, value, onChange }) => (
@@ -392,10 +439,12 @@ const FormulaGuide = ({ onChoose }) => {
           </div>
           <div className="flex items-baseline justify-between gap-4">
             <span className="font-bold text-slate-950">2. {solution.title}</span>
-            <span className="text-sm font-semibold text-slate-700 whitespace-nowrap">sur devis</span>
+            <span className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+              {solution.price ? `${solution.pricePrefix ? `${solution.pricePrefix} ` : ''}${solution.price} HT` : 'sur devis'}
+            </span>
           </div>
         </div>
-        <p className="text-xs text-[#0E7490] font-semibold mt-4">L’audit est offert si vous poursuivez : son montant est déduit de la solution.</p>
+        <p className="text-xs text-[#0E7490] font-semibold mt-4">Le coût de l’audit est déduit de la solution si vous poursuivez avec Zonia.</p>
         <a
           href="#contact"
           onClick={() => onChoose(audit.title)}
@@ -438,6 +487,29 @@ const ZoniaLogo = ({ size = 40, strokeColor = 'white' }) => (
   </svg>
 );
 
+const CatalogCard = ({ icon, title, desc, price, pricePrefix, tone, onChoose }) => {
+  const gold = tone === 'gold';
+  const quoted = price === 'Sur devis';
+  return (
+    <article className="h-full flex flex-col bg-white p-6 rounded-2xl border border-slate-200 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] hover:border-[#19E4FA] hover:-translate-y-1 transition-all duration-300">
+      <div className="flex items-start justify-between gap-3 mb-5">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center border flex-shrink-0 ${gold ? 'bg-[#FFD700]/20 border-[#EAB308]/40' : 'bg-[#19E4FA]/15 border-[#19E4FA]/30'}`}>
+          {React.cloneElement(icon, { className: `w-6 h-6 ${gold ? 'text-[#A16207]' : 'text-[#0E7490]'}` })}
+        </div>
+        <p className="text-right leading-tight">
+          {pricePrefix && <span className="block text-xs font-medium text-slate-500">{pricePrefix}</span>}
+          <span className={`font-extrabold tracking-tight text-slate-950 ${quoted ? 'text-base' : 'text-lg'}`}>{price}</span>
+        </p>
+      </div>
+      <h3 className="text-lg font-bold text-slate-950 mb-2">{title}</h3>
+      <p className="text-slate-600 text-sm leading-relaxed flex-1">{desc}</p>
+      <a href="#contact" onClick={() => onChoose(title)} className="mt-5 text-sm font-bold text-[#0E7490] hover:text-slate-950 inline-flex items-center gap-1">
+        Choisir ce module <ArrowRight className="w-4 h-4" />
+      </a>
+    </article>
+  );
+};
+
 const ServiceCard = ({ icon, title, desc, tone }) => {
   const gold = tone === 'gold';
   return (
@@ -473,6 +545,7 @@ const Navbar = () => {
             <div className="hidden md:flex items-center gap-8">
               <a href="#methode" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Vos gains</a>
               <a href="#solutions" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Solutions</a>
+              <a href="#catalogue" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Catalogue</a>
               <a href="#pourquoi" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Pourquoi nous</a>
               <a href="#formules" className="text-sm font-medium text-slate-700 hover:text-slate-950 transition-colors">Formules</a>
               <a href="#contact" className="bg-slate-950 text-white border border-slate-950 hover:bg-[#0891B2] hover:border-[#0891B2] px-5 py-2.5 rounded-full text-sm font-bold transition-colors">Demander un audit</a>
@@ -492,6 +565,7 @@ const Navbar = () => {
           <div className="md:hidden border-t border-slate-200 px-4 py-4 space-y-2">
             <a href="#methode" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Vos gains</a>
             <a href="#solutions" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Solutions</a>
+            <a href="#catalogue" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Catalogue</a>
             <a href="#pourquoi" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Pourquoi nous</a>
             <a href="#formules" onClick={close} className="block text-center text-slate-950 border border-slate-950 hover:bg-slate-950 hover:text-white px-4 py-3 rounded-full text-sm font-medium">Formules</a>
             <a href="#contact" onClick={close} className="block text-center bg-slate-950 text-white border border-slate-950 px-4 py-3 rounded-full text-sm font-bold">Demander un audit</a>
@@ -699,12 +773,37 @@ const Vitrine = () => {
           </div>
         </div>
       </section>
-      <section id="formules" className="scroll-mt-24 py-24 relative z-10">
+      <section id="catalogue" className="scroll-mt-24 py-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl mb-12">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Catalogue</p>
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-4">Le catalogue Zonia</h2>
+            <p className="text-slate-600 text-lg">Des modules prêts à l’emploi, réunis dans une seule interface. Vous choisissez uniquement ceux dont vous avez besoin.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {CATALOG.map((item) => (
+              <CatalogCard key={item.title} {...item} onChoose={chooseFormula} />
+            ))}
+          </div>
+          <div className="mt-8 rounded-2xl border border-[#FFD700]/50 bg-[#FFFBEB] p-6 md:p-8 flex gap-4 items-start">
+            <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-white border border-[#EAB308]/40 flex-shrink-0">
+              <ZoniaLogo size={26} strokeColor="#A16207" />
+            </span>
+            <p className="text-slate-800 leading-relaxed">
+              <span className="font-bold text-slate-950">Une seule interface pour tout.</span> Les modules partagent les mêmes données : vous commencez par celui qui vous fait gagner le plus de temps, puis vous ajoutez les autres quand vous le souhaitez.
+            </p>
+          </div>
+          <p className="mt-6 text-xs text-slate-500 leading-relaxed max-w-3xl">
+            Tarifs indicatifs, hors taxes, modifiables selon les besoins de votre projet. Le coût de l’audit est déduit si vous poursuivez avec Zonia.
+          </p>
+        </div>
+      </section>
+      <section id="formules" className="scroll-mt-24 py-24 relative z-10 bg-white/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mb-10">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Formules</p>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Choisissez votre point de départ</h2>
-            <p className="text-slate-600 text-lg">Des prix clairs pour commencer. Le devis final suit le périmètre défini pendant l’audit.</p>
+            <p className="text-slate-600 text-lg">Tarifs indicatifs, hors taxes. Ils sont modifiables selon les besoins de votre projet : chaque projet fait l’objet d’un devis.</p>
           </div>
 
           <FormulaGuide onChoose={chooseFormula} />
@@ -714,11 +813,11 @@ const Vitrine = () => {
               <p className="text-xs font-bold tracking-[0.18em] text-slate-400 mb-1">ÉTAPE 1</p>
               <h3 className="text-2xl font-bold text-slate-950">Commencer par un audit</h3>
             </div>
-            <span className="self-start md:self-auto text-sm font-semibold text-[#0E7490] bg-[#ECFEFF] border border-[#19E4FA]/40 rounded-full px-4 py-2">Offert si vous poursuivez avec Zonia</span>
+            <span className="self-start md:self-auto text-sm font-semibold text-[#0E7490] bg-[#ECFEFF] border border-[#19E4FA]/40 rounded-full px-4 py-2">Déduit si vous poursuivez avec Zonia</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {AUDITS.map((audit) => (
-              <PriceCard key={audit.id} title={audit.title} price={audit.price} priceSuffix="HT" meta={audit.duration} featured={audit.featured} onChoose={chooseFormula}>
+              <PriceCard key={audit.id} title={audit.title} price={audit.price} priceSuffix={audit.price === 'Sur devis' ? undefined : 'HT'} meta={audit.duration} featured={audit.featured} onChoose={chooseFormula}>
                 <p className="text-sm text-slate-600 mb-4"><span className="font-semibold text-slate-900">Idéal si :</span> {audit.idealFor}</p>
                 <ul className="space-y-2">
                   {audit.points.map((point) => (
@@ -736,7 +835,7 @@ const Vitrine = () => {
             <div>
               <p className="text-xs font-bold tracking-[0.18em] text-slate-400 mb-1">ÉTAPE 2</p>
               <h3 className="text-2xl font-bold text-slate-950">Construire votre solution</h3>
-              <p className="text-slate-600 mt-2 max-w-2xl">Sur devis : le prix dépend de votre besoin et de la solution retenue. L’audit le chiffre précisément, et son montant est déduit.</p>
+              <p className="text-slate-600 mt-2 max-w-2xl">Les modules du catalogue partent de 2 500 € HT. Un besoin hors catalogue est chiffré sur devis. L’audit précise le périmètre, et son coût est déduit si vous poursuivez.</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 md:justify-end md:max-w-md">
               <span className="w-full md:text-right text-xs font-semibold text-slate-500">Ce qui fait varier le prix :</span>
@@ -745,9 +844,9 @@ const Vitrine = () => {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {SOLUTION_OFFERS.map((offer) => (
-              <PriceCard key={offer.id} title={offer.title} meta="Sur devis" featured={offer.featured} onChoose={chooseFormula}>
+              <PriceCard key={offer.id} title={offer.title} price={offer.price} pricePrefix={offer.pricePrefix} priceSuffix={offer.price ? 'HT' : undefined} meta={offer.price ? undefined : 'Sur devis'} featured={offer.featured} onChoose={chooseFormula}>
                 <p className="text-sm text-slate-600 leading-relaxed">{offer.desc}</p>
                 <p className="text-xs text-slate-500 mt-3 italic">{offer.example}</p>
               </PriceCard>
@@ -756,9 +855,9 @@ const Vitrine = () => {
 
           <div className="mt-16 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
             <div className="lg:col-span-2">
-              <p className="text-xs font-bold tracking-[0.18em] text-slate-400 mb-1">ÉTAPE 3</p>
-              <h3 className="text-2xl font-bold text-slate-950 mb-2">Faire évoluer l’outil</h3>
-              <p className="text-slate-600 text-sm leading-relaxed">Les corrections sont incluses. L’abonnement couvre les évolutions : un nouveau flux, un écran, une connexion.</p>
+              <p className="text-xs font-bold tracking-[0.18em] text-slate-400 mb-1">ÉTAPE 3 · EN OPTION</p>
+              <h3 className="text-2xl font-bold text-slate-950 mb-2">Les mises à jour technologiques</h3>
+              <p className="text-slate-600 text-sm leading-relaxed">Inclus dans chaque solution : un outil 100 % fonctionnel, la correction des bugs et l’amélioration de vos processus. L’abonnement couvre les mises à jour quand l’outil doit évoluer.</p>
             </div>
             <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
               {SUBSCRIPTION_TIERS.map((tier) => (
@@ -772,7 +871,7 @@ const Vitrine = () => {
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              ['Audit offert', 'Son montant est déduit de votre solution si vous poursuivez avec Zonia.'],
+              ['Audit déduit', 'Son coût est déduit de votre solution si vous poursuivez avec Zonia.'],
               ['Données en Europe', 'Hébergement européen, traitement conforme au RGPD.'],
               ['Vous êtes propriétaire', 'L’outil livré et ses données vous appartiennent.'],
             ].map(([title, text]) => (
@@ -1150,25 +1249,25 @@ const Vitrine = () => {
               <div className="bg-slate-800/50 rounded-lg p-4">
                 <h4 className="font-bold text-white mb-2">Quelles formules proposez-vous ?</h4>
                 <p className="text-sm text-slate-300">
-                  Trois audits (Flash à 600 € HT, Standard de 1 200 à 1 800 € HT, Approfondi de 3 000 à 6 000 € HT),
-                  puis trois solutions sur devis : Essentiel, Sur mesure et Intégrée. Leur prix dépend de votre besoin.
-                  L’audit est offert si vous poursuivez : son montant est déduit de la solution.
+                  Trois audits (Flash à 600 € HT, Standard de 1 800 à 2 400 € HT, Approfondi sur devis),
+                  puis les modules du catalogue à partir de 2 500 € HT, ou un projet sur mesure.
+                  Le coût de l’audit est déduit de la solution si vous poursuivez avec Zonia.
                 </p>
               </div>
 
               <div className="bg-slate-800/50 rounded-lg p-4">
                 <h4 className="font-bold text-white mb-2">Combien de temps prend un projet ?</h4>
                 <p className="text-sm text-slate-300">
-                  Le calendrier se fixe après l’audit. Une solution Essentiel est plus courte qu’une solution Intégrée,
-                  qui se livre par lots. Nous ne partons pas sur un ERP généraliste de longue durée.
+                  Le calendrier se fixe après l’audit. Un module du catalogue est plus court qu’un projet sur mesure
+                  ou un ERP, qui se livre par lots.
                 </p>
               </div>
 
               <div className="bg-slate-800/50 rounded-lg p-4">
                 <h4 className="font-bold text-white mb-2">Que se passe-t-il après la livraison ?</h4>
                 <p className="text-sm text-slate-300">
-                  Les corrections sont incluses. Les évolutions sont couvertes par l’abonnement Évolution technologique,
-                  de 150 € à 600 € HT et plus par mois selon la taille de l’outil.
+                  Chaque solution inclut un outil fonctionnel, la correction des bugs et l’amélioration de vos processus.
+                  Les mises à jour technologiques sont en option, de 250 € à 900 € HT et plus par mois selon l’outil.
                 </p>
               </div>
 
