@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 // --- STYLES CSS INTÉGRÉS ---
-// Correction : Ajout de overflow-x-hidden sur le body et scroll-behavior
+// overflow-x: clip (pas hidden) : hidden forcerait overflow-y à auto et une 2e barre de scroll
 const cssStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap');
 
@@ -20,7 +20,7 @@ const cssStyles = `
     font-family: 'Outfit', sans-serif; 
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Empêche le scroll horizontal causé par les blobs */
+    overflow-x: clip;
   }
 
   /* Background Grid */
@@ -653,14 +653,15 @@ const Vitrine = () => {
   };
 
   return (
-    // Ajout de overflow-x-hidden ici pour protéger le scroll vertical
-    <div id="top" className="relative bg-[#F4F7FB] text-slate-800 min-h-screen selection:bg-[#FFD700] selection:text-slate-900 overflow-x-hidden">
+    <div id="top" className="relative bg-[#F4F7FB] text-slate-800 min-h-screen selection:bg-[#FFD700] selection:text-slate-900 overflow-x-clip">
       {/* Intégration des styles via une balise style */}
       <style>{cssStyles}</style>
 
       <div className="fixed inset-0 bg-grid pointer-events-none z-0" />
-      <div className="glow-blob top-[-200px] left-[-200px]" />
-      <div className="glow-blob bottom-[-200px] right-[-200px]" style={{ background: 'radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(15, 23, 42, 0) 70%)' }} />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true">
+        <div className="glow-blob top-[-200px] left-[-200px]" />
+        <div className="glow-blob bottom-[-200px] right-[-200px]" style={{ background: 'radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, rgba(15, 23, 42, 0) 70%)' }} />
+      </div>
       <Navbar />
       <section className="relative pt-28 pb-16 lg:pt-36 lg:pb-20 px-4 z-10">
         <div className="max-w-4xl mx-auto text-center">
