@@ -286,7 +286,7 @@ const CATALOG = [
   {
     icon: <MessageSquare />,
     title: 'Chatbot',
-    price: '5 000 €',
+    price: '3 000 €',
     pricePrefix: 'à partir de',
     desc: 'Répond à vos clients ou à vos équipes à toute heure, avec les informations de votre entreprise.',
     tone: 'gold',
@@ -776,10 +776,12 @@ const Vitrine = () => {
       </section>
       <section id="catalogue" className="scroll-mt-24 py-24 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-12">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Catalogue</p>
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-4">Le catalogue Zonia</h2>
-            <p className="text-slate-600 text-lg">Des modules prêts à l’emploi, réunis dans une seule interface. Vous choisissez uniquement ceux dont vous avez besoin.</p>
+          <div className="mb-12">
+            <div className="max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Catalogue</p>
+              <h2 className="text-3xl md:text-5xl font-bold text-slate-950 mb-4">Le catalogue Zonia</h2>
+            </div>
+            <p className="text-slate-600 text-lg whitespace-nowrap">Des modules prêts à l’emploi, réunis dans une seule interface. Vous choisissez uniquement ceux dont vous avez besoin.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {CATALOG.map((item) => (
@@ -801,10 +803,12 @@ const Vitrine = () => {
       </section>
       <section id="formules" className="scroll-mt-24 py-24 relative z-10 bg-white/70">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-10">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Formules</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Choisissez votre point de départ</h2>
-            <p className="text-slate-600 text-lg">Tarifs indicatifs, hors taxes. Ils sont modifiables selon les besoins de votre projet : chaque projet fait l’objet d’un devis.</p>
+          <div className="mb-10">
+            <div className="max-w-3xl">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#0E7490] mb-3">Formules</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-950 mb-4">Choisissez votre point de départ</h2>
+            </div>
+            <p className="text-slate-600 text-lg whitespace-nowrap">Tarifs indicatifs, hors taxes. Ils sont modifiables selon les besoins de votre projet : chaque projet fait l’objet d’un devis.</p>
           </div>
 
           <FormulaGuide onChoose={chooseFormula} />
